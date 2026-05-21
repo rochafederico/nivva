@@ -6,6 +6,7 @@ export class DebtListTotals extends HTMLElement {
     connectedCallback() {
         this._pendiente = this._pendiente || {};
         this._pagado = this._pagado || {};
+        this._fmtCache = new Map();
         this._render();
     }
 
@@ -21,13 +22,17 @@ export class DebtListTotals extends HTMLElement {
     }
 
     _fmtMoneda(moneda, n) {
-        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n || 0);
+        if (!this._fmtCache) this._fmtCache = new Map();
+        if (!this._fmtCache.has(moneda)) {
+            this._fmtCache.set(moneda, new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }));
+        }
+        return this._fmtCache.get(moneda).format(n || 0);
     }
 
     _render() {
         const pendiente = this._pendiente || {};
         const pagado = this._pagado || {};
-        const currencies = new Set([...Object.keys(pendiente), ...Object.keys(pagado)]);
+        const currencies = new Set(Object.keys(pendiente).concat(Object.keys(pagado)));
 
         // Limpiar contenido anterior
         this.innerHTML = '';
