@@ -285,7 +285,18 @@ export class DebtList extends HTMLElement {
 
         const pendiente = this.totalesPendientes || {};
         const pagado = this.totalesPagados || {};
-        totalsEl.update(pendiente, pagado);
+
+        // Calcular cuotas vencidas (no pagadas con vencimiento anterior a hoy)
+        const d = new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        let vencidasCount = 0;
+        (this.debts || []).forEach(deuda => {
+            (deuda.montos || []).forEach(monto => {
+                if (!monto.pagado && monto.vencimiento < today) vencidasCount++;
+            });
+        });
+
+        totalsEl.update(pendiente, pagado, vencidasCount);
     }
 
     render() {
