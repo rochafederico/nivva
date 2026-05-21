@@ -1054,6 +1054,7 @@ async function testDebtEntityShellRenderVacio() {
     console.log('  DebtEntityShell: muestra mensaje cuando no hay deudas');
     await cleanup();
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1063,6 +1064,7 @@ async function testDebtEntityShellRenderVacio() {
     assert(container.textContent.includes('No hay deudas registradas'), 'Debe mostrar mensaje vacío cuando no hay deudas');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1080,6 +1082,7 @@ async function testDebtEntityShellRenderConEntidades() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Test', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1091,6 +1094,7 @@ async function testDebtEntityShellRenderConEntidades() {
     assert(row.textContent.includes('Banco Test'), 'La fila debe contener el acreedor');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1111,6 +1115,7 @@ async function testDebtEntityShellCuotasFormato() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1124,6 +1129,7 @@ async function testDebtEntityShellCuotasFormato() {
     assert(cuotasCell.textContent.trim() === '2/3', `Cuotas debe mostrar "2/3" (2 pagadas, 3 total), obtuvo "${cuotasCell.textContent.trim()}"`);
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1134,6 +1140,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     console.log('  DebtEntityShell: recarga la tabla al recibir deuda:saved');
     await cleanup();
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
@@ -1159,6 +1166,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     assert(row.textContent.includes('Acreedor Nuevo'), 'La tabla debe contener el acreedor nuevo');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1178,28 +1186,28 @@ async function testDebtEntityShellNavTabsRender() {
     const tabLinks = shell.querySelectorAll('.nav-underline .nav-link');
     assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
 
-    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
-    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos"');
+    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/deudas');
+    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos/deudas"');
 
-    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/mensual');
-    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos/mensual"');
+    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
+    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos"');
 
     document.body.removeChild(shell);
     await cleanup();
 }
 
 // ===================================================================
-// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos/mensual
+// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos
 // ===================================================================
 async function testDebtEntityShellCuotasView() {
-    console.log('  DebtEntityShell: la vista cuotas (path /gastos/mensual) muestra debt-list sin columna Tipo');
+    console.log('  DebtEntityShell: la vista cuotas (path /gastos) muestra debt-list sin columna Tipo');
     await cleanup();
 
-    window.history.pushState({}, '', '/gastos/mensual');
+    window.history.pushState({}, '', '/gastos');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
 
-    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos/mensual');
+    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos');
     assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
     assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
 
@@ -1336,6 +1344,7 @@ async function testDebtEntityShellTotalesBarPorMoneda() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Multi', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1349,6 +1358,7 @@ async function testDebtEntityShellTotalesBarPorMoneda() {
     assert(totalsBar.textContent.includes('Pendiente total'), 'Barra debe mostrar etiqueta "Pendiente total"');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1367,6 +1377,7 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Pagado', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1376,6 +1387,7 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
     assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos los montos están pagados');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1397,6 +1409,7 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad B', tipoDeuda: 'Tarjeta', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1407,6 +1420,7 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
     assert(badges.length === 1, 'Debe mostrar 1 badge ARS aggregando ambas entidades');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 

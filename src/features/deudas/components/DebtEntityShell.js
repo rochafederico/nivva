@@ -1,6 +1,6 @@
 // src/features/deudas/components/DebtEntityShell.js
 // Web Component <debt-entity-shell> – vista de deudas con tabs Bootstrap
-// Rutas: /gastos (Deudas) y /gastos/mensual (Cuotas del mes)
+// Rutas: /gastos (Cuotas del mes) y /gastos/deudas (Deudas)
 
 import '../../../shared/components/AppButton.js';
 import '../../../layout/PageSectionLayout.js';
@@ -33,7 +33,7 @@ export class DebtEntityShell extends HTMLElement {
     }
 
     _getViewFromPath() {
-        return window.location.pathname === '/gastos/mensual' ? 'cuotas' : 'deudas';
+        return window.location.pathname === '/gastos/deudas' ? 'deudas' : 'cuotas';
     }
 
     connectedCallback() {
@@ -274,8 +274,8 @@ export class DebtEntityShell extends HTMLElement {
         const nav = document.createElement('ul');
         nav.className = 'nav nav-underline mb-3';
         nav.setAttribute('role', 'tablist');
-        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos/mensual', this.currentView === 'cuotas'));
-        nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
+        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos', this.currentView === 'cuotas'));
+        nav.appendChild(this._createTabItem('Deudas', '/gastos/deudas', this.currentView === 'deudas'));
         return nav;
     }
 
