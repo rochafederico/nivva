@@ -233,7 +233,7 @@ export class DebtRowItem extends HTMLElement {
 
         // Col 3 — Estado: monto arriba, badge debajo (crece, no comprime a sus vecinos)
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-1';
+        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-2';
 
         const amountEl = document.createElement('div');
         amountEl.className = 'fw-semibold text-nowrap';

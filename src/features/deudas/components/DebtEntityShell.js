@@ -274,8 +274,8 @@ export class DebtEntityShell extends HTMLElement {
         const nav = document.createElement('ul');
         nav.className = 'nav nav-underline mb-3';
         nav.setAttribute('role', 'tablist');
-        nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
         nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos/mensual', this.currentView === 'cuotas'));
+        nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
         return nav;
     }
 
