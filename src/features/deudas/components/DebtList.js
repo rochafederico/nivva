@@ -4,6 +4,7 @@ import '../../../shared/components/AppCheckbox.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
 import './DebtRowItem.js';
+import './DebtListTotals.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 export class DebtList extends HTMLElement {
@@ -279,44 +280,16 @@ export class DebtList extends HTMLElement {
     }
 
     _renderTotals() {
-        let totalsEl = this.querySelector('.debt-list-totals');
+        let totalsEl = this.querySelector('debt-list-totals');
         if (!totalsEl) return;
 
         const pendiente = this.totalesPendientes || {};
         const pagado = this.totalesPagados || {};
-        const currencies = new Set([...Object.keys(pendiente), ...Object.keys(pagado)]);
-
-        if (currencies.size === 0) {
-            totalsEl.innerHTML = '';
-            return;
-        }
-
-        const fmt = (moneda, n) => this.fmtMoneda(moneda, n || 0);
-
-        const pendienteItems = [...currencies]
-            .filter(m => Number(pendiente[m]) > 0)
-            .map(m => `<span class="badge text-bg-warning me-1">${fmt(m, pendiente[m])}</span>`)
-            .join('');
-        const pagadoItems = [...currencies]
-            .filter(m => Number(pagado[m]) > 0)
-            .map(m => `<span class="badge text-bg-success me-1">${fmt(m, pagado[m])}</span>`)
-            .join('');
-
-        if (!pendienteItems && !pagadoItems) {
-            totalsEl.innerHTML = '';
-            return;
-        }
-
-        totalsEl.innerHTML = `
-            <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 px-3 py-2 border-top text-end">
-                ${pendienteItems ? `<div class="d-flex align-items-center gap-1"><span class="text-muted small me-1">Pendiente:</span>${pendienteItems}</div>` : ''}
-                ${pagadoItems ? `<div class="d-flex align-items-center gap-1"><span class="text-muted small me-1">Pagado:</span>${pagadoItems}</div>` : ''}
-            </div>
-        `;
+        totalsEl.update(pendiente, pagado);
     }
 
     render() {
-        this.innerHTML = '<div class="debt-list-container"></div><div class="debt-list-totals"></div>';
+        this.innerHTML = '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
     }
 
     groupMontos(montos, groupBy) {

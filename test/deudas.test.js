@@ -1224,7 +1224,7 @@ async function testDebtEntityShellCuotasView() {
 // UC-DL1: DebtList._renderTotals — barra con pendiente y pagado por moneda
 // ===================================================================
 async function testDebtListRenderTotalsPendienteYPagado() {
-    console.log('  DebtList._renderTotals: muestra badges de pendiente y pagado por moneda');
+    console.log('  DebtList._renderTotals: muestra items de pendiente y pagado por moneda');
 
     const list = document.createElement('debt-list');
     document.body.appendChild(list);
@@ -1234,16 +1234,16 @@ async function testDebtListRenderTotalsPendienteYPagado() {
     list.totalesPagados = { ARS: 5000 };
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
-    assert(totalsEl !== null, 'Debe existir .debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl !== null, 'Debe existir debt-list-totals');
 
-    const pendienteBadges = totalsEl.querySelectorAll('.badge.text-bg-warning');
-    assert(pendienteBadges.length === 2, 'Debe mostrar 2 badges de pendiente (ARS y USD)');
+    const pendienteItems = totalsEl.querySelectorAll('.bg-warning-subtle');
+    assert(pendienteItems.length === 2, 'Debe mostrar 2 items de pendiente (ARS y USD)');
 
-    const pagadoBadges = totalsEl.querySelectorAll('.badge.text-bg-success');
-    assert(pagadoBadges.length === 1, 'Debe mostrar 1 badge de pagado (ARS)');
+    const pagadoItems = totalsEl.querySelectorAll('.bg-success-subtle');
+    assert(pagadoItems.length === 1, 'Debe mostrar 1 item de pagado (ARS)');
 
-    const pendienteLabel = totalsEl.querySelector('.text-muted.small');
+    const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
     assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
 
     document.body.removeChild(list);
@@ -1264,7 +1264,7 @@ async function testDebtListRenderTotalsVacioSiTodosCero() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
     assert(totalsEl.innerHTML.trim() !== '', 'Debe tener contenido cuando hay totales no-cero');
 
     // All zero: bar must be cleared
@@ -1292,17 +1292,17 @@ async function testDebtListRenderTotalsActualizaTrasRefresh() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 1, 'Inicial: 1 badge pendiente');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 0, 'Inicial: sin badges pagado');
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Inicial: 1 item pendiente');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 0, 'Inicial: sin items pagado');
 
     // Update: two currencies pending, one pagado
     list.totalesPendientes = { USD: 200, ARS: 8000 };
     list.totalesPagados = { ARS: 3000 };
     list._renderTotals();
 
-    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 2, 'Tras update: 2 badges pendiente');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 1, 'Tras update: 1 badge pagado');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 2, 'Tras update: 2 items pendiente');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 1, 'Tras update: 1 item pagado');
 
     document.body.removeChild(list);
 }
@@ -1321,7 +1321,7 @@ async function testDebtListRenderTotalsNoCurrencies() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
     assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando no hay monedas');
 
     document.body.removeChild(list);
