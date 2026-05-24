@@ -50,7 +50,10 @@ export class DebtListTotals extends HTMLElement {
                 return a.localeCompare(b);
             });
 
-        if (entries.length === 0) { amountEl.textContent = '—'; return; }
+        if (entries.length === 0) {
+            amountEl.textContent = '—';
+            return;
+        }
 
         const [primaryCur, primaryVal] = entries[0];
         const primary = document.createElement('span');
