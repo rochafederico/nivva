@@ -36,12 +36,34 @@ export class DebtListTotals extends HTMLElement {
         return this._fmtCache.get(moneda).format(n || 0);
     }
 
-    /** Formatea un mapa moneda→monto como "$ 1.234 / USD 50,00" */
-    _fmtAmounts(amountsMap) {
-        return Object.entries(amountsMap)
+    /**
+     * Rellena `amountEl` con nodos: importe principal como `<span>` y monedas
+     * secundarias como `<small>` (más pequeñas, semi-transparentes).
+     * ARS se muestra primero (principal); resto como secundarias.
+     */
+    _buildAmountNodes(amountsMap, colorKey, amountEl) {
+        const entries = Object.entries(amountsMap)
             .filter(([, v]) => Number(v) > 0)
-            .map(([m, v]) => this._fmtMoneda(m, Number(v)))
-            .join(' / ');
+            .sort(([a], [b]) => {
+                if (a === 'ARS') return -1;
+                if (b === 'ARS') return 1;
+                return a.localeCompare(b);
+            });
+
+        if (entries.length === 0) { amountEl.textContent = '—'; return; }
+
+        const [primaryCur, primaryVal] = entries[0];
+        const primary = document.createElement('span');
+        primary.textContent = this._fmtMoneda(primaryCur, Number(primaryVal));
+        amountEl.appendChild(primary);
+
+        for (let i = 1; i < entries.length; i++) {
+            const [cur, val] = entries[i];
+            const secondary = document.createElement('small');
+            secondary.className = `text-${colorKey}-emphasis opacity-75 fw-semibold ms-1`;
+            secondary.textContent = this._fmtMoneda(cur, Number(val));
+            amountEl.appendChild(secondary);
+        }
     }
 
     _render() {
@@ -102,7 +124,7 @@ export class DebtListTotals extends HTMLElement {
 
         const amountEl = document.createElement('div');
         amountEl.className = `fw-bold fs-4 lh-1 text-${colorKey}-emphasis`;
-        amountEl.textContent = this._fmtAmounts(amountsMap);
+        this._buildAmountNodes(amountsMap, colorKey, amountEl);
         textBlock.appendChild(amountEl);
 
         if (vencidas > 0) {
@@ -124,7 +146,7 @@ export class DebtListTotals extends HTMLElement {
             const icon = document.createElement('i');
             icon.className = 'bi bi-check2 me-1';
             const txt = document.createTextNode(
-                `${pagadosCount} pagado${pagadosCount !== 1 ? 's' : ''}`
+                `${pagadosCount} pago${pagadosCount !== 1 ? 's' : ''} realizado${pagadosCount !== 1 ? 's' : ''}`
             );
             pagadosEl.appendChild(icon);
             pagadosEl.appendChild(txt);

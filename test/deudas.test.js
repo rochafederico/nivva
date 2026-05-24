@@ -1246,7 +1246,9 @@ async function testDebtListRenderTotalsPendienteYPagado() {
 
     // Amount text must contain both currencies joined with /
     const amountEl = totalsEl.querySelector('.bg-warning-subtle .fw-bold');
-    assert(amountEl !== null && amountEl.textContent.includes('/'), 'Monto pendiente debe incluir "/" para separar monedas');
+    assert(amountEl !== null, 'Debe existir el elemento de monto pendiente');
+    const secondaryEl = amountEl.querySelector('small');
+    assert(secondaryEl !== null, 'Monto pendiente con multi-moneda debe tener elemento small para moneda secundaria');
 
     const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
     assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
