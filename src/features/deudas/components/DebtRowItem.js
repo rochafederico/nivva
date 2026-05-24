@@ -170,15 +170,22 @@ export class DebtRowItem {
         }
 
         const venc = String(row.vencimiento ?? '').trim();
+
+        // Helper para construir el elemento de fecha con clases de visibilidad responsive
+        const makeDateEl = (extraClass) => {
+            const el = document.createElement('div');
+            el.className = `${extraClass} align-items-center text-muted small mt-1`;
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-calendar3 me-1';
+            icon.setAttribute('aria-hidden', 'true');
+            el.appendChild(icon);
+            el.appendChild(document.createTextNode(formatDate(venc)));
+            return el;
+        };
+
         if (venc) {
-            const vencEl = document.createElement('div');
-            vencEl.className = 'text-muted small mt-1 d-md-none';
-            const calIcon = document.createElement('i');
-            calIcon.className = 'bi bi-calendar3 me-1';
-            calIcon.setAttribute('aria-hidden', 'true');
-            vencEl.appendChild(calIcon);
-            vencEl.appendChild(document.createTextNode(formatDate(venc)));
-            nameBlock.appendChild(vencEl);
+            // Solo mobile: fecha debajo del nombre del acreedor
+            nameBlock.appendChild(makeDateEl('d-flex d-md-none'));
         }
 
         infoFlex.appendChild(nameBlock);
@@ -207,16 +214,9 @@ export class DebtRowItem {
         amountRow.appendChild(badgeSpan);
         estadoCol.appendChild(amountRow);
 
-        // Línea 2: fecha alineada a la derecha (solo desktop)
+        // Línea 2: fecha a la derecha del monto (solo desktop)
         if (venc) {
-            const desktopDateEl = document.createElement('div');
-            desktopDateEl.className = 'd-none d-md-flex align-items-center text-muted small mt-1';
-            const calIconDesktop = document.createElement('i');
-            calIconDesktop.className = 'bi bi-calendar3 me-1';
-            calIconDesktop.setAttribute('aria-hidden', 'true');
-            desktopDateEl.appendChild(calIconDesktop);
-            desktopDateEl.appendChild(document.createTextNode(formatDate(venc)));
-            estadoCol.appendChild(desktopDateEl);
+            estadoCol.appendChild(makeDateEl('d-none d-md-flex'));
         }
 
         actWrap.appendChild(estadoCol);
