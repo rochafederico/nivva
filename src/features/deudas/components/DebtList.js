@@ -259,6 +259,16 @@ export class DebtList extends HTMLElement {
         this.innerHTML = '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
     }
 
+    /**
+     * Registers an external debt-list-totals element (outside the card) that
+     * _renderTotals() will update instead of the one embedded inside this component.
+     * Called by DebtEntityShell after it moves the element outside the card.
+     * @param {HTMLElement} el - The debt-list-totals element to use
+     */
+    setExternalTotals(el) {
+        this._externalTotals = el;
+    }
+
     groupMontos(montos, groupBy) {
         // Devuelve un array agrupado según el criterio, siempre separando por moneda salvo si el filtro es 'moneda'
         const grouped = {};

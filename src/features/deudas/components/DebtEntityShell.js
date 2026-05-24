@@ -278,7 +278,7 @@ export class DebtEntityShell extends HTMLElement {
                 const totalsEl = debtListEl.querySelector('debt-list-totals');
                 if (totalsEl) {
                     this.appendChild(totalsEl);
-                    debtListEl._externalTotals = totalsEl;
+                    debtListEl.setExternalTotals(totalsEl);
                 }
             }
         }
