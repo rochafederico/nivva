@@ -4,6 +4,8 @@ import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
+import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
+import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtListTotals.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -1053,6 +1055,7 @@ async function testDebtEntityShellRenderVacio() {
     console.log('  DebtEntityShell: muestra mensaje cuando no hay deudas');
     await cleanup();
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1062,6 +1065,7 @@ async function testDebtEntityShellRenderVacio() {
     assert(container.textContent.includes('No hay deudas registradas'), 'Debe mostrar mensaje vacío cuando no hay deudas');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1079,6 +1083,7 @@ async function testDebtEntityShellRenderConEntidades() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Test', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1090,6 +1095,7 @@ async function testDebtEntityShellRenderConEntidades() {
     assert(row.textContent.includes('Banco Test'), 'La fila debe contener el acreedor');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1110,6 +1116,7 @@ async function testDebtEntityShellCuotasFormato() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1123,6 +1130,7 @@ async function testDebtEntityShellCuotasFormato() {
     assert(cuotasCell.textContent.trim() === '2/3', `Cuotas debe mostrar "2/3" (2 pagadas, 3 total), obtuvo "${cuotasCell.textContent.trim()}"`);
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1133,6 +1141,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     console.log('  DebtEntityShell: recarga la tabla al recibir deuda:saved');
     await cleanup();
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
@@ -1158,6 +1167,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     assert(row.textContent.includes('Acreedor Nuevo'), 'La tabla debe contener el acreedor nuevo');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1177,28 +1187,28 @@ async function testDebtEntityShellNavTabsRender() {
     const tabLinks = shell.querySelectorAll('.nav-underline .nav-link');
     assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
 
-    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
-    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos"');
+    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/deudas');
+    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos/deudas"');
 
-    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/mensual');
-    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos/mensual"');
+    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
+    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos"');
 
     document.body.removeChild(shell);
     await cleanup();
 }
 
 // ===================================================================
-// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos/mensual
+// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos
 // ===================================================================
 async function testDebtEntityShellCuotasView() {
-    console.log('  DebtEntityShell: la vista cuotas (path /gastos/mensual) muestra debt-list sin columna Tipo');
+    console.log('  DebtEntityShell: la vista cuotas (path /gastos) muestra debt-list sin columna Tipo');
     await cleanup();
 
-    window.history.pushState({}, '', '/gastos/mensual');
+    window.history.pushState({}, '', '/gastos');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
 
-    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos/mensual');
+    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos');
     assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
     assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
 
@@ -1215,7 +1225,7 @@ async function testDebtEntityShellCuotasView() {
 // UC-DL1: DebtList._renderTotals — barra con pendiente y pagado por moneda
 // ===================================================================
 async function testDebtListRenderTotalsPendienteYPagado() {
-    console.log('  DebtList._renderTotals: muestra badges de pendiente y pagado por moneda');
+    console.log('  DebtList._renderTotals: muestra 1 card pendiente y 1 card pagado agrupando monedas');
 
     const list = document.createElement('debt-list');
     document.body.appendChild(list);
@@ -1225,16 +1235,23 @@ async function testDebtListRenderTotalsPendienteYPagado() {
     list.totalesPagados = { ARS: 5000 };
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
-    assert(totalsEl !== null, 'Debe existir .debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl !== null, 'Debe existir debt-list-totals');
 
-    const pendienteBadges = totalsEl.querySelectorAll('.badge.text-bg-warning');
-    assert(pendienteBadges.length === 2, 'Debe mostrar 2 badges de pendiente (ARS y USD)');
+    // New: one card per state (not per currency)
+    const pendienteItems = totalsEl.querySelectorAll('.bg-warning-subtle');
+    assert(pendienteItems.length === 1, 'Debe mostrar 1 card de pendiente (todas las monedas agrupadas)');
 
-    const pagadoBadges = totalsEl.querySelectorAll('.badge.text-bg-success');
-    assert(pagadoBadges.length === 1, 'Debe mostrar 1 badge de pagado (ARS)');
+    const pagadoItems = totalsEl.querySelectorAll('.bg-success-subtle');
+    assert(pagadoItems.length === 1, 'Debe mostrar 1 card de pagado');
 
-    const pendienteLabel = totalsEl.querySelector('.text-muted.small');
+    // Amount text must contain both currencies joined with /
+    const amountEl = totalsEl.querySelector('.bg-warning-subtle .fw-bold');
+    assert(amountEl !== null, 'Debe existir el elemento de monto pendiente');
+    const secondaryEl = amountEl.querySelector('small');
+    assert(secondaryEl !== null, 'Monto pendiente con multi-moneda debe tener elemento small para moneda secundaria');
+
+    const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
     assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
 
     document.body.removeChild(list);
@@ -1255,7 +1272,7 @@ async function testDebtListRenderTotalsVacioSiTodosCero() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
     assert(totalsEl.innerHTML.trim() !== '', 'Debe tener contenido cuando hay totales no-cero');
 
     // All zero: bar must be cleared
@@ -1283,17 +1300,17 @@ async function testDebtListRenderTotalsActualizaTrasRefresh() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 1, 'Inicial: 1 badge pendiente');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 0, 'Inicial: sin badges pagado');
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Inicial: 1 card pendiente');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 0, 'Inicial: sin cards pagado');
 
-    // Update: two currencies pending, one pagado
+    // Update: two currencies pending, one pagado — still 1 card per state
     list.totalesPendientes = { USD: 200, ARS: 8000 };
     list.totalesPagados = { ARS: 3000 };
     list._renderTotals();
 
-    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 2, 'Tras update: 2 badges pendiente');
-    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 1, 'Tras update: 1 badge pagado');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Tras update: 1 card pendiente (multi-moneda agrupada)');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 1, 'Tras update: 1 card pagado');
 
     document.body.removeChild(list);
 }
@@ -1312,8 +1329,79 @@ async function testDebtListRenderTotalsNoCurrencies() {
     list.totalesPagados = {};
     list._renderTotals();
 
-    const totalsEl = list.querySelector('.debt-list-totals');
+    const totalsEl = list.querySelector('debt-list-totals');
     assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando no hay monedas');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL5: DebtList._renderTotals — ignora vencimientos vacíos o inválidos
+// ===================================================================
+async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
+    console.log('  DebtList._renderTotals: ignora vencimientos vacíos o inválidos');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const yesterday = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    list.totalesPendientes = { ARS: 1500 };
+    list.totalesPagados = {};
+    list.debts = [{
+        montos: [
+            { pagado: false, vencimiento: yesterday },
+            { pagado: false, vencimiento: '' },
+            { pagado: false, vencimiento: 'sin-fecha' },
+            { pagado: true, vencimiento: yesterday }
+        ]
+    }];
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl.textContent.includes('1 cuota vencida'), 'Debe contar solo el vencimiento válido no pagado');
+    assert(!totalsEl.textContent.includes('2 cuotas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
+
+    const summary = summarizeDebtListTotals(list.debts, '2999-01-01');
+    assert(summary.vencidas === 1, 'DebtListTotals debe calcular vencidas ignorando fechas inválidas');
+    assert(summary.pagadosCount === 1, 'DebtListTotals debe calcular cantidad de pagos realizados');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL6: DebtList agrupada — mantiene DebtRowItem y no vuelve a AppTable
+// ===================================================================
+async function testDebtListGroupedUsesDebtRowItemLayout() {
+    console.log('  DebtList agrupada: usa DebtRowItem y no reintroduce AppTable');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    list.groupBy = 'acreedor';
+    list._showDetailAction = true;
+    list._excludeColumns = ['tipoDeuda'];
+    list.debts = [{
+        acreedor: 'Banco Galicia',
+        tipoDeuda: 'Prestamo',
+        montos: [
+            { id: 1, deudaId: 10, monto: 1000, moneda: 'ARS', vencimiento: '2026-12-01', pagado: false },
+            { id: 2, deudaId: 10, monto: 500, moneda: 'ARS', vencimiento: '2026-12-10', pagado: false },
+        ]
+    }];
+
+    list.renderTable();
+
+    assert(list.querySelector('app-table') === null, 'La vista agrupada no debe renderizar AppTable');
+    assert(list.querySelectorAll('tbody tr').length === 1, 'La vista agrupada debe renderizar filas compactas');
+    assert(list.querySelector('.debt-card-avatar') !== null, 'La vista agrupada debe usar la estructura de DebtRowItem');
+    assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
+    assert(list.querySelector('i.bi-chevron-right') !== null, 'La fila agrupada debe mostrar acción de detalle individual cuando show-detail-action está habilitado');
+    assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
 
     document.body.removeChild(list);
 }
@@ -1335,6 +1423,7 @@ async function testDebtEntityShellTotalesBarPorMoneda() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Multi', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1348,6 +1437,7 @@ async function testDebtEntityShellTotalesBarPorMoneda() {
     assert(totalsBar.textContent.includes('Pendiente total'), 'Barra debe mostrar etiqueta "Pendiente total"');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1366,6 +1456,7 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Pagado', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1375,6 +1466,7 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
     assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos los montos están pagados');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1396,6 +1488,7 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad B', tipoDeuda: 'Tarjeta', notas: '' } });
     document.body.removeChild(form);
 
+    window.history.pushState({}, '', '/gastos/deudas');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
     await shell.loadEntities();
@@ -1406,7 +1499,125 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
     assert(badges.length === 1, 'Debe mostrar 1 badge ARS aggregando ambas entidades');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
+}
+
+// ===================================================================
+// UC-ML1: DebtRowItem (clase JS) — renderiza <tr> + <td> responsivos Bootstrap
+// ===================================================================
+async function testDebtRowItem() {
+    console.log('  UC-ML1: DebtRowItem renderiza tr+td con helpers Bootstrap');
+
+    // Helpers de módulo (getInitials, getAvatarClasses, getTipoIcon, getEstado)
+    assert(getInitials('Juan Perez') === 'JP', 'getInitials: 2 palabras → primeras letras');
+    assert(getInitials('Banco') === 'BA', 'getInitials: 1 palabra → 2 chars');
+    assert(getInitials('') === '', 'getInitials: cadena vacía → vacío');
+
+    const avClasses = getAvatarClasses('Banco');
+    assert(typeof avClasses === 'string', 'getAvatarClasses debe retornar string');
+    assert(avClasses.includes('bg-'), 'getAvatarClasses debe incluir clase de fondo Bootstrap');
+    assert(getAvatarClasses('Banco') === avClasses, 'getAvatarClasses debe ser determinístico');
+
+    assert(getTipoIcon('Alquiler') === 'bi-house', 'Alquiler → bi-house');
+    assert(getTipoIcon('Prestamo') === 'bi-bank2', 'Prestamo → bi-bank2');
+    assert(getTipoIcon('Préstamo') === 'bi-bank2', 'Préstamo (con acento) → bi-bank2');
+    assert(getTipoIcon('Tarjeta de crédito') === 'bi-credit-card', 'Tarjeta → bi-credit-card');
+    assert(getTipoIcon('Servicio') === 'bi-tools', 'Servicio → bi-tools');
+    assert(getTipoIcon('Otro') === 'bi-tag', 'Tipo desconocido → bi-tag');
+
+    const estadoPagado = getEstado({ pagado: true, vencimiento: '2026-01-01' });
+    assert(estadoPagado !== null && estadoPagado.label === 'Pagado', 'getEstado pagado → Pagado');
+    assert(estadoPagado.className === 'text-bg-success', 'getEstado pagado → verde');
+
+    const estadoPendiente = getEstado({ pagado: false, vencimiento: '2999-12-31' });
+    assert(estadoPendiente !== null && estadoPendiente.label === 'Pendiente', 'Pendiente sin vencer → Pendiente');
+    assert(estadoPendiente.className === 'text-bg-secondary', 'getEstado pendiente → gris secondary');
+
+    // formatDate: convierte YYYY-MM-DD → DD/MM/YYYY
+    assert(formatDate('2026-12-01') === '01/12/2026', 'formatDate: fecha estándar');
+    assert(formatDate('2024-01-15') === '15/01/2024', 'formatDate: día y mes con cero');
+    assert(formatDate('') === '', 'formatDate: cadena vacía → vacía');
+    assert(formatDate(null) === '', 'formatDate: null → vacío');
+    assert(formatDate(undefined) === '', 'formatDate: undefined → vacío');
+    assert(formatDate('no-date') === 'no-date', 'formatDate: formato inválido → sin cambios');
+    assert(formatDate('2026-13') === '2026-13', 'formatDate: formato incompleto → sin cambios');
+
+    // DebtRowItem: renderiza <tr> con layout unificado (sin breakpoints separados)
+    const row = {
+        id: 99,
+        acreedor: 'Test Acreedor',
+        tipoDeuda: 'Prestamo',
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: '2026-12-01',
+        pagado: false,
+        _reload: () => {},
+        _onRowClick: () => {},
+    };
+
+    // Necesitamos un <table><tbody> para que el <tr> pueda insertarse correctamente
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+
+    const rowItem = new DebtRowItem(row, { excludeColumns: [], showDetailAction: true });
+    tbody.appendChild(rowItem.element);
+
+    const tr = rowItem.element;
+    assert(tr !== null && tr.tagName === 'TR', 'DebtRowItem.element debe ser un <tr> directo');
+
+    // Layout unificado: 2 celdas visibles en todos los breakpoints (sin d-md-none)
+    const allCells = tr.querySelectorAll('td.d-table-cell');
+    assert(allCells.length >= 2, 'Debe haber al menos 2 celdas visibles en todos los breakpoints');
+
+    // Sin celdas exclusivas de desktop (layout unificado)
+    const desktopCells = tr.querySelectorAll('td.d-none.d-md-table-cell');
+    assert(desktopCells.length === 0, 'No debe haber celdas exclusivas de desktop (layout unificado)');
+
+    // Avatar circular con iniciales
+    const avatarEl = tr.querySelector('.debt-card-avatar.rounded-circle');
+    assert(avatarEl !== null, 'DebtRowItem debe tener avatar circular con clase .debt-card-avatar');
+    assert(avatarEl.textContent === 'TA', 'Avatar debe mostrar iniciales de "Test Acreedor"');
+    assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar usa clases de color Bootstrap');
+
+    // Nombre del acreedor en mobile
+    const nameEl = tr.querySelector('.fw-bold.text-break');
+    assert(nameEl !== null && nameEl.textContent === 'Test Acreedor', 'Debe mostrar nombre del acreedor');
+
+    const amountEl = tr.querySelector('.fw-normal.text-nowrap');
+    assert(amountEl !== null, 'Debe mostrar monto con peso normal');
+    assert(amountEl.textContent === '$ 1.000,00', 'Monto debe mantener dos decimales');
+
+    // Badge de tipo con ícono Bootstrap Icons
+    const tipoBadge = tr.querySelector('.badge.rounded-pill');
+    assert(tipoBadge !== null, 'Debe renderizar badge de tipo');
+    assert(tipoBadge.querySelector('i.bi-bank2') !== null, 'Badge Prestamo debe tener bi-bank2');
+
+    // Fecha con ícono de calendario (formateada DD/MM/YYYY)
+    const calIcon = tr.querySelector('i.bi-calendar3');
+    assert(calIcon !== null, 'Debe mostrar ícono de calendario');
+    const dateText = calIcon.parentElement?.textContent || '';
+    assert(dateText.includes('01/12/2026'), 'Fecha debe mostrarse como DD/MM/YYYY');
+
+    // Chevron (affordance de navegación)
+    const chevron = tr.querySelector('i.bi-chevron-right');
+    assert(chevron !== null, 'Con _onRowClick debe mostrar chevron');
+
+    const rowNoDetail = { ...row, _onRowClick: () => {} };
+    const rowItemNoDetail = new DebtRowItem(rowNoDetail, { excludeColumns: [], showDetailAction: false });
+    assert(rowItemNoDetail.element.querySelector('i.bi-chevron-right') === null, 'showDetailAction=false debe ocultar chevron');
+    assert(!rowItemNoDetail.element.classList.contains('cursor-pointer'), 'showDetailAction=false no debe marcar la fila como clickeable');
+
+    const rowItemNoPayment = new DebtRowItem(row, { excludeColumns: [], showDetailAction: true, showPaymentAction: false });
+    assert(rowItemNoPayment.element.querySelector('app-checkbox') === null, 'showPaymentAction=false debe ocultar el switch');
+
+    // _renderEstadoPago y _renderEstadoPagoCard deben quedar registrados en el row
+    assert(typeof row._renderEstadoPago === 'function', 'Debe exponer _renderEstadoPago en el row');
+    assert(typeof row._renderEstadoPagoCard === 'function', 'Debe exponer _renderEstadoPagoCard en el row');
+
+    document.body.removeChild(table);
 }
 
 export const tests = [
@@ -1444,7 +1655,10 @@ export const tests = [
     testDebtListRenderTotalsVacioSiTodosCero,
     testDebtListRenderTotalsActualizaTrasRefresh,
     testDebtListRenderTotalsNoCurrencies,
+    testDebtListRenderTotalsIgnoraVencimientosInvalidos,
+    testDebtListGroupedUsesDebtRowItemLayout,
     testDebtEntityShellTotalesBarPorMoneda,
     testDebtEntityShellTotalesBarSinPendiente,
-    testDebtEntityShellTotalesBarAgregaVariasEntidades
+    testDebtEntityShellTotalesBarAgregaVariasEntidades,
+    testDebtRowItem
 ];

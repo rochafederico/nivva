@@ -115,6 +115,7 @@ export const debtTableColumns = [
                 const previousChecked = !!row.pagado;
                 row.pagado = nextChecked;
                 if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                if (typeof row._renderEstadoPagoCard === 'function') row._renderEstadoPagoCard();
 
                 try {
                     await setPagado(row.id, nextChecked);
@@ -131,6 +132,7 @@ export const debtTableColumns = [
                     row.pagado = previousChecked;
                     appCheckbox.checked = previousChecked;
                     if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                    if (typeof row._renderEstadoPagoCard === 'function') row._renderEstadoPagoCard();
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
                             message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',

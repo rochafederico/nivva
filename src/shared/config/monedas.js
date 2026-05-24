@@ -4,5 +4,8 @@ const signos = { 'ARS': '$', 'USD': 'US$' };
 const getSigno = (moneda) => signos[moneda] || '$';
 export const formatMoneda = (valor, moneda) => {
     const signo = getSigno(moneda);
-    return `${signo} ${Intl.NumberFormat('es-AR').format(valor)}`;
-}
+    return `${signo} ${Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(valor)}`;
+};

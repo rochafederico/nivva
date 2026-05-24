@@ -1,6 +1,6 @@
 // src/features/deudas/components/DebtEntityShell.js
 // Web Component <debt-entity-shell> – vista de deudas con tabs Bootstrap
-// Rutas: /gastos (Deudas) y /gastos/mensual (Cuotas del mes)
+// Rutas: /gastos (Cuotas del mes) y /gastos/deudas (Deudas)
 
 import '../../../shared/components/AppButton.js';
 import '../../../layout/PageSectionLayout.js';
@@ -33,7 +33,7 @@ export class DebtEntityShell extends HTMLElement {
     }
 
     _getViewFromPath() {
-        return window.location.pathname === '/gastos/mensual' ? 'cuotas' : 'deudas';
+        return window.location.pathname === '/gastos/deudas' ? 'deudas' : 'cuotas';
     }
 
     connectedCallback() {
@@ -268,14 +268,28 @@ export class DebtEntityShell extends HTMLElement {
             cardBody.classList.remove('p-3');
             cardBody.classList.add('p-0');
         }
+
+        // 4. Move debt-list-totals outside the card for structural separation.
+        // DebtList renders debt-list-totals as a child; we relocate it here as a
+        // direct sibling of the card so it appears below the list, not inside it.
+        if (this.currentView === 'cuotas') {
+            const debtListEl = this.querySelector('debt-list');
+            if (debtListEl) {
+                const totalsEl = debtListEl.querySelector('debt-list-totals');
+                if (totalsEl) {
+                    this.appendChild(totalsEl);
+                    debtListEl.setExternalTotals(totalsEl);
+                }
+            }
+        }
     }
 
     _renderTabs() {
         const nav = document.createElement('ul');
         nav.className = 'nav nav-underline mb-3';
         nav.setAttribute('role', 'tablist');
-        nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
-        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos/mensual', this.currentView === 'cuotas'));
+        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos', this.currentView === 'cuotas'));
+        nav.appendChild(this._createTabItem('Deudas', '/gastos/deudas', this.currentView === 'deudas'));
         return nav;
     }
 
