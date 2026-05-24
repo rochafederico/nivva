@@ -127,10 +127,11 @@ export class DebtList extends HTMLElement {
         });
 
         const container = this.querySelector('.debt-list-container');
+        const isUngroupedView = this.groupBy === 'none';
 
         this._renderRowTable(container, tableData, {
-            showDetailAction: this.groupBy === 'none' && this._showDetailAction,
-            showPaymentAction: this.groupBy === 'none',
+            showDetailAction: isUngroupedView && this._showDetailAction,
+            showPaymentAction: isUngroupedView,
         });
 
         this._renderTotals();

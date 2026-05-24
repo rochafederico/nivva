@@ -1398,6 +1398,7 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
 
     assert(list.querySelector('app-table') === null, 'La vista agrupada no debe renderizar AppTable');
     assert(list.querySelectorAll('tbody tr').length === 1, 'La vista agrupada debe renderizar filas compactas');
+    assert(list.querySelector('.debt-card-avatar') !== null, 'La vista agrupada debe usar la estructura de DebtRowItem');
     assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
     assert(list.querySelector('i.bi-chevron-right') === null, 'La fila agrupada no debe mostrar acción de detalle individual');
     assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
