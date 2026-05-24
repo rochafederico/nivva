@@ -1491,10 +1491,7 @@ async function testDebtRowItem() {
     assert(estadoPagado !== null && estadoPagado.label === 'Pagado', 'getEstado pagado → Pagado');
     assert(estadoPagado.className === 'text-bg-success', 'getEstado pagado → verde');
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
-    const estadoPendiente = getEstado({ pagado: false, vencimiento: tomorrowStr });
+    const estadoPendiente = getEstado({ pagado: false, vencimiento: '2999-12-31' });
     assert(estadoPendiente !== null && estadoPendiente.label === 'Pendiente', 'Pendiente sin vencer → Pendiente');
     assert(estadoPendiente.className === 'text-bg-secondary', 'getEstado pendiente → gris secondary');
 

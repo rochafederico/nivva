@@ -76,7 +76,7 @@ export class DebtRowItem {
         const badgeSpan = document.createElement('span');
 
         const renderEstado = () => {
-            badgeSpan.innerHTML = '';
+            badgeSpan.replaceChildren();
             const estado = getEstado(row);
             if (!estado) return;
             const b = document.createElement('span');
