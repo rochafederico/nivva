@@ -134,11 +134,11 @@ Vertical 9:16 realistic lifestyle product photograph.
 
 A modern smartphone standing upright on a warm minimal wooden desk, slightly below the center of the frame. The scene should feel like a real home desk in warm natural light, calm, simple and human.
 
-On the phone screen, use the attached Nivva reference image as the visual source of truth. Preserve the Nivva brand, teal identity, real app layout, component hierarchy and overall screen structure: top brand/header area, monthly selector, debt/payment rows, status badges, toggles, bottom navigation and summary cards for pending and paid amounts.
+On the phone screen, use the attached Nivva app reference image as the visual source of truth. This is an owned product reference. Match the Nivva brand, teal identity, mobile layout, component hierarchy and overall screen structure: top brand/header area, monthly selector, list rows, status badges, toggles, bottom navigation and two summary cards.
 
-Replace every personal or sensitive value from the reference image with invented data. Do not copy exact names, creditor labels, amounts, dates, balances or identifiers from the reference. The invented data must stay internally consistent across the whole interface: the selected month, row dates, paid/pending/vencido states, row amounts, totals and summary cards should all match logically.
+Use only clean placeholder content inside the interface. Replace all visible labels, dates and amounts from the reference with fictional sample values. The sample values must stay internally consistent across the whole screen: selected month, row dates, row states, row amounts and summary totals should all match logically.
 
-Use fictional values such as a selected month like “Mayo 2026”, rows such as “Alquiler”, “Internet”, “Seguro”, “Curso” or “Celular”, invented due dates and invented amounts. If the screen shows totals, they must equal the visible fictional rows and preserve a realistic Argentine peso format. Keep Nivva branding visible, but do not show bank logos, credit card brands, QR codes, account numbers, real private data, browser controls or address bar.
+Example sample content: selected month “Mayo 2026”, rows like “Alquiler”, “Internet”, “Seguro”, “Curso” and “Celular”, simple due dates within that month and realistic ARS amounts. If the screen shows totals, they must equal the visible sample rows. Keep Nivva branding visible. Use neutral interface content only, without third-party logos, scannable codes, browser controls or address bar.
 
 The background should be softly blurred with subtle everyday desk objects like a notebook or mug. No people, no faces, no watermark, no extra marketing text outside the phone.
 
@@ -151,11 +151,11 @@ Variante desktop:
 ```text
 Vertical 9:16 realistic home-office product photo.
 
-A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen should adapt the attached Nivva reference image into a desktop presentation while preserving the Nivva brand, teal identity, layout logic, monthly selector, debt/payment rows, status badges, toggles, navigation structure and pending/paid summary cards. It should look like the same Nivva interface shown in the reference, not a generic finance dashboard.
+A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen should adapt the attached Nivva app reference image into a desktop presentation while preserving the Nivva brand, teal identity, layout logic, monthly selector, list rows, status badges, toggles, navigation structure and two summary cards. It should look like the same Nivva product interface shown in the reference, not a generic dashboard.
 
-Replace every personal or sensitive value with invented data. Do not copy exact names, creditor labels, amounts, dates, balances or identifiers from the reference image. Keep all fictional values internally consistent across row amounts, row states, selected month, totals and summary cards. Do not include bank logos, credit card brands, QR codes, account numbers, private data, visible hardware brands or browser/address-bar chrome.
+Use only clean placeholder content inside the interface. Replace all visible labels, dates and amounts from the reference with fictional sample values, keeping the selected month, row dates, row states, row amounts and summary totals internally consistent. Avoid third-party logos, scannable codes, visible hardware brands and browser/address-bar chrome.
 
-The scene must be different from the smartphone scene: different angle, different props and more desk depth. Use warm natural light, a neutral wall, a small plant, notebook, keyboard, mouse and mug. Keep it calm, organized and human. No visible hardware brands. No bank logos. No extra generated text outside the screen.
+The scene must be different from the smartphone scene: different angle, different props and more desk depth. Use warm natural light, a neutral wall, a small plant, notebook, keyboard, mouse and mug. Keep it calm, organized and human. Use neutral props and no extra generated text outside the screen.
 Aspect ratio: 9:16.
 ```
 
