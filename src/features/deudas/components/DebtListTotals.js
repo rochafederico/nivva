@@ -162,7 +162,7 @@ export class DebtListTotals extends HTMLElement {
             const icon = document.createElement('i');
             icon.className = 'bi bi-exclamation-triangle me-1';
             const txt = document.createTextNode(
-                `${vencidas} deuda${vencidas !== 1 ? 's' : ''} vencida${vencidas !== 1 ? 's' : ''}`
+                `${vencidas} cuota${vencidas !== 1 ? 's' : ''} vencida${vencidas !== 1 ? 's' : ''}`
             );
             vencidasEl.appendChild(icon);
             vencidasEl.appendChild(txt);

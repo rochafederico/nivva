@@ -1362,8 +1362,8 @@ async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
     list._renderTotals();
 
     const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.textContent.includes('1 deuda vencida'), 'Debe contar solo el vencimiento válido no pagado');
-    assert(!totalsEl.textContent.includes('2 deudas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
+    assert(totalsEl.textContent.includes('1 cuota vencida'), 'Debe contar solo el vencimiento válido no pagado');
+    assert(!totalsEl.textContent.includes('2 cuotas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
 
     const summary = summarizeDebtListTotals(list.debts, '2999-01-01');
     assert(summary.vencidas === 1, 'DebtListTotals debe calcular vencidas ignorando fechas inválidas');
@@ -1400,7 +1400,7 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
     assert(list.querySelectorAll('tbody tr').length === 1, 'La vista agrupada debe renderizar filas compactas');
     assert(list.querySelector('.debt-card-avatar') !== null, 'La vista agrupada debe usar la estructura de DebtRowItem');
     assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
-    assert(list.querySelector('i.bi-chevron-right') === null, 'La fila agrupada no debe mostrar acción de detalle individual');
+    assert(list.querySelector('i.bi-chevron-right') !== null, 'La fila agrupada debe mostrar acción de detalle individual cuando show-detail-action está habilitado');
     assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
 
     document.body.removeChild(list);
@@ -1504,7 +1504,7 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
 }
 
 // ===================================================================
-// UC-ML1: DebtRowItem Web Component — renderiza <tr> + <td> responsivos Bootstrap
+// UC-ML1: DebtRowItem (clase JS) — renderiza <tr> + <td> responsivos Bootstrap
 // ===================================================================
 async function testDebtRowItem() {
     console.log('  UC-ML1: DebtRowItem renderiza tr+td con helpers Bootstrap');

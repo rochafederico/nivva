@@ -130,7 +130,7 @@ export class DebtList extends HTMLElement {
         const isUngroupedView = this.groupBy === 'none';
 
         this._renderRowTable(container, tableData, {
-            showDetailAction: isUngroupedView && this._showDetailAction,
+            showDetailAction: this._showDetailAction,
             showPaymentAction: isUngroupedView,
         });
 
