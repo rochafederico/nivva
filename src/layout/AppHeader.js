@@ -45,6 +45,9 @@ export class AppHeader extends HTMLElement {
     `;
     const actions = this.querySelector('[data-header-actions]');
     const userMenu = this.querySelector('user-menu-button');
+    if (!actions || !userMenu) {
+      throw new Error('AppHeader actions container is incomplete');
+    }
     actions.insertBefore(createIconButton({
       id: 'tour-btn',
       icon: 'bi-question-circle',
