@@ -68,7 +68,7 @@ export class DebtRowItem {
         const excl = this._excludeColumns;
 
         // ── Estado badges (mobile + desktop compartidos) ──────────────
-        const mobileBadgeDiv = document.createElement('div');
+        const mobileBadgeDiv = document.createElement('span');
         const desktopBadgeDiv = document.createElement('div');
         desktopBadgeDiv.className = 'mt-1';
 
@@ -217,11 +217,11 @@ export class DebtRowItem {
         const mActWrap = document.createElement('div');
         mActWrap.className = 'd-flex align-items-center';
 
-        // Col 3 — Estado: monto arriba, badge debajo (crece, no comprime a sus vecinos)
+        // Col 3 — Estado: monto y badge en la misma línea (crece, no comprime a sus vecinos)
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-2';
+        estadoCol.className = 'd-flex align-items-center justify-content-end flex-grow-1 me-2 gap-1';
 
-        const amountEl = document.createElement('div');
+        const amountEl = document.createElement('span');
         amountEl.className = 'fw-semibold text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
         estadoCol.appendChild(amountEl);
