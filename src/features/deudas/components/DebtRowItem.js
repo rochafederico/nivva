@@ -157,7 +157,7 @@ export class DebtRowItem {
         nameDateRow.className = 'd-flex flex-column flex-md-row align-items-md-baseline gap-md-2 min-w-0';
 
         const nameEl = document.createElement('h6');
-        nameEl.className = 'fw-semibold text-break mb-0';
+        nameEl.className = 'fw-bold text-break mb-0';
         nameEl.textContent = row.acreedor ?? '';
         nameDateRow.appendChild(nameEl);
 
@@ -206,14 +206,14 @@ export class DebtRowItem {
 
         // Estado: monto + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-3';
+        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-4';
 
         // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
         const amountRow = document.createElement('div');
         amountRow.className = 'd-flex flex-wrap align-items-baseline gap-1 justify-content-end';
 
         const amountEl = document.createElement('span');
-        amountEl.className = 'fw-semibold fs-5 lh-sm text-nowrap';
+        amountEl.className = 'fw-normal lh-sm text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
         amountRow.appendChild(amountEl);
         amountRow.appendChild(badgeSpan);

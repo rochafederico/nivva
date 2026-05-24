@@ -1544,8 +1544,12 @@ async function testDebtRowItem() {
     assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar usa clases de color Bootstrap');
 
     // Nombre del acreedor en mobile
-    const nameEl = tr.querySelector('.fw-semibold.text-break');
+    const nameEl = tr.querySelector('.fw-bold.text-break');
     assert(nameEl !== null && nameEl.textContent === 'Test Acreedor', 'Debe mostrar nombre del acreedor');
+
+    const amountEl = tr.querySelector('.fw-normal.text-nowrap');
+    assert(amountEl !== null, 'Debe mostrar monto con peso normal');
+    assert(amountEl.textContent === '$ 1.000,00', 'Monto debe mantener dos decimales');
 
     // Badge de tipo con ícono Bootstrap Icons
     const tipoBadge = tr.querySelector('.badge.rounded-pill');
