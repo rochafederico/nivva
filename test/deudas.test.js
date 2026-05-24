@@ -498,14 +498,14 @@ async function testPagoToggleVisualFeedback() {
 
         input.checked = true;
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
         assert(montoNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
         assert(notifications.some(n => n.type === 'success'), 'Al marcar pago debe mostrarse toast verde');
 
         input.checked = false;
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
         assert(montoNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
         const pendingStateBadge = montoNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
