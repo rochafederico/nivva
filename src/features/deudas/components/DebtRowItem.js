@@ -80,7 +80,7 @@ export class DebtRowItem {
             const estado = getEstado(row);
             if (!estado) return;
             const b = document.createElement('span');
-            b.className = `badge ${estado.className} text-nowrap`;
+            b.className = `badge ${estado.className} fw-normal lh-sm px-1 py-0 text-nowrap`;
             b.textContent = estado.label;
             badgeSpan.appendChild(b);
         };
@@ -210,10 +210,10 @@ export class DebtRowItem {
 
         // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
         const amountRow = document.createElement('div');
-        amountRow.className = 'd-flex flex-wrap align-items-center gap-1 justify-content-end';
+        amountRow.className = 'd-flex flex-wrap align-items-baseline gap-1 justify-content-end';
 
         const amountEl = document.createElement('span');
-        amountEl.className = 'fw-semibold text-nowrap';
+        amountEl.className = 'fw-semibold fs-5 lh-sm text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
         amountRow.appendChild(amountEl);
         amountRow.appendChild(badgeSpan);
