@@ -1335,6 +1335,39 @@ async function testDebtListRenderTotalsNoCurrencies() {
 }
 
 // ===================================================================
+// UC-DL5: DebtList._renderTotals — ignora vencimientos vacíos o inválidos
+// ===================================================================
+async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
+    console.log('  DebtList._renderTotals: ignora vencimientos vacíos o inválidos');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const yesterday = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    list.totalesPendientes = { ARS: 1500 };
+    list.totalesPagados = {};
+    list.debts = [{
+        montos: [
+            { pagado: false, vencimiento: yesterday },
+            { pagado: false, vencimiento: '' },
+            { pagado: false, vencimiento: 'sin-fecha' },
+            { pagado: true, vencimiento: yesterday }
+        ]
+    }];
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('debt-list-totals');
+    assert(totalsEl.textContent.includes('1 deuda vencida'), 'Debe contar solo el vencimiento válido no pagado');
+    assert(!totalsEl.textContent.includes('2 deudas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
 // UC-DS7: DebtEntityShell._renderTotalesBar — agrega pendiente por moneda
 // ===================================================================
 async function testDebtEntityShellTotalesBarPorMoneda() {
@@ -1574,6 +1607,7 @@ export const tests = [
     testDebtListRenderTotalsVacioSiTodosCero,
     testDebtListRenderTotalsActualizaTrasRefresh,
     testDebtListRenderTotalsNoCurrencies,
+    testDebtListRenderTotalsIgnoraVencimientosInvalidos,
     testDebtEntityShellTotalesBarPorMoneda,
     testDebtEntityShellTotalesBarSinPendiente,
     testDebtEntityShellTotalesBarAgregaVariasEntidades,

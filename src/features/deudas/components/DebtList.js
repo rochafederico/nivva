@@ -247,7 +247,8 @@ export class DebtList extends HTMLElement {
         let pagadosCount = 0;
         (this.debts || []).forEach(deuda => {
             (deuda.montos || []).forEach(monto => {
-                if (!monto.pagado && monto.vencimiento < today) vencidasCount++;
+                const hasValidVencimiento = typeof monto.vencimiento === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(monto.vencimiento);
+                if (!monto.pagado && hasValidVencimiento && monto.vencimiento < today) vencidasCount++;
                 if (monto.pagado) pagadosCount++;
             });
         });
