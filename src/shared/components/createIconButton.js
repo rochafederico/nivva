@@ -27,7 +27,7 @@ export function createIconButton({
   button.setAttribute('aria-label', label);
 
   const normalizedExtraClasses = hasExtraClasses ? extraClasses.trim() : '';
-  const additionalClasses = normalizedExtraClasses ? normalizedExtraClasses.split(/\s+/) : [];
+  const additionalClasses = normalizedExtraClasses.match(/\S+/g) ?? [];
   if (additionalClasses.length > 0) {
     button.classList.add(...additionalClasses);
   }

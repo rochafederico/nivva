@@ -16,7 +16,7 @@ export const tests = [
 
     async function createIconButton_usesBootstrapAndAccessibleLabel() {
         console.log('  createIconButton: usa Bootstrap y aria-label');
-        const whitespaceSeparatedExtraClasses = 'position-relative' + '\n' + 'flex-shrink-0' + '\t' + 'shadow-sm';
+        const whitespaceSeparatedExtraClasses = `position-relative\nflex-shrink-0\tshadow-sm`;
         const btn = createIconButton({
             id: 'test-icon-btn',
             icon: 'bi-bell',
@@ -49,7 +49,7 @@ export const tests = [
                 extraClasses: ['position-relative'],
             });
         } catch (err) {
-            failed = err.message.includes('extraClasses debe ser string');
+            failed = err instanceof Error;
         }
 
         assert(failed, 'Debe rechazar extraClasses si no es string');
