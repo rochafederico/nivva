@@ -134,9 +134,11 @@ Vertical 9:16 realistic lifestyle product photograph.
 
 A modern smartphone standing upright on a warm minimal wooden desk, slightly below the center of the frame. The scene should feel like a real home desk in warm natural light, calm, simple and human.
 
-On the phone screen, show a generic and fictional mobile finance dashboard with a clean and minimal interface. Use a color palette inspired by teal, cream, white and soft dark gray. The screen should suggest monthly payment organization with simple cards, status sections and clean spacing, but without readable personal data, brand names, company names, bank references or exact UI replication.
+On the phone screen, use the attached Nivva reference image as the visual source of truth. Preserve the Nivva brand, teal identity, real app layout, component hierarchy and overall screen structure: top brand/header area, monthly selector, debt/payment rows, status badges, toggles, bottom navigation and summary cards for pending and paid amounts.
 
-Do not show any real app brand, exact logo, browser controls, address bar, QR codes, account numbers, private data or recognizable financial institutions. Keep the interface plausible but generic, softly simplified and not fully legible.
+Replace every personal or sensitive value from the reference image with invented data. Do not copy exact names, creditor labels, amounts, dates, balances or identifiers from the reference. The invented data must stay internally consistent across the whole interface: the selected month, row dates, paid/pending/vencido states, row amounts, totals and summary cards should all match logically.
+
+Use fictional values such as a selected month like “Mayo 2026”, rows such as “Alquiler”, “Internet”, “Seguro”, “Curso” or “Celular”, invented due dates and invented amounts. If the screen shows totals, they must equal the visible fictional rows and preserve a realistic Argentine peso format. Keep Nivva branding visible, but do not show bank logos, credit card brands, QR codes, account numbers, real private data, browser controls or address bar.
 
 The background should be softly blurred with subtle everyday desk objects like a notebook or mug. No people, no faces, no watermark, no extra marketing text outside the phone.
 
@@ -149,7 +151,9 @@ Variante desktop:
 ```text
 Vertical 9:16 realistic home-office product photo.
 
-A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen shows a fictional personal finance dashboard in desktop layout: a clean left sidebar, simple rows representing payment items, soft status indicators and two summary cards for pending and paid amounts. The interface should use teal, cream and white tones, with rounded elements and clean spacing, but must remain generic and not reproduce any existing application exactly. Do not include brand names, readable account numbers, bank references or private data. The layout should be plausible but softly simplified.
+A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen should adapt the attached Nivva reference image into a desktop presentation while preserving the Nivva brand, teal identity, layout logic, monthly selector, debt/payment rows, status badges, toggles, navigation structure and pending/paid summary cards. It should look like the same Nivva interface shown in the reference, not a generic finance dashboard.
+
+Replace every personal or sensitive value with invented data. Do not copy exact names, creditor labels, amounts, dates, balances or identifiers from the reference image. Keep all fictional values internally consistent across row amounts, row states, selected month, totals and summary cards. Do not include bank logos, credit card brands, QR codes, account numbers, private data, visible hardware brands or browser/address-bar chrome.
 
 The scene must be different from the smartphone scene: different angle, different props and more desk depth. Use warm natural light, a neutral wall, a small plant, notebook, keyboard, mouse and mug. Keep it calm, organized and human. No visible hardware brands. No bank logos. No extra generated text outside the screen.
 Aspect ratio: 9:16.
@@ -301,6 +305,6 @@ The music should support a clean personal productivity app, not feel like a bank
 - [ ] No se promete salir de deudas ni mejorar finanzas.
 - [ ] La estética se mantiene simple, clara y humana.
 - [ ] La escena 1 muestra desorden sin dramatizar.
-- [ ] La nueva vista aparece al menos una vez con una interfaz genérica que transmita claridad y organización.
+- [ ] La nueva vista aparece al menos una vez con la interfaz y marca de Nivva, usando datos ficticios consistentes y sin datos personales reales.
 - [ ] El cierre muestra el logo de Nivva.
 - [ ] No se generó voz IA.
