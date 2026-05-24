@@ -21,7 +21,7 @@ export const tests = [
             icon: 'bi-bell',
             label: 'Ver vencimientos próximos',
             title: 'Vencimientos próximos',
-            extraClasses: 'position-relative',
+            extraClasses: 'position-relative\nflex-shrink-0\tshadow-sm',
         });
 
         assert(btn.tagName === 'BUTTON', 'Debe crear un button nativo');
@@ -31,9 +31,27 @@ export const tests = [
         assert(btn.classList.contains('btn-primary'), 'Debe usar variant primary por defecto');
         assert(btn.classList.contains('d-inline-flex'), 'Debe mantener layout inline-flex');
         assert(btn.classList.contains('position-relative'), 'Debe aceptar clases extra');
+        assert(btn.classList.contains('flex-shrink-0'), 'Debe separar clases extra por cualquier whitespace');
+        assert(btn.classList.contains('shadow-sm'), 'Debe separar clases extra con tabs');
         assert(btn.getAttribute('aria-label') === 'Ver vencimientos próximos', 'Debe aplicar aria-label');
         assert(btn.title === 'Vencimientos próximos', 'Debe aplicar title opcional');
         assert(btn.querySelector('i.bi.bi-bell') !== null, 'Debe renderizar el ícono Bootstrap');
+    },
+
+    async function createIconButton_rejectsNonStringExtraClasses() {
+        console.log('  createIconButton: valida extraClasses string');
+        let failed = false;
+        try {
+            createIconButton({
+                icon: 'bi-bell',
+                label: 'Ver vencimientos próximos',
+                extraClasses: ['position-relative'],
+            });
+        } catch (err) {
+            failed = err.message.includes('extraClasses debe ser string');
+        }
+
+        assert(failed, 'Debe rechazar extraClasses si no es string');
     },
 
     // ===================================================================
