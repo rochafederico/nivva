@@ -45,8 +45,11 @@ export class AppHeader extends HTMLElement {
     `;
     const actions = this.querySelector('[data-header-actions]');
     const userMenu = this.querySelector('user-menu-button');
-    if (!actions || !userMenu) {
-      throw new Error('AppHeader: missing actions container or user-menu-button element');
+    if (!actions) {
+      throw new Error('AppHeader: missing [data-header-actions] container');
+    }
+    if (!userMenu) {
+      throw new Error('AppHeader: missing user-menu-button element');
     }
     actions.insertBefore(createIconButton({
       id: 'tour-btn',

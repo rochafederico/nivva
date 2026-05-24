@@ -10,6 +10,10 @@ export function createIconButton({
   if (!icon || !label) {
     throw new Error('createIconButton requiere icon y label');
   }
+  const allowedVariants = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'link'];
+  if (!allowedVariants.includes(variant)) {
+    throw new Error(`createIconButton: variant no permitido (${variant})`);
+  }
 
   const button = document.createElement('button');
   button.type = 'button';
