@@ -163,7 +163,7 @@ export class DebtList extends HTMLElement {
     // Usa un layout unificado con 2 columnas (info + acciones) en todos los breakpoints.
     _renderRowTable(container, tableData) {
         let tableWrapper = container.querySelector('.table-responsive');
-        let thead, tbody;
+        let tbody;
 
         if (!tableWrapper) {
             container.innerHTML = '';
@@ -173,22 +173,13 @@ export class DebtList extends HTMLElement {
             const table = document.createElement('table');
             table.className = 'table table-hover table-striped mb-0';
 
-            thead = document.createElement('thead');
-            thead.className = 'table-light';
-
             tbody = document.createElement('tbody');
-            table.appendChild(thead);
             table.appendChild(tbody);
             tableWrapper.appendChild(table);
             container.appendChild(tableWrapper);
         } else {
-            thead = tableWrapper.querySelector('thead');
             tbody = tableWrapper.querySelector('tbody');
         }
-
-        // Reconstruir cabecera (puede cambiar si varían excludeColumns)
-        thead.innerHTML = '';
-        thead.appendChild(this._buildTheadRow());
 
         // Reconstruir filas
         tbody.innerHTML = '';
@@ -211,29 +202,6 @@ export class DebtList extends HTMLElement {
             });
             tbody.appendChild(rowItem.element);
         });
-    }
-
-    // Construye el <tr> del <thead> con 2 cabeceras para el layout unificado.
-    // Los textos están visually-hidden para mantener accesibilidad sin mostrarlos visualmente.
-    _buildTheadRow() {
-        const tr = document.createElement('tr');
-
-        const thInfo = document.createElement('th');
-        const infoLabel = document.createElement('span');
-        infoLabel.className = 'visually-hidden';
-        infoLabel.textContent = 'Gasto';
-        thInfo.appendChild(infoLabel);
-        tr.appendChild(thInfo);
-
-        const thPago = document.createElement('th');
-        thPago.className = 'text-end';
-        const pagoLabel = document.createElement('span');
-        pagoLabel.className = 'visually-hidden';
-        pagoLabel.textContent = 'Pago';
-        thPago.appendChild(pagoLabel);
-        tr.appendChild(thPago);
-
-        return tr;
     }
 
     toggleEstado(id) {
@@ -266,7 +234,7 @@ export class DebtList extends HTMLElement {
     }
 
     _renderTotals() {
-        let totalsEl = this.querySelector('debt-list-totals');
+        let totalsEl = this._externalTotals || this.querySelector('debt-list-totals');
         if (!totalsEl) return;
 
         const pendiente = this.totalesPendientes || {};

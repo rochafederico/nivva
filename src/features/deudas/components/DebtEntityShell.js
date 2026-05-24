@@ -268,6 +268,20 @@ export class DebtEntityShell extends HTMLElement {
             cardBody.classList.remove('p-3');
             cardBody.classList.add('p-0');
         }
+
+        // 4. Move debt-list-totals outside the card for structural separation.
+        // DebtList renders debt-list-totals as a child; we relocate it here as a
+        // direct sibling of the card so it appears below the list, not inside it.
+        if (this.currentView === 'cuotas') {
+            const debtListEl = this.querySelector('debt-list');
+            if (debtListEl) {
+                const totalsEl = debtListEl.querySelector('debt-list-totals');
+                if (totalsEl) {
+                    this.appendChild(totalsEl);
+                    debtListEl._externalTotals = totalsEl;
+                }
+            }
+        }
     }
 
     _renderTabs() {
