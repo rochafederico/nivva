@@ -1,9 +1,8 @@
 import './DarkToggle.js';
 import './NotificationsButton.js';
+import './TourButton.js';
 import './UserMenuButton.js';
 import '../shared/components/AppToast.js';
-import { createIconButton } from '../shared/components/createIconButton.js';
-import { trackEvent } from '../shared/observability/index.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {
@@ -14,19 +13,13 @@ export class AppHeader extends HTMLElement {
       window.history.pushState({}, '', '/');
       window.dispatchEvent(new PopStateEvent('popstate'));
     };
-    this._onTourClick = () => {
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'tour', location: 'header' });
-      window.dispatchEvent(new CustomEvent('tour:start'));
-    };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
-    this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     window.addEventListener('data-imported', this._onDataImported);
   }
 
   disconnectedCallback() {
     this.querySelector('.navbar-brand')?.removeEventListener('click', this._onBrandClick);
-    this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
     window.removeEventListener('data-imported', this._onDataImported);
   }
 
@@ -36,27 +29,14 @@ export class AppHeader extends HTMLElement {
       <nav class="navbar navbar-dark bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
-          <div class="ms-auto d-flex align-items-center gap-2" data-header-actions>
+          <div class="ms-auto d-flex align-items-center gap-2">
             <notifications-button></notifications-button>
+            <tour-button></tour-button>
             <user-menu-button></user-menu-button>
           </div>
         </div>
       </nav>
     `;
-    const actions = this.querySelector('[data-header-actions]');
-    const userMenu = this.querySelector('user-menu-button');
-    if (!actions) {
-      throw new Error('AppHeader render failed: [data-header-actions] container not found in template');
-    }
-    if (!userMenu) {
-      throw new Error('AppHeader render failed: user-menu-button element not found');
-    }
-    actions.insertBefore(createIconButton({
-      id: 'tour-btn',
-      icon: 'bi-question-circle',
-      label: 'Abrir guía rápida',
-      title: 'Abrir guía rápida',
-    }), userMenu);
   }
 }
 customElements.define('app-header', AppHeader);
