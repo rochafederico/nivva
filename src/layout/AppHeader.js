@@ -2,6 +2,7 @@ import './DarkToggle.js';
 import './NotificationsButton.js';
 import './UserMenuButton.js';
 import '../shared/components/AppToast.js';
+import { createIconButton } from '../shared/components/createIconButton.js';
 import { trackEvent } from '../shared/observability/index.js';
 
 export class AppHeader extends HTMLElement {
@@ -35,17 +36,22 @@ export class AppHeader extends HTMLElement {
       <nav class="navbar navbar-dark bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
-          <div class="ms-auto d-flex align-items-center gap-2">
+          <div class="ms-auto d-flex align-items-center gap-2" data-header-actions>
             <notifications-button></notifications-button>
-            <button id="tour-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3"
-              type="button" title="Abrir guía rápida" aria-label="Abrir guía rápida">
-              <i class="bi bi-question-circle" aria-hidden="true"></i>
-            </button>
             <user-menu-button></user-menu-button>
           </div>
         </div>
       </nav>
     `;
+    this.querySelector('[data-header-actions]')?.insertBefore(
+      createIconButton({
+        id: 'tour-btn',
+        icon: 'bi-question-circle',
+        label: 'Abrir guía rápida',
+        title: 'Abrir guía rápida',
+      }),
+      this.querySelector('user-menu-button'),
+    );
   }
 }
 customElements.define('app-header', AppHeader);
@@ -53,4 +59,3 @@ customElements.define('app-header', AppHeader);
 export default function AppHeaderComponent() {
   return document.createElement('app-header');
 }
-

@@ -1,5 +1,6 @@
 import { createNavbarPopover } from './navbarPopoversController.js';
 import { openSettingsFrom } from './settingsShortcutAction.js';
+import { createIconButton } from '../shared/components/createIconButton.js';
 
 export class UserMenuButton extends HTMLElement {
   connectedCallback() {
@@ -63,12 +64,11 @@ export class UserMenuButton extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
-      <button id="user-menu-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3"
-        type="button" aria-label="Abrir menú de usuario">
-        <i class="bi bi-person-circle" aria-hidden="true"></i>
-      </button>
-    `;
+    this.replaceChildren(createIconButton({
+      id: 'user-menu-btn',
+      icon: 'bi-person-circle',
+      label: 'Abrir menú de usuario',
+    }));
   }
 }
 

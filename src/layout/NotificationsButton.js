@@ -1,4 +1,5 @@
 import { createNavbarPopover } from './navbarPopoversController.js';
+import { createIconButton } from '../shared/components/createIconButton.js';
 
 export class NotificationsButton extends HTMLElement {
   connectedCallback() {
@@ -89,12 +90,13 @@ export class NotificationsButton extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
-      <button id="notifications-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3 position-relative"
-        type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
-        <i class="bi bi-bell" aria-hidden="true"></i>
-      </button>
-    `;
+    this.replaceChildren(createIconButton({
+      id: 'notifications-btn',
+      icon: 'bi-bell',
+      label: 'Ver vencimientos próximos',
+      title: 'Vencimientos próximos',
+      extraClasses: 'position-relative',
+    }));
   }
 }
 

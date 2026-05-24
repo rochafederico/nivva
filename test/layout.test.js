@@ -10,8 +10,31 @@ import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import HomeQuickActions from '../src/pages/HomeQuickActions.js';
+import { createIconButton } from '../src/shared/components/createIconButton.js';
 
 export const tests = [
+
+    async function createIconButton_usesBootstrapAndAccessibleLabel() {
+        console.log('  createIconButton: usa Bootstrap y aria-label');
+        const btn = createIconButton({
+            id: 'test-icon-btn',
+            icon: 'bi-bell',
+            label: 'Ver vencimientos próximos',
+            title: 'Vencimientos próximos',
+            extraClasses: 'position-relative',
+        });
+
+        assert(btn.tagName === 'BUTTON', 'Debe crear un button nativo');
+        assert(btn.id === 'test-icon-btn', 'Debe aplicar id');
+        assert(btn.type === 'button', 'Debe usar type button');
+        assert(btn.classList.contains('btn'), 'Debe usar clase btn');
+        assert(btn.classList.contains('btn-primary'), 'Debe usar variant primary por defecto');
+        assert(btn.classList.contains('d-inline-flex'), 'Debe mantener layout inline-flex');
+        assert(btn.classList.contains('position-relative'), 'Debe aceptar clases extra');
+        assert(btn.getAttribute('aria-label') === 'Ver vencimientos próximos', 'Debe aplicar aria-label');
+        assert(btn.title === 'Vencimientos próximos', 'Debe aplicar title opcional');
+        assert(btn.querySelector('i.bi.bi-bell') !== null, 'Debe renderizar el ícono Bootstrap');
+    },
 
     // ===================================================================
     // UC1: navConfig provides title and subtitle for each route
