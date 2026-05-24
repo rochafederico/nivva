@@ -80,7 +80,7 @@ export class DebtRowItem {
             const estado = getEstado(row);
             if (!estado) return;
             const b = document.createElement('span');
-            b.className = `badge ${estado.className} fw-normal lh-sm px-1 py-0 text-nowrap`;
+            b.className = `badge ${estado.className} fw-normal lh-sm px-1 py-0 ms-2 text-nowrap`;
             b.textContent = estado.label;
             badgeSpan.appendChild(b);
         };
