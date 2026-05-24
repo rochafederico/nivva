@@ -172,7 +172,7 @@ export class DebtRowItem {
         const venc = String(row.vencimiento ?? '').trim();
         if (venc) {
             const vencEl = document.createElement('div');
-            vencEl.className = 'text-muted small mt-1';
+            vencEl.className = 'text-muted small mt-1 d-md-none';
             const calIcon = document.createElement('i');
             calIcon.className = 'bi bi-calendar3 me-1';
             calIcon.setAttribute('aria-hidden', 'true');
@@ -192,15 +192,33 @@ export class DebtRowItem {
         const actWrap = document.createElement('div');
         actWrap.className = 'd-flex align-items-center';
 
-        // Estado: monto y badge en la misma línea (crece, no comprime a sus vecinos)
+        // Estado: columna vertical (monto+badge en línea, fecha abajo en desktop)
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex align-items-center justify-content-end flex-grow-1 me-2 gap-1';
+        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-2';
+
+        // Línea 1: monto y badge en la misma línea
+        const amountRow = document.createElement('div');
+        amountRow.className = 'd-flex align-items-center gap-1';
 
         const amountEl = document.createElement('span');
         amountEl.className = 'fw-semibold text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
-        estadoCol.appendChild(amountEl);
-        estadoCol.appendChild(badgeSpan);
+        amountRow.appendChild(amountEl);
+        amountRow.appendChild(badgeSpan);
+        estadoCol.appendChild(amountRow);
+
+        // Línea 2: fecha alineada a la derecha (solo desktop)
+        if (venc) {
+            const desktopDateEl = document.createElement('div');
+            desktopDateEl.className = 'd-none d-md-flex align-items-center text-muted small mt-1';
+            const calIconDesktop = document.createElement('i');
+            calIconDesktop.className = 'bi bi-calendar3 me-1';
+            calIconDesktop.setAttribute('aria-hidden', 'true');
+            desktopDateEl.appendChild(calIconDesktop);
+            desktopDateEl.appendChild(document.createTextNode(formatDate(venc)));
+            estadoCol.appendChild(desktopDateEl);
+        }
+
         actWrap.appendChild(estadoCol);
 
         // Switch: columna de ancho fijo, centrada, independiente del estado
