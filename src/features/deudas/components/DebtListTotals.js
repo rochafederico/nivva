@@ -63,7 +63,7 @@ export class DebtListTotals extends HTMLElement {
         for (let i = 1; i < entries.length; i++) {
             const [cur, val] = entries[i];
             const secondary = document.createElement('small');
-            secondary.className = `text-${colorKey}-emphasis opacity-75 fw-semibold ms-3`;
+            secondary.className = `text-${colorKey}-emphasis opacity-75 fw-semibold`;
             secondary.textContent = this._fmtMoneda(cur, Number(val));
             amountEl.appendChild(secondary);
         }
@@ -126,7 +126,7 @@ export class DebtListTotals extends HTMLElement {
         textBlock.appendChild(labelEl);
 
         const amountEl = document.createElement('div');
-        amountEl.className = `fw-bold fs-4 lh-1 text-${colorKey}-emphasis`;
+        amountEl.className = `fw-bold fs-4 lh-1 text-${colorKey}-emphasis d-flex flex-wrap align-items-baseline gap-2`;
         this._buildAmountNodes(amountsMap, colorKey, amountEl);
         textBlock.appendChild(amountEl);
 
