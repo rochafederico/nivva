@@ -1224,7 +1224,7 @@ async function testDebtEntityShellCuotasView() {
 // UC-DL1: DebtList._renderTotals — barra con pendiente y pagado por moneda
 // ===================================================================
 async function testDebtListRenderTotalsPendienteYPagado() {
-    console.log('  DebtList._renderTotals: muestra items de pendiente y pagado por moneda');
+    console.log('  DebtList._renderTotals: muestra 1 card pendiente y 1 card pagado agrupando monedas');
 
     const list = document.createElement('debt-list');
     document.body.appendChild(list);
@@ -1237,11 +1237,16 @@ async function testDebtListRenderTotalsPendienteYPagado() {
     const totalsEl = list.querySelector('debt-list-totals');
     assert(totalsEl !== null, 'Debe existir debt-list-totals');
 
+    // New: one card per state (not per currency)
     const pendienteItems = totalsEl.querySelectorAll('.bg-warning-subtle');
-    assert(pendienteItems.length === 2, 'Debe mostrar 2 items de pendiente (ARS y USD)');
+    assert(pendienteItems.length === 1, 'Debe mostrar 1 card de pendiente (todas las monedas agrupadas)');
 
     const pagadoItems = totalsEl.querySelectorAll('.bg-success-subtle');
-    assert(pagadoItems.length === 1, 'Debe mostrar 1 item de pagado (ARS)');
+    assert(pagadoItems.length === 1, 'Debe mostrar 1 card de pagado');
+
+    // Amount text must contain both currencies joined with /
+    const amountEl = totalsEl.querySelector('.bg-warning-subtle .fw-bold');
+    assert(amountEl !== null && amountEl.textContent.includes('/'), 'Monto pendiente debe incluir "/" para separar monedas');
 
     const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
     assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
@@ -1293,16 +1298,16 @@ async function testDebtListRenderTotalsActualizaTrasRefresh() {
     list._renderTotals();
 
     const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Inicial: 1 item pendiente');
-    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 0, 'Inicial: sin items pagado');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Inicial: 1 card pendiente');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 0, 'Inicial: sin cards pagado');
 
-    // Update: two currencies pending, one pagado
+    // Update: two currencies pending, one pagado — still 1 card per state
     list.totalesPendientes = { USD: 200, ARS: 8000 };
     list.totalesPagados = { ARS: 3000 };
     list._renderTotals();
 
-    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 2, 'Tras update: 2 items pendiente');
-    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 1, 'Tras update: 1 item pagado');
+    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Tras update: 1 card pendiente (multi-moneda agrupada)');
+    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 1, 'Tras update: 1 card pagado');
 
     document.body.removeChild(list);
 }
