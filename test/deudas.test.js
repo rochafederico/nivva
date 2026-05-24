@@ -4,7 +4,7 @@ import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
-import { getInitials, getAvatarClasses, getTipoIcon, getEstado } from '../src/features/deudas/components/DebtRowItem.js';
+import { getInitials, getAvatarClasses, getTipoIcon, getEstado, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -1471,20 +1471,17 @@ async function testDebtRowItem() {
         _onRowClick: () => {},
     };
 
-    // Necesitamos un <table><tbody> para que el componente funcione correctamente
+    // Necesitamos un <table><tbody> para que el <tr> pueda insertarse correctamente
     const table = document.createElement('table');
     const tbody = document.createElement('tbody');
     table.appendChild(tbody);
     document.body.appendChild(table);
 
-    const rowItem = document.createElement('debt-row-item');
-    rowItem.excludeColumns = [];
-    rowItem.showDetailAction = false;
-    rowItem.rowData = row;
-    tbody.appendChild(rowItem); // connectedCallback → _render()
+    const rowItem = new DebtRowItem(row, { excludeColumns: [], showDetailAction: false });
+    tbody.appendChild(rowItem.element);
 
-    const tr = rowItem.querySelector('tr');
-    assert(tr !== null, 'DebtRowItem debe renderizar un <tr>');
+    const tr = rowItem.element;
+    assert(tr !== null && tr.tagName === 'TR', 'DebtRowItem.element debe ser un <tr> directo');
 
     // Celdas mobile (d-table-cell d-md-none)
     const mobileCells = tr.querySelectorAll('td.d-table-cell.d-md-none');

@@ -3,7 +3,7 @@ import '../../../shared/components/AppTable.js';
 import '../../../shared/components/AppCheckbox.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
-import './DebtRowItem.js';
+import { DebtRowItem } from './DebtRowItem.js';
 import './DebtListTotals.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
@@ -159,8 +159,8 @@ export class DebtList extends HTMLElement {
         this._renderTotals();
     }
 
-    // Renderiza una tabla Bootstrap con <debt-row-item> por fila.
-    // Las celdas del componente usan d-table-cell/d-md-none y d-none/d-md-table-cell
+    // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
+    // Las celdas usan d-table-cell/d-md-none y d-none/d-md-table-cell
     // para mostrar el layout de card en mobile y columnas en desktop.
     _renderRowTable(container, tableData) {
         let tableWrapper = container.querySelector('.table-responsive');
@@ -206,11 +206,11 @@ export class DebtList extends HTMLElement {
         }
 
         tableData.forEach(row => {
-            const rowItem = document.createElement('debt-row-item');
-            rowItem.excludeColumns = this._excludeColumns || [];
-            rowItem.showDetailAction = this._showDetailAction;
-            rowItem.rowData = row; // dispara _render en connectedCallback
-            tbody.appendChild(rowItem);
+            const rowItem = new DebtRowItem(row, {
+                excludeColumns: this._excludeColumns || [],
+                showDetailAction: this._showDetailAction,
+            });
+            tbody.appendChild(rowItem.element);
         });
     }
 

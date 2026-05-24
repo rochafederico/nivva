@@ -1,5 +1,5 @@
 // src/features/deudas/components/DebtRowItem.js
-// Web Component que representa una fila de deuda con diseño responsivo Bootstrap.
+// Clase JS que construye una fila <tr> de deuda con diseño responsivo Bootstrap.
 // En mobile (< md): 2 celdas — info (avatar + nombre + tipo + fecha) y acciones (monto + badge + toggle).
 // En desktop (md+): celdas individuales por columna — acreedor, tipo, vencimiento, monto, toggle.
 
@@ -49,37 +49,23 @@ export function getEstado(row) {
 }
 
 // ── Componente ────────────────────────────────────────────────────────────────
+// DebtRowItem es una clase JS (no un custom element) que construye un <tr> directamente,
+// eliminando el elemento envoltorio extra en el DOM.
+// Uso: const item = new DebtRowItem(row, { excludeColumns, showDetailAction });
+//       tbody.appendChild(item.element);
 
-export class DebtRowItem extends HTMLElement {
-    connectedCallback() {
-        // display:contents hace que el elemento sea transparente al layout de la tabla,
-        // por lo que el <tr> interno aparece como hijo directo del <tbody>.
-        this.style.display = 'contents';
-        if (this._rowData) this._render();
+export class DebtRowItem {
+    constructor(row, options = {}) {
+        this._rowData = row;
+        this._excludeColumns = options.excludeColumns || [];
+        this._showDetailAction = !!options.showDetailAction;
+        this.element = this._build();
     }
 
-    set rowData(data) {
-        this._rowData = data;
-        if (this.isConnected) this._render();
-    }
-
-    get rowData() {
-        return this._rowData;
-    }
-
-    set excludeColumns(arr) {
-        this._excludeColumns = arr || [];
-    }
-
-    set showDetailAction(val) {
-        this._showDetailAction = !!val;
-    }
-
-    _render() {
-        this.innerHTML = '';
+    _build() {
         const row = this._rowData;
-        if (!row) return;
-        const excl = this._excludeColumns || [];
+        if (!row) return document.createElement('tr');
+        const excl = this._excludeColumns;
 
         // ── Estado badges (mobile + desktop compartidos) ──────────────
         const mobileBadgeDiv = document.createElement('div');
@@ -331,8 +317,6 @@ export class DebtRowItem extends HTMLElement {
         tdToggle.appendChild(toggleWrap);
         tr.appendChild(tdToggle);
 
-        this.appendChild(tr);
+        return tr;
     }
 }
-
-customElements.define('debt-row-item', DebtRowItem);
