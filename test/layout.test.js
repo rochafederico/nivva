@@ -55,6 +55,41 @@ export const tests = [
         assert(failed, 'Debe rechazar extraClasses si no es string');
     },
 
+    function createIconButton_requiresIconAndLabel() {
+        console.log('  createIconButton: requiere icon y label');
+        const cases = [
+            { label: 'Ver vencimientos próximos' },
+            { icon: 'bi-bell' },
+        ];
+
+        for (const options of cases) {
+            let failed = false;
+            try {
+                createIconButton(options);
+            } catch (err) {
+                failed = err instanceof Error;
+            }
+
+            assert(failed, 'Debe rechazar si falta icon o label');
+        }
+    },
+
+    function createIconButton_rejectsInvalidVariant() {
+        console.log('  createIconButton: valida variant permitido');
+        let failed = false;
+        try {
+            createIconButton({
+                icon: 'bi-bell',
+                label: 'Ver vencimientos próximos',
+                variant: 'outline-primary',
+            });
+        } catch (err) {
+            failed = err instanceof Error;
+        }
+
+        assert(failed, 'Debe rechazar variant no permitido');
+    },
+
     // ===================================================================
     // UC1: navConfig provides title and subtitle for each route
     // ===================================================================
