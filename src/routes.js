@@ -23,8 +23,8 @@ const routes = [
     component: componentMap[item.path],
   })),
   {
-    path: '/gastos/mensual',
-    label: 'Cuotas del mes',
+    path: '/gastos/deudas',
+    label: 'Deudas',
     title: 'Deudas',
     subtitle: DEFAULT_SUBTITLE,
     component: GastosMensual,

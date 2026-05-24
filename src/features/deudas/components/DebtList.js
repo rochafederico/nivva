@@ -1,7 +1,6 @@
-import '../../../shared/components/AppButton.js';
-import '../../../shared/components/AppTable.js';
-import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
+import { DebtRowItem } from './DebtRowItem.js';
+import './DebtListTotals.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 export class DebtList extends HTMLElement {
@@ -86,9 +85,6 @@ export class DebtList extends HTMLElement {
     }
 
     renderTable() {
-        // Totales por moneda
-        const totales = {};
-
         // Unificar todos los montos en un solo array con referencia a la deuda
         let allMontos = this.debts.reduce((arr, deuda) => {
             deuda.montos.forEach(monto => {
@@ -105,49 +101,7 @@ export class DebtList extends HTMLElement {
         // Ordenar por fecha de vencimiento ascendente
         allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
 
-        // Calcular totales por moneda
-        allMontos.forEach(monto => {
-            totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
-        });
-
-        // Definir columnas para AppTable, ocultando 'Acciones' y 'Pagado' si hay agrupamiento
-        let columns = [...debtTableColumns];
-        // Filtrar columnas 'Acciones' y 'vencimiento' si hay agrupamiento, pero mostrar 'vencimiento' solo si el agrupamiento es por 'vencimiento'
-        if (this.groupBy !== 'none') {
-            let hiddenKeys = ['acciones', 'vencimiento'];
-            if (this.groupBy === 'vencimiento') {
-                hiddenKeys = ['acciones'];
-            }
-            columns = columns.filter(col => !hiddenKeys.includes(col.key));
-        }
-        // Filtrar columnas excluidas via atributo exclude-columns
-        if (this._excludeColumns && this._excludeColumns.length) {
-            columns = columns.filter(col => !this._excludeColumns.includes(col.key));
-        }
-
-        // Agregar columna de acción "ver deuda" si se solicitó explícitamente
-        if (this._showDetailAction) {
-            columns = [...columns, {
-                key: 'ver-deuda',
-                label: '',
-                render: row => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'btn btn-sm btn-outline-secondary';
-                    btn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || ''}`);
-                    btn.innerHTML = '<i class="bi bi-eye" aria-hidden="true"></i>';
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (typeof row._onDetail === 'function') {
-                            row._onDetail(row, btn);
-                        }
-                    });
-                    return btn;
-                }
-            }];
-        }
-
-        // Mapear datos de la tabla
+        // Mapear datos de la tabla enriqueciendo con callbacks
         const tableData = allMontos.map(row => {
             const entry = {
                 ...row,
@@ -172,16 +126,61 @@ export class DebtList extends HTMLElement {
             return entry;
         });
 
-        // Renderizar AppTable
-        let table = this.querySelector('app-table');
-        if (!table) {
-            table = document.createElement('app-table');
-            this.appendChild(table);
-        }
-        table.columnsConfig = columns;
-        table.tableData = tableData;
+        const container = this.querySelector('.debt-list-container');
+        const isUngroupedView = this.groupBy === 'none';
+
+        this._renderRowTable(container, tableData, {
+            showDetailAction: this._showDetailAction,
+            showPaymentAction: isUngroupedView,
+        });
 
         this._renderTotals();
+    }
+
+    // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
+    // Usa un layout unificado con 2 columnas (info + acciones) en todos los breakpoints.
+    _renderRowTable(container, tableData, options = {}) {
+        let tableWrapper = container.querySelector('.table-responsive');
+        let tbody;
+
+        if (!tableWrapper) {
+            container.innerHTML = '';
+            tableWrapper = document.createElement('div');
+            tableWrapper.className = 'table-responsive';
+
+            const table = document.createElement('table');
+            table.className = 'table table-hover table-striped mb-0';
+
+            tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+            tableWrapper.appendChild(table);
+            container.appendChild(tableWrapper);
+        } else {
+            tbody = tableWrapper.querySelector('tbody');
+        }
+
+        // Reconstruir filas
+        tbody.innerHTML = '';
+
+        if (tableData.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 99;
+            td.className = 'text-muted text-center py-4';
+            td.textContent = 'No hay cuotas para este mes.';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        tableData.forEach(row => {
+            const rowItem = new DebtRowItem(row, {
+                excludeColumns: this._excludeColumns || [],
+                showDetailAction: options.showDetailAction ?? this._showDetailAction,
+                showPaymentAction: options.showPaymentAction ?? true,
+            });
+            tbody.appendChild(rowItem.element);
+        });
     }
 
     toggleEstado(id) {
@@ -214,47 +213,27 @@ export class DebtList extends HTMLElement {
     }
 
     _renderTotals() {
-        let totalsEl = this.querySelector('.debt-list-totals');
+        let totalsEl = this._externalTotals || this.querySelector('debt-list-totals');
         if (!totalsEl) return;
 
         const pendiente = this.totalesPendientes || {};
         const pagado = this.totalesPagados || {};
-        const currencies = new Set([...Object.keys(pendiente), ...Object.keys(pagado)]);
 
-        if (currencies.size === 0) {
-            totalsEl.innerHTML = '';
-            return;
-        }
-
-        const fmt = (moneda, n) => this.fmtMoneda(moneda, n || 0);
-
-        const pendienteItems = [...currencies]
-            .filter(m => Number(pendiente[m]) > 0)
-            .map(m => `<span class="badge text-bg-warning me-1">${fmt(m, pendiente[m])}</span>`)
-            .join('');
-        const pagadoItems = [...currencies]
-            .filter(m => Number(pagado[m]) > 0)
-            .map(m => `<span class="badge text-bg-success me-1">${fmt(m, pagado[m])}</span>`)
-            .join('');
-
-        if (!pendienteItems && !pagadoItems) {
-            totalsEl.innerHTML = '';
-            return;
-        }
-
-        totalsEl.innerHTML = `
-            <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 px-3 py-2 border-top text-end">
-                ${pendienteItems ? `<div class="d-flex align-items-center gap-1"><span class="text-muted small me-1">Pendiente:</span>${pendienteItems}</div>` : ''}
-                ${pagadoItems ? `<div class="d-flex align-items-center gap-1"><span class="text-muted small me-1">Pagado:</span>${pagadoItems}</div>` : ''}
-            </div>
-        `;
+        totalsEl.update(pendiente, pagado, { debts: this.debts || [] });
     }
 
     render() {
-        this.innerHTML = `
-            <app-table></app-table>
-            <div class="debt-list-totals"></div>
-        `;
+        this.innerHTML = '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
+    }
+
+    /**
+     * Registers an external debt-list-totals element (outside the card) that
+     * _renderTotals() will update instead of the one embedded inside this component.
+     * Called by DebtEntityShell after it moves the element outside the card.
+     * @param {HTMLElement} el - The debt-list-totals element to use
+     */
+    setExternalTotals(el) {
+        this._externalTotals = el;
     }
 
     groupMontos(montos, groupBy) {

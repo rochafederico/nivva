@@ -50,13 +50,19 @@ El workflow de CI corre automáticamente en estos eventos:
 | `push` | `main`, `develop` |
 | `pull_request` | PRs hacia `main` o `develop` |
 
-### Pasos del workflow
+El workflow corre dos jobs en paralelo:
+
+- **`lint`** — ejecuta `npm run lint` para validar estilo y calidad de código.
+- **`test`** — ejecuta `npm test` para correr la suite de tests.
+
+Ambos jobs corren de forma independiente: si lint falla, los tests igualmente se ejecutan y se reportan por separado.
+
+### Pasos de cada job
 
 1. **Checkout** — descarga el código del repo.
 2. **Setup Node.js 20** — instala Node con caché de npm para acelerar instalaciones.
 3. **Install dependencies** — ejecuta `npm ci` para instalación limpia y reproducible.
-4. **Lint** — ejecuta `npm run lint` para validar estilo y calidad de código.
-5. **Test** — ejecuta `npm test` para correr la suite de tests.
+4. **Lint** / **Test** — valida calidad o ejecuta la suite de tests.
 
 ---
 
@@ -67,7 +73,7 @@ Las siguientes opciones **no se pueden configurar por archivos del repo** y debe
 ### Branch protection para `main` y `develop`
 
 - **Require a pull request before merging** — evita pushes directos.
-- **Require status checks to pass before merging** — marcar `lint-and-test` como required check.
+- **Require status checks to pass before merging** — marcar `lint` y `test` como required checks.
 - **Require branches to be up to date before merging** — evita que se mergee código desactualizado.
 - **Dismiss stale pull request approvals when new commits are pushed** — obliga a re-aprobar si hay cambios.
 
