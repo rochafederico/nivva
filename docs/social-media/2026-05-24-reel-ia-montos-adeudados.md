@@ -179,19 +179,33 @@ Ahora lo ves más claro.
 
 ### Escena 3 — Nueva vista de montos adeudados
 
-Objetivo visual: mostrar la funcionalidad real: listado de cuotas, pagado/vencido, resumen pendiente y resumen pagado.
+Objetivo visual: mostrar la funcionalidad real con una escena humana: una persona usando Nivva y viendo la pantalla de deudas con pendiente y pagado. Esta escena debe ser más cercana que técnica, pero la UI debe seguir siendo protagonista.
 
 ```text
-Vertical 9:16 realistic lifestyle product photo.
+Vertical 9:16 realistic lifestyle product photograph.
 
-A smartphone on a warm minimal desk showing the Nivva app open on the debts view. The interface must look clean, readable and mobile-first. Use teal #3D8F8F and cream #F2EDE8. Show a monthly debts list with clear visual separation between paid and overdue/pending items. At the bottom of the app screen, show two clear summary cards: one for pending amount and one for paid amount.
+A person sitting near a warm home desk and holding a modern smartphone with the Nivva app open. Do not show the person's face; frame the image from the shoulders down or from behind, showing only hands, sweater/torso, jeans and part of the desk. The phone should be the main focal point, held naturally in one hand, slightly angled toward the camera.
 
-The UI should feel realistic and inspired by an actual web app, not futuristic. Keep the phone screen sharp and legible, with rounded cards, soft shadows and simple navigation. The background should be softly blurred with warm natural light.
+On the phone screen, show the Nivva debts view clearly. Use teal #3D8F8F, cream #F2EDE8, white surfaces, rounded cards and soft dividers. The UI should show a monthly debts list with simple status badges for paid and overdue/pending items, plus two summary cards near the bottom: one for pending amount and one for paid amount. The screen should look like a real mobile-first web app, not a generic finance mockup.
 
-Do not show browser address bar. No bank logos, no credit card logos, no private data, no QR codes, no extra generated captions outside the phone.
+The environment should be calm, organized and realistic: warm wooden desk, soft natural light, blurred notebook, pen, mug, plant or papers in the background. Keep the mood useful and relaxed, not emotional or dramatic. Leave generous negative space in the upper part for text overlay.
 
-Leave space for text overlay.
+Do not show browser address bar, Safari/Chrome controls or screenshot chrome. No bank logos, no credit card logos, no QR codes, no private data, no extra captions outside the phone, no watermark. Avoid distorted hands, extra fingers or warped phone screen.
+
+Style: realistic lifestyle photography, warm natural light, shallow depth of field, premium but everyday, calm personal finance moment.
 Aspect ratio: 9:16.
+```
+
+Refuerzo si la pantalla no se entiende:
+
+```text
+Keep the phone screen sharp and readable. The key visual hierarchy must be visible: debt rows, paid/overdue status indicators, pending summary card, paid summary card, and teal bottom navigation. The screen should resemble the real Nivva debts view, with clear pending vs paid separation.
+```
+
+Variante si se quiere priorizar captura real:
+
+```text
+Use the real Nivva debts screenshot as the phone screen reference. Preserve the layout: teal header, debts title, monthly selector, debt rows, paid/vencido badges, toggles, bottom navigation, yellow pending card and green paid card. Integrate it naturally into a realistic hand-held smartphone scene without browser chrome.
 ```
 
 Texto en Edits:
@@ -200,7 +214,7 @@ Texto en Edits:
 Pendiente y pagado, separados.
 ```
 
-> Recomendación: para esta escena conviene priorizar una captura real de Nivva o usar la captura real como referencia visual principal.
+> Recomendación: para esta escena conviene priorizar una captura real de Nivva o usar la captura real como referencia visual principal. Si se usa IA, validar especialmente manos, proporción del teléfono y legibilidad de la pantalla.
 
 ### Escena 4 — Beneficio: persona usando Nivva
 
