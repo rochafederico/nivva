@@ -1,6 +1,6 @@
 # Social Media — Reel IA: nueva vista de montos adeudados
 
-> Guía operativa para crear un reel de Instagram usando ElevenLabs + Instagram Edits, sin voz generada por IA.
+> Guía operativa y registro del reel de Instagram creado para promocionar la nueva vista de montos adeudados de Nivva.
 
 ## Objetivo
 
@@ -9,6 +9,19 @@ Promocionar la nueva vista de montos adeudados de Nivva mostrando, de forma clar
 - qué queda pendiente;
 - qué ya está pagado;
 - cuánto corresponde al mes seleccionado.
+
+La narrativa del reel va de **desorden manual** a **claridad visual en Nivva**.
+
+## Versión publicada
+
+El reel se armó en **4 escenas**, sin textos agregados sobre el video.
+
+| Escena | Idea | Función narrativa |
+|---|---|---|
+| 1 | Escritorio con papeles, cuentas, planilla y pizarra | Mostrar el problema: organización manual y desorden visual |
+| 2 | Celular o pantalla con Nivva | Presentar la solución de forma visual |
+| 3 | Persona usando Nivva en el celular | Humanizar el uso y mostrar claridad en contexto real |
+| 4 | Logo de Nivva | Cierre de marca |
 
 ## Criterio de marca
 
@@ -19,97 +32,57 @@ Promocionar la nueva vista de montos adeudados de Nivva mostrando, de forma clar
 - No usar estética futurista, cripto, bancaria ni exageradamente “IA”.
 - Mostrar Nivva como herramienta de registro y visibilidad.
 - Usar IA como apoyo visual, no como protagonista del mensaje.
+- Priorizar escenas realistas, cálidas y cotidianas.
+- Evitar estética de stock corporativo demasiado perfecta.
 
-## Herramientas sugeridas
+## Decisión de edición
 
-### Prioridad recomendada
+Para esta versión se decidió **no usar textos en pantalla**. La comunicación queda apoyada en:
 
-1. **ElevenLabs** para armar el flujo de generación visual y producir imágenes/clips base.
-2. **Instagram Edits** para editar, ordenar clips, agregar textos, música y publicar.
-3. **Captura real de la app** para mostrar la nueva vista como evidencia del producto.
+- la progresión visual de las escenas;
+- la captura/representación de Nivva;
+- el caption de Instagram;
+- los hashtags;
+- el cierre con marca.
 
-> Nota: no usar voz generada con IA. Los textos del reel se definen desde la documentación de marca y se agregan como overlays en Instagram Edits.
+Motivo: al no sumar overlays, el reel se ve más limpio, más realista y menos publicitario. Además, permite que el foco quede en la app y en el contraste entre el desorden inicial y la claridad final.
 
-## Flujo de trabajo resumido
-
-1. Definir el mensaje del reel.
-2. Crear un flujo en ElevenLabs.
-3. Generar imágenes base por escena.
-4. Convertir las imágenes a clips cortos.
-5. Grabar o capturar la pantalla real de la nueva vista.
-6. Editar todo en Instagram Edits.
-7. Agregar textos breves en pantalla.
-8. Publicar como reel y reutilizar como historia.
-
-## Flujo recomendado en ElevenLabs
-
-Crear un flujo visual con estos nodos:
-
-| Nodo | Tipo | Salida |
-|---|---|---|
-| 1 | Texto | Prompt maestro |
-| 2 | Imagen | Escena problema |
-| 3 | Imagen | Escena transición |
-| 4 | Imagen | Escena nueva vista |
-| 5 | Imagen | Escena beneficio |
-| 6 | Imagen | Cierre marca |
-| 7 | Video | Animación de escenas |
-| 8 | Export | Clips para Edits |
-
-### Paso a paso en ElevenLabs
-
-1. Crear un flujo nuevo.
-2. Agregar un nodo de texto con el **prompt maestro**.
-3. Agregar un nodo de imagen por cada escena.
-4. Conectar el prompt maestro con cada nodo de imagen.
-5. En cada nodo de imagen, sumar el prompt específico de la escena.
-6. Generar una primera versión de cada imagen.
-7. Elegir solo imágenes donde el celular, la mano y la pantalla se vean naturales.
-8. Convertir cada imagen aceptada a video con el prompt de imagen a video.
-9. Exportar clips verticales 9:16 de 3 a 5 segundos.
-10. No generar voz ni narración.
-
-## Estructura del reel
-
-Duración sugerida: 18 a 24 segundos.
-
-| Escena | Duración | Idea |
-|---|---:|---|
-| 1 | 3s | Antes: papeles, planillas, confusión |
-| 2 | 4s | Aparece Nivva en el celular |
-| 3 | 6s | Nueva vista de montos adeudados |
-| 4 | 5s | Pendiente y pagado más claros |
-| 5 | 3s | Cierre con marca |
-
-## Textos en pantalla
-
-Usar estos textos como overlays en Instagram Edits:
-
-1. `¿Te cuesta ver cuánto debés?`
-2. `Ahora lo ves más claro.`
-3. `Pendiente y pagado, separados.`
-4. `Tus montos del mes, en un solo lugar.`
-5. `Nivva`
-6. `Tus números, fácil y simple.`
-
-## Prompt maestro para el flujo
-
-Usar como primer nodo de texto en ElevenLabs.
+## Caption para publicar
 
 ```text
-Create a vertical 9:16 realistic product marketing reel for a personal finance web app called Nivva.
+Ordenar tus cuentas no debería depender de mil papeles, cuentas sueltas o una planilla difícil de seguir.
+
+En Nivva estoy mejorando la vista de montos adeudados para que sea más simple ver qué queda pendiente, qué ya pagaste y cuánto corresponde al mes.
+
+La idea es clara: menos vueltas, más visibilidad.
+
+Probala gratis desde el link del perfil.
+```
+
+## Hashtags
+
+```text
+#Nivva #FinanzasPersonales #OrganizacionFinanciera #Deudas #PresupuestoPersonal #AppWeb #Productividad #HerramientasDigitales #FinanzasDelHogar #HechoEnArgentina #ProyectoPersonal #WebApp #UX #DiseñoDeProducto #ConstruyendoEnPublico
+```
+
+## Prompt maestro para imágenes
+
+Usar como base para todas las escenas.
+
+```text
+Create a vertical 9:16 realistic product marketing image for a personal finance web app called Nivva.
 
 Brand style: simple, clear, calm, trustworthy and human. The product helps people register and visualize monthly financial commitments. It is not a financial advisor and should not promise financial improvement.
 
-Visual style: realistic, minimal, warm natural light, modern home desk, smartphone as the main subject. Avoid exaggerated AI aesthetics. The mood should feel organized and useful, not dramatic.
+Visual style: realistic lifestyle photography, warm natural light, shallow depth of field, modern home desk, everyday objects, natural textures, calm composition. Avoid exaggerated AI aesthetics. The mood should feel useful and human, not dramatic.
 
 Brand colors: teal #3D8F8F, cream #F2EDE8, white, soft black #1A1A1A and neutral gray.
 
-The app should look like a clean mobile-first web app. The key feature is an improved “amounts owed” view that clearly separates pending payments, paid payments and monthly totals.
+The app should look like a clean mobile-first web app. The key feature is an improved monthly debts view that clearly separates pending payments, paid payments and monthly totals.
 
 Do not show real bank logos, credit card brands, private data, QR codes, account numbers or sensitive financial information.
 
-Do not add Spanish text inside the generated image or video. Leave empty space for text overlays that will be added later in Instagram Edits.
+Leave empty space if text overlays are needed later, but do not generate text inside the image.
 
 Format: vertical 9:16.
 Tone: calm, useful, premium but simple.
@@ -120,130 +93,203 @@ Tone: calm, useful, premium but simple.
 Usar como restricción en todos los nodos de imagen o video.
 
 ```text
-No futuristic holograms, no neon, no cyberpunk, no flying charts, no crypto coins, no bank logos, no credit card brands, no real personal data, no QR codes, no messy unreadable UI, no distorted phone screen, no dramatic anxiety, no luxury lifestyle, no money flying, no exaggerated AI glow, no robotic interface, no extra fingers, no broken hands, no generated Spanish text, no fake captions, no watermark.
+No futuristic holograms, no neon, no cyberpunk, no flying charts, no crypto coins, no bank logos, no credit card brands, no real personal data, no QR codes, no messy unreadable UI, no distorted phone screen, no dramatic anxiety, no luxury lifestyle, no money flying, no exaggerated AI glow, no robotic interface, no extra fingers, no broken hands, no fake captions, no watermark, no perfect corporate stock-photo look.
 ```
 
 ## Prompts por escena
 
-### Escena 1 — Problema
+### Escena 1 — Problema: desorden manual
+
+Objetivo visual: mostrar el “antes”. Debe verse como una persona intentando organizar sus cuentas con papeles, planilla y pizarra física.
 
 ```text
-Vertical 9:16 realistic image. A home desk with scattered receipts, a notebook, a calculator, a pen and a laptop with a spreadsheet blurred in the background. Warm natural light. The scene should feel relatable and slightly disorganized, but not dramatic. No people faces. No bank logos. Leave empty space for text overlay. No generated text.
+Vertical 9:16 realistic lifestyle photograph.
+
+A warm home-office desk in natural morning light, slightly messy and very relatable. The desk is full of scattered receipts, loose bills, handwritten notes, a notebook open with calculations, a simple calculator, pens, sticky notes and a generic laptop in the background showing a blurred spreadsheet with rows and columns.
+
+On the left side of the scene, include a physical whiteboard with many handwritten personal-finance calculations, arrows, crossed-out amounts, monthly totals and reminders. The handwriting should look real and messy, but not readable in detail. The whiteboard should communicate financial confusion and manual organization.
+
+The laptop must be generic, with no visible brand. The spreadsheet should be softly blurred and not readable. No bank logos, no credit card logos, no app logos, no people, no faces.
+
+The scene should feel disorganized but not dramatic: everyday financial clutter, warm, human, realistic, calm tension. Use soft shadows, warm natural light, shallow depth of field, and realistic textures on paper, wood and objects.
+
+Do not generate any readable text, captions, slogans or watermarks.
+
+Style: realistic photography, cozy home desk, warm natural light, 35mm lens look, shallow depth of field, imperfect real-life composition.
+Aspect ratio: 9:16.
 ```
 
-Texto en Edits:
+Refuerzo si el resultado sale demasiado prolijo:
 
 ```text
-¿Te cuesta ver cuánto debés?
+Make it look like a real candid photo, not a polished stock image. Slightly imperfect framing, natural shadows, papers overlapping, receipts at different angles, realistic desk clutter, warm sunlight, subtle dust and paper texture. The mood is “I’m trying to organize my finances manually” before discovering a simpler app.
 ```
 
-### Escena 2 — Transición a Nivva
+### Escena 2 — Aparece Nivva
+
+Objetivo visual: presentar Nivva como una alternativa clara y ordenada al desorden anterior. Esta escena funciona mejor si el celular o la pantalla aparece como protagonista, con una composición simple y realista.
 
 ```text
-Vertical 9:16 realistic image. A smartphone on a warm minimal desk showing a clean personal finance web app called Nivva. The interface uses teal #3D8F8F and cream #F2EDE8. The app looks simple, readable and mobile-first. The background is softly blurred. Leave empty space for text overlay. No generated text.
+Vertical 9:16 realistic lifestyle product photograph.
+
+A modern smartphone standing upright on a warm minimal wooden desk, slightly below the center of the frame. The scene should feel like a real home desk in warm natural light, not like a corporate stock photo.
+
+On the phone screen, show the Nivva personal finance web app open. The UI should be simple, readable and mobile-first, using teal #3D8F8F, cream #F2EDE8, white surfaces, rounded cards, soft dividers and subtle icons. Show a clear monthly overview or debts dashboard inspired by the real Nivva interface, with visual cards and simple navigation. The app should feel calm, organized and trustworthy.
+
+Do not show a browser address bar, Safari/Chrome controls or screenshot chrome. The phone screen must be sharp, realistic and proportional, with no warped UI. The background should be softly blurred and warm, with only a few subtle props such as a ceramic mug, small plant, notebook or pen. Keep the desk minimal and ordered to contrast with the previous cluttered scene.
+
+No people, no faces, no bank logos, no credit card logos, no QR codes, no private data, no extra marketing text outside the phone, no watermark.
+
+Style: realistic photography, warm natural light, premium but simple, shallow depth of field, natural desk textures, calm composition.
+Aspect ratio: 9:16.
 ```
 
-Texto en Edits:
+Variante desktop:
 
 ```text
-Ahora lo ves más claro.
+Vertical 9:16 realistic home-office product photo.
+
+A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen shows the Nivva debts dashboard in desktop layout: left sidebar navigation, clean debt rows, paid and overdue status badges, and two summary cards for pending and paid amounts. The screen should be readable enough to understand the layout, but still integrated naturally into a realistic photo.
+
+The scene must be different from the smartphone scene: different angle, different props and more desk depth. Use warm natural light, a neutral wall, a small plant, notebook, keyboard, mouse and mug. Keep it calm, organized and human. No visible hardware brands. No bank logos. No extra generated text outside the screen.
+Aspect ratio: 9:16.
 ```
 
-### Escena 3 — Nueva vista de montos
+### Escena 3 — Uso real de Nivva
+
+Objetivo visual: mostrar la funcionalidad real con una escena humana: una persona usando Nivva y viendo la pantalla de deudas con pendiente y pagado.
 
 ```text
-Vertical 9:16 realistic close-up of a smartphone screen showing a clean mobile app view for monthly owed amounts. The interface clearly separates pending payments and paid payments. Show visual totals at the bottom. Use teal #3D8F8F, cream #F2EDE8, white and soft black. The UI must feel simple and organized. No real brands, no private data, no QR codes. No generated text.
+Vertical 9:16 realistic lifestyle product photograph.
+
+A person sitting near a warm home desk and holding a modern smartphone with the Nivva app open. Do not show the person's face; frame the image from the shoulders down or from behind, showing only hands, sweater/torso, jeans and part of the desk. The phone should be the main focal point, held naturally in one hand, slightly angled toward the camera.
+
+On the phone screen, show the Nivva debts view clearly. Use teal #3D8F8F, cream #F2EDE8, white surfaces, rounded cards and soft dividers. The UI should show a monthly debts list with simple status badges for paid and overdue/pending items, plus two summary cards near the bottom: one for pending amount and one for paid amount. The screen should look like a real mobile-first web app, not a generic finance mockup.
+
+The environment should be calm, organized and realistic: warm wooden desk, soft natural light, blurred notebook, pen, mug, plant or papers in the background. Keep the mood useful and relaxed, not emotional or dramatic.
+
+Do not show browser address bar, Safari/Chrome controls or screenshot chrome. No bank logos, no credit card logos, no QR codes, no private data, no extra captions outside the phone, no watermark. Avoid distorted hands, extra fingers or warped phone screen.
+
+Style: realistic lifestyle photography, warm natural light, shallow depth of field, premium but everyday, calm personal finance moment.
+Aspect ratio: 9:16.
 ```
 
-Texto en Edits:
+Refuerzo si la pantalla no se entiende:
 
 ```text
-Pendiente y pagado, separados.
+Keep the phone screen sharp and readable. The key visual hierarchy must be visible: debt rows, paid/overdue status indicators, pending summary card, paid summary card, and teal bottom navigation. The screen should resemble the real Nivva debts view, with clear pending vs paid separation.
 ```
 
-> Recomendación: para esta escena conviene priorizar una captura real de Nivva antes que una pantalla generada por IA.
-
-### Escena 4 — Beneficio
+Variante si se quiere priorizar captura real:
 
 ```text
-Vertical 9:16 realistic image of a person holding a smartphone with the Nivva app open. The person is sitting near a desk in warm natural light. The phone screen shows a clean monthly summary with pending and paid amounts. The mood is calm and organized. Do not show the person's face. No exaggerated emotion. No generated text.
+Use the real Nivva debts screenshot as the phone screen reference. Preserve the layout: teal header, debts title, monthly selector, debt rows, paid/vencido badges, toggles, bottom navigation, yellow pending card and green paid card. Integrate it naturally into a realistic hand-held smartphone scene without browser chrome.
 ```
 
-Texto en Edits:
+### Escena 4 — Cierre: logo de Nivva
+
+Objetivo visual: cierre simple, premium y limpio. Debe funcionar como transición final de marca.
 
 ```text
-Tus montos del mes, en un solo lugar.
+Vertical 9:16 realistic branded end-transition image.
+
+Use the Nivva logo as the main focal point. Preserve the logo’s geometric shape and teal identity. Create a clean, elegant end card that feels calm, modern and minimal, suitable as the final transition of a social media reel for a personal finance app.
+
+Place the logo prominently near the center with subtle depth, soft lighting and a warm cream-toned background with gentle teal accents. Add a soft blurred tabletop or abstract minimal setting so it feels premium and cohesive with the previous warm desk scenes, but keep it visually simpler than the earlier scenes.
+
+No people. No extra logos. No generated text. Leave breathing room around the logo so it works well for fade-out or outro animation.
+
+Aspect ratio: 9:16.
 ```
 
-### Escena 5 — Cierre
+## Prompts para imagen a video
 
-```text
-Vertical 9:16 minimal brand image. Cream background #F2EDE8, centered teal symbol inspired by the Nivva brand, clean sans-serif text area, modern and simple. No extra decoration. Calm, trustworthy and minimal. No generated text.
-```
+### Animación general por escena
 
-Texto en Edits:
-
-```text
-Nivva
-Tus números, fácil y simple.
-```
-
-## Prompt para imagen a video
-
-Usar en cada nodo que convierta imagen a video.
+Usar cuando se quiera convertir una imagen individual en clip.
 
 ```text
 Animate this vertical 9:16 image into a short realistic product promo clip.
 
-Use a slow camera push-in, subtle handheld movement and warm natural lighting. Keep the smartphone and app interface stable and readable. Do not distort the screen. Do not add new objects. Do not add text. Keep the movement calm, premium and minimal.
+Use a slow camera push-in, subtle handheld movement and warm natural lighting. Keep the main subject stable and natural. Do not distort the smartphone screen. Do not add new objects. Do not add text. Keep the movement calm, premium and minimal.
 
 Duration: 4 seconds.
+Aspect ratio: 9:16.
+```
+
+### Transición desde desorden hacia Nivva
+
+Usar entre la escena 1 y la escena 2.
+
+```text
+Create a vertical 9:16 realistic transition video between the two reference images.
+
+Start with the cluttered desk scene: scattered receipts, calculator, notebook, whiteboard and blurred spreadsheet. Use a slow push-in across the papers, as if the camera is searching for clarity. Keep the warm natural light and realistic desk textures.
+
+Then transition smoothly into the smartphone scene with the Nivva app open on a clean warm desk. The transition should feel like moving from manual confusion to visual organization. Use a soft dissolve or match-cut based on the warm desk tones and teal accents.
+
+No new text, no logos except Nivva inside the app, no dramatic effects, no futuristic glow, no distorted UI.
+
+Duration: 4 to 5 seconds.
+Camera motion: slow push-in, soft dissolve, stable final frame.
+Mood: calm, practical, organized.
+Aspect ratio: 9:16.
+```
+
+### Transición desde persona usando la app hacia logo
+
+Usar entre la escena 3 y la escena 4.
+
+```text
+Create a vertical 9:16 realistic transition video using the two reference images.
+
+Start with the person sitting near a warm home desk, holding a smartphone with the Nivva app open. The mood is calm, organized and realistic. Slowly push in toward the smartphone screen with a soft handheld camera movement. Keep the warm natural light, shallow depth of field and cozy desk atmosphere.
+
+As the camera approaches the phone screen, create a smooth transition where the teal elements of the app subtly expand and dissolve into the final Nivva logo scene. The transition should feel elegant and minimal, like the app experience resolving into the brand identity.
+
+End on the teal Nivva logo floating or centered in a warm cream minimalist environment. Add a very subtle slow zoom out or gentle floating motion to the logo. Keep the background soft, premium and calm.
+
+No people faces. No extra text. No generated captions. No bank logos. No exaggerated effects. No futuristic holograms.
+
+Duration: 4 to 5 seconds.
+Camera motion: slow push-in from phone, soft dissolve into logo, slight logo float at the end.
+Mood: calm, clear, organized, personal finance made simple.
+Aspect ratio: 9:16.
+```
+
+Versión corta si el generador responde mejor a prompts simples:
+
+```text
+Create a vertical 9:16 realistic transition video between the two reference images. Begin with the person holding the phone showing the Nivva app. Slowly zoom into the phone screen. The teal app color softly expands and dissolves into the final scene with the Nivva logo floating on a warm cream minimalist background. Keep the motion smooth, calm and premium. Warm natural light, soft depth of field, no faces, no extra text, no logos other than Nivva, no futuristic effects. End with a subtle floating motion and slow zoom on the logo.
 ```
 
 ## Prompt para música o ambiente opcional
 
-Usar solo si se decide generar música o ambiente dentro de ElevenLabs. No usar voz.
+Usar solo si se decide generar música o ambiente. No usar voz.
 
 ```text
 Create a short instrumental background track for a calm, modern product reel.
 
 Mood: warm, simple, focused and optimistic.
 Style: minimal electronic acoustic, soft beat, no vocals, no lyrics, no dramatic buildup.
-Duration: 24 seconds.
+Duration: 18 seconds.
 The music should support a clean personal productivity app, not feel like a bank ad or a luxury commercial.
 ```
 
 ## Edición en Instagram Edits
 
 1. Crear un proyecto vertical 9:16.
-2. Importar los clips generados con ElevenLabs.
-3. Importar una grabación real de la nueva vista, si está disponible.
-4. Ordenar los clips así:
-   - escritorio con papeles;
-   - celular con Nivva;
-   - detalle de montos;
-   - persona usando el celular;
-   - cierre con marca.
-5. Cortar cada clip a 3–5 segundos.
-6. Agregar textos en pantalla, uno por escena.
-7. Usar tipografía simple, sin efectos llamativos.
-8. Usar texto blanco o negro según contraste.
-9. Usar teal solo para palabras clave como `Pendiente`, `Pagado` o `Nivva`.
-10. Agregar música instrumental suave desde Instagram o importar la generada en ElevenLabs.
-11. No agregar voz IA.
-12. Exportar y revisar que la pantalla se entienda sin audio.
-
-## Caption sugerido
-
-```text
-Ahora la vista de montos es más clara.
-
-Podés ver qué queda pendiente, qué ya pagaste y cuánto corresponde al mes seleccionado.
-
-Nivva te ayuda a registrar y visualizar tus compromisos sin planillas, sin vueltas y sin subir tus datos.
-
-Probala gratis.
-```
+2. Importar los clips generados.
+3. Ordenar los clips así:
+   - escritorio con papeles, planilla y pizarra;
+   - celular o pantalla con Nivva;
+   - persona usando Nivva;
+   - cierre con logo.
+4. Cortar cada clip a 3–5 segundos.
+5. No agregar textos en pantalla para esta versión.
+6. Agregar música instrumental suave.
+7. No agregar voz IA.
+8. Exportar y revisar que se entienda visualmente sin audio.
 
 ## Checklist antes de publicar
 
@@ -251,9 +297,10 @@ Probala gratis.
 - [ ] No aparecen datos reales.
 - [ ] No aparecen marcas de bancos o tarjetas.
 - [ ] No se usan pantallas viejas como protagonista.
-- [ ] Los textos están en registro “vos”.
+- [ ] El caption está en registro “vos”.
 - [ ] No se promete salir de deudas ni mejorar finanzas.
 - [ ] La estética se mantiene simple, clara y humana.
-- [ ] El cierre muestra Nivva y el tagline.
-- [ ] No se generó voz IA.
+- [ ] La escena 1 muestra desorden sin dramatizar.
 - [ ] La nueva vista aparece al menos una vez con captura real o UI claramente legible.
+- [ ] El cierre muestra el logo de Nivva.
+- [ ] No se generó voz IA.
