@@ -43,15 +43,14 @@ export class AppHeader extends HTMLElement {
         </div>
       </nav>
     `;
-    this.querySelector('[data-header-actions]')?.insertBefore(
-      createIconButton({
-        id: 'tour-btn',
-        icon: 'bi-question-circle',
-        label: 'Abrir guía rápida',
-        title: 'Abrir guía rápida',
-      }),
-      this.querySelector('user-menu-button'),
-    );
+    const actions = this.querySelector('[data-header-actions]');
+    const userMenu = this.querySelector('user-menu-button');
+    actions?.insertBefore(createIconButton({
+      id: 'tour-btn',
+      icon: 'bi-question-circle',
+      label: 'Abrir guía rápida',
+      title: 'Abrir guía rápida',
+    }), userMenu);
   }
 }
 customElements.define('app-header', AppHeader);
