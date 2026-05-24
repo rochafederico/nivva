@@ -145,7 +145,7 @@ export class DebtRowItem {
         infoFlex.className = 'd-flex align-items-center gap-3';
 
         const avatar = document.createElement('div');
-        avatar.className = `debt-card-avatar d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 fw-semibold ${getAvatarClasses(row.acreedor)}`;
+        avatar.className = `debt-card-avatar d-none d-sm-flex align-items-center justify-content-center rounded-circle flex-shrink-0 fw-semibold ${getAvatarClasses(row.acreedor)}`;
         avatar.textContent = getInitials(row.acreedor);
         infoFlex.appendChild(avatar);
 
