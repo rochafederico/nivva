@@ -150,14 +150,14 @@ export class DebtRowItem {
         infoFlex.appendChild(avatar);
 
         const nameBlock = document.createElement('div');
-        nameBlock.className = 'flex-grow-1 min-w-0 overflow-hidden';
+        nameBlock.className = 'flex-grow-1 min-w-0';
 
         // Responsive: acreedor + date inline on desktop, stacked on mobile
         const nameDateRow = document.createElement('div');
         nameDateRow.className = 'd-flex flex-column flex-md-row align-items-md-baseline gap-md-2 min-w-0';
 
         const nameEl = document.createElement('h6');
-        nameEl.className = 'fw-semibold text-truncate mb-0';
+        nameEl.className = 'fw-semibold text-break mb-0';
         nameEl.textContent = row.acreedor ?? '';
         nameDateRow.appendChild(nameEl);
 

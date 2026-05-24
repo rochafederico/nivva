@@ -1514,7 +1514,7 @@ async function testDebtRowItem() {
     assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar usa clases de color Bootstrap');
 
     // Nombre del acreedor en mobile
-    const nameEl = tr.querySelector('.fw-semibold.text-truncate');
+    const nameEl = tr.querySelector('.fw-semibold.text-break');
     assert(nameEl !== null && nameEl.textContent === 'Test Acreedor', 'Debe mostrar nombre del acreedor');
 
     // Badge de tipo con ícono Bootstrap Icons
