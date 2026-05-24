@@ -14,7 +14,7 @@ import { createIconButton } from '../src/shared/components/createIconButton.js';
 
 export const tests = [
 
-    async function createIconButton_usesBootstrapAndAccessibleLabel() {
+    function createIconButton_usesBootstrapAndAccessibleLabel() {
         console.log('  createIconButton: usa Bootstrap y aria-label');
         const whitespaceSeparatedExtraClasses = `position-relative\nflex-shrink-0\tshadow-sm`;
         const btn = createIconButton({
@@ -39,7 +39,7 @@ export const tests = [
         assert(btn.querySelector('i.bi.bi-bell') !== null, 'Debe renderizar el ícono Bootstrap');
     },
 
-    async function createIconButton_rejectsNonStringExtraClasses() {
+    function createIconButton_rejectsNonStringExtraClasses() {
         console.log('  createIconButton: valida extraClasses string');
         let failed = false;
         try {
