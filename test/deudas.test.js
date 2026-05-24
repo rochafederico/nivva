@@ -5,6 +5,7 @@ import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/feat
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
 import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
+import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtListTotals.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -1364,6 +1365,43 @@ async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
     assert(totalsEl.textContent.includes('1 deuda vencida'), 'Debe contar solo el vencimiento válido no pagado');
     assert(!totalsEl.textContent.includes('2 deudas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
 
+    const summary = summarizeDebtListTotals(list.debts, '2999-01-01');
+    assert(summary.vencidas === 1, 'DebtListTotals debe calcular vencidas ignorando fechas inválidas');
+    assert(summary.pagadosCount === 1, 'DebtListTotals debe calcular cantidad de pagos realizados');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL6: DebtList agrupada — mantiene DebtRowItem y no vuelve a AppTable
+// ===================================================================
+async function testDebtListGroupedUsesDebtRowItemLayout() {
+    console.log('  DebtList agrupada: usa DebtRowItem y no reintroduce AppTable');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    list.groupBy = 'acreedor';
+    list._showDetailAction = true;
+    list._excludeColumns = ['tipoDeuda'];
+    list.debts = [{
+        acreedor: 'Banco Galicia',
+        tipoDeuda: 'Prestamo',
+        montos: [
+            { id: 1, deudaId: 10, monto: 1000, moneda: 'ARS', vencimiento: '2026-12-01', pagado: false },
+            { id: 2, deudaId: 10, monto: 500, moneda: 'ARS', vencimiento: '2026-12-10', pagado: false },
+        ]
+    }];
+
+    list.renderTable();
+
+    assert(list.querySelector('app-table') === null, 'La vista agrupada no debe renderizar AppTable');
+    assert(list.querySelectorAll('tbody tr').length === 1, 'La vista agrupada debe renderizar filas compactas');
+    assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
+    assert(list.querySelector('i.bi-chevron-right') === null, 'La fila agrupada no debe mostrar acción de detalle individual');
+    assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
+
     document.body.removeChild(list);
 }
 
@@ -1523,7 +1561,7 @@ async function testDebtRowItem() {
     table.appendChild(tbody);
     document.body.appendChild(table);
 
-    const rowItem = new DebtRowItem(row, { excludeColumns: [], showDetailAction: false });
+    const rowItem = new DebtRowItem(row, { excludeColumns: [], showDetailAction: true });
     tbody.appendChild(rowItem.element);
 
     const tr = rowItem.element;
@@ -1565,6 +1603,14 @@ async function testDebtRowItem() {
     // Chevron (affordance de navegación)
     const chevron = tr.querySelector('i.bi-chevron-right');
     assert(chevron !== null, 'Con _onRowClick debe mostrar chevron');
+
+    const rowNoDetail = { ...row, _onRowClick: () => {} };
+    const rowItemNoDetail = new DebtRowItem(rowNoDetail, { excludeColumns: [], showDetailAction: false });
+    assert(rowItemNoDetail.element.querySelector('i.bi-chevron-right') === null, 'showDetailAction=false debe ocultar chevron');
+    assert(!rowItemNoDetail.element.classList.contains('cursor-pointer'), 'showDetailAction=false no debe marcar la fila como clickeable');
+
+    const rowItemNoPayment = new DebtRowItem(row, { excludeColumns: [], showDetailAction: true, showPaymentAction: false });
+    assert(rowItemNoPayment.element.querySelector('app-checkbox') === null, 'showPaymentAction=false debe ocultar el switch');
 
     // _renderEstadoPago y _renderEstadoPagoCard deben quedar registrados en el row
     assert(typeof row._renderEstadoPago === 'function', 'Debe exponer _renderEstadoPago en el row');
@@ -1609,6 +1655,7 @@ export const tests = [
     testDebtListRenderTotalsActualizaTrasRefresh,
     testDebtListRenderTotalsNoCurrencies,
     testDebtListRenderTotalsIgnoraVencimientosInvalidos,
+    testDebtListGroupedUsesDebtRowItemLayout,
     testDebtEntityShellTotalesBarPorMoneda,
     testDebtEntityShellTotalesBarSinPendiente,
     testDebtEntityShellTotalesBarAgregaVariasEntidades,

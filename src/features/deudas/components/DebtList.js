@@ -1,7 +1,3 @@
-import '../../../shared/components/AppButton.js';
-import '../../../shared/components/AppTable.js';
-import '../../../shared/components/AppCheckbox.js';
-import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
 import { DebtRowItem } from './DebtRowItem.js';
 import './DebtListTotals.js';
@@ -132,36 +128,17 @@ export class DebtList extends HTMLElement {
 
         const container = this.querySelector('.debt-list-container');
 
-        if (this.groupBy !== 'none') {
-            // Vista agrupada: usa AppTable (columnas configuradas por debtTableColumns)
-            let columns = [...debtTableColumns];
-            let hiddenKeys = ['acciones', 'vencimiento'];
-            if (this.groupBy === 'vencimiento') hiddenKeys = ['acciones'];
-            columns = columns.filter(col => !hiddenKeys.includes(col.key));
-            if (this._excludeColumns && this._excludeColumns.length) {
-                columns = columns.filter(col => !this._excludeColumns.includes(col.key));
-            }
-
-            if (!container.querySelector('app-table')) container.innerHTML = '';
-            let table = container.querySelector('app-table');
-            if (!table) {
-                table = document.createElement('app-table');
-                container.appendChild(table);
-            }
-            table.columnsConfig = columns;
-            table.tableData = tableData;
-        } else {
-            // Vista sin agrupamiento: usa DebtRowItem por fila en tabla responsiva
-            if (container.querySelector('app-table')) container.innerHTML = '';
-            this._renderRowTable(container, tableData);
-        }
+        this._renderRowTable(container, tableData, {
+            showDetailAction: this.groupBy === 'none' && this._showDetailAction,
+            showPaymentAction: this.groupBy === 'none',
+        });
 
         this._renderTotals();
     }
 
     // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
     // Usa un layout unificado con 2 columnas (info + acciones) en todos los breakpoints.
-    _renderRowTable(container, tableData) {
+    _renderRowTable(container, tableData, options = {}) {
         let tableWrapper = container.querySelector('.table-responsive');
         let tbody;
 
@@ -198,7 +175,8 @@ export class DebtList extends HTMLElement {
         tableData.forEach(row => {
             const rowItem = new DebtRowItem(row, {
                 excludeColumns: this._excludeColumns || [],
-                showDetailAction: this._showDetailAction,
+                showDetailAction: options.showDetailAction ?? this._showDetailAction,
+                showPaymentAction: options.showPaymentAction ?? true,
             });
             tbody.appendChild(rowItem.element);
         });
@@ -240,20 +218,7 @@ export class DebtList extends HTMLElement {
         const pendiente = this.totalesPendientes || {};
         const pagado = this.totalesPagados || {};
 
-        // Calcular cuotas vencidas (no pagadas con vencimiento anterior a hoy) y pagadas
-        const d = new Date();
-        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        let vencidasCount = 0;
-        let pagadosCount = 0;
-        (this.debts || []).forEach(deuda => {
-            (deuda.montos || []).forEach(monto => {
-                const hasValidVencimiento = typeof monto.vencimiento === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(monto.vencimiento);
-                if (!monto.pagado && hasValidVencimiento && monto.vencimiento < today) vencidasCount++;
-                if (monto.pagado) pagadosCount++;
-            });
-        });
-
-        totalsEl.update(pendiente, pagado, vencidasCount, pagadosCount);
+        totalsEl.update(pendiente, pagado, { debts: this.debts || [] });
     }
 
     render() {

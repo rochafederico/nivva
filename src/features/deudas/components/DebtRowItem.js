@@ -64,6 +64,7 @@ export class DebtRowItem {
         this._rowData = row;
         this._excludeColumns = options.excludeColumns || [];
         this._showDetailAction = !!options.showDetailAction;
+        this._showPaymentAction = options.showPaymentAction !== false;
         this.element = this._build();
     }
 
@@ -92,47 +93,50 @@ export class DebtRowItem {
         renderEstado();
 
         // ── Checkbox ─────────────────────────────────────────────────
-        const cb = document.createElement('app-checkbox');
-        cb.inputId = `debt-m-${row.id ?? Math.random().toString(36).slice(2)}`;
-        cb.checked = !!row.pagado;
-        cb.title = 'Marcar como pagado';
+        let cb = null;
+        if (this._showPaymentAction) {
+            cb = document.createElement('app-checkbox');
+            cb.inputId = `debt-m-${row.id ?? Math.random().toString(36).slice(2)}`;
+            cb.checked = !!row.pagado;
+            cb.title = 'Marcar como pagado';
 
-        const handleToggle = async (e) => {
-            const nextChecked = !!e.detail.checked;
-            const previousChecked = !!row.pagado;
-            row.pagado = nextChecked;
-            cb.checked = nextChecked;
-            renderEstado();
-            try {
-                const { setPagado } = await import('../../montos/montoRepository.js');
-                await setPagado(row.id, nextChecked);
-                window.dispatchEvent(new CustomEvent('app:notify', {
-                    detail: {
-                        message: nextChecked
-                            ? '✅ Cuota marcada como pagada.'
-                            : '⚠️ Cuota marcada como pendiente.',
-                        type: nextChecked ? 'success' : 'warning'
-                    }
-                }));
-                if (typeof row._reload === 'function') row._reload();
-            } catch {
-                row.pagado = previousChecked;
-                cb.checked = previousChecked;
+            const handleToggle = async (e) => {
+                const nextChecked = !!e.detail.checked;
+                const previousChecked = !!row.pagado;
+                row.pagado = nextChecked;
+                cb.checked = nextChecked;
                 renderEstado();
-                window.dispatchEvent(new CustomEvent('app:notify', {
-                    detail: {
-                        message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',
-                        type: 'danger'
-                    }
-                }));
-            }
-        };
+                try {
+                    const { setPagado } = await import('../../montos/montoRepository.js');
+                    await setPagado(row.id, nextChecked);
+                    window.dispatchEvent(new CustomEvent('app:notify', {
+                        detail: {
+                            message: nextChecked
+                                ? '✅ Cuota marcada como pagada.'
+                                : '⚠️ Cuota marcada como pendiente.',
+                            type: nextChecked ? 'success' : 'warning'
+                        }
+                    }));
+                    if (typeof row._reload === 'function') row._reload();
+                } catch {
+                    row.pagado = previousChecked;
+                    cb.checked = previousChecked;
+                    renderEstado();
+                    window.dispatchEvent(new CustomEvent('app:notify', {
+                        detail: {
+                            message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',
+                            type: 'danger'
+                        }
+                    }));
+                }
+            };
 
-        cb.addEventListener('checkbox-change', handleToggle);
+            cb.addEventListener('checkbox-change', handleToggle);
+        }
 
         // ── Fila principal ────────────────────────────────────────────
         const tr = document.createElement('tr');
-        if (typeof row._onRowClick === 'function') {
+        if (this._showDetailAction && typeof row._onRowClick === 'function') {
             tr.classList.add('cursor-pointer');
             tr.addEventListener('click', () => row._onRowClick(row, tr));
         }
@@ -222,14 +226,16 @@ export class DebtRowItem {
         actWrap.appendChild(estadoCol);
 
         // Switch: columna flex-shrink-0 con padding para zona táctil adecuada
-        const switchCol = document.createElement('div');
-        switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-2';
-        switchCol.addEventListener('click', e => e.stopPropagation());
-        switchCol.appendChild(cb);
-        actWrap.appendChild(switchCol);
+        if (cb) {
+            const switchCol = document.createElement('div');
+            switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-2';
+            switchCol.addEventListener('click', e => e.stopPropagation());
+            switchCol.appendChild(cb);
+            actWrap.appendChild(switchCol);
+        }
 
         // Chevron: columna de ancho fijo, siempre pegada al borde derecho
-        if (typeof row._onRowClick === 'function') {
+        if (this._showDetailAction && typeof row._onRowClick === 'function') {
             const chevronBtn = document.createElement('button');
             chevronBtn.type = 'button';
             chevronBtn.className = 'btn btn-link p-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';

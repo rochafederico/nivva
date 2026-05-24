@@ -3,6 +3,30 @@
 // Una tarjeta por estado (Pendiente / Pagado) agrupando todas las monedas,
 // con diseño Bootstrap 5.3 + Bootstrap Icons.
 
+function getLocalTodayYmd() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function isValidYmd(value) {
+    return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+export function summarizeDebtListTotals(debts = [], today = getLocalTodayYmd()) {
+    let vencidas = 0;
+    let pagadosCount = 0;
+
+    (debts || []).forEach(deuda => {
+        (deuda.montos || []).forEach(monto => {
+            const vencimiento = String(monto.vencimiento ?? '').trim();
+            if (!monto.pagado && isValidYmd(vencimiento) && vencimiento < today) vencidas++;
+            if (monto.pagado) pagadosCount++;
+        });
+    });
+
+    return { vencidas, pagadosCount };
+}
+
 export class DebtListTotals extends HTMLElement {
     connectedCallback() {
         this._pendiente = this._pendiente || {};
@@ -17,14 +41,22 @@ export class DebtListTotals extends HTMLElement {
      * Actualiza los totales y re-renderiza el componente.
      * @param {Object} pendiente     - Mapa moneda → monto pendiente (ej. { ARS: 15000, USD: 100 })
      * @param {Object} pagado        - Mapa moneda → monto pagado   (ej. { ARS: 5000 })
-     * @param {number} vencidas      - Cantidad de cuotas vencidas no pagadas
-     * @param {number} pagadosCount  - Cantidad de cuotas pagadas
+     * @param {Object|number} summary - { debts } para calcular indicadores, o cantidad de vencidas legacy
+     * @param {number} pagadosCount   - Cantidad de cuotas pagadas cuando summary es número legacy
      */
-    update(pendiente, pagado, vencidas = 0, pagadosCount = 0) {
+    update(pendiente, pagado, summary = {}, pagadosCount = 0) {
         this._pendiente = pendiente || {};
         this._pagado = pagado || {};
-        this._vencidas = vencidas || 0;
-        this._pagadosCount = pagadosCount || 0;
+
+        if (typeof summary === 'number') {
+            this._vencidas = summary || 0;
+            this._pagadosCount = pagadosCount || 0;
+        } else {
+            const calculated = summarizeDebtListTotals(summary?.debts || [], summary?.today);
+            this._vencidas = Number(summary?.vencidas ?? calculated.vencidas) || 0;
+            this._pagadosCount = Number(summary?.pagadosCount ?? calculated.pagadosCount) || 0;
+        }
+
         this._render();
     }
 
