@@ -63,7 +63,7 @@ export class DebtListTotals extends HTMLElement {
         for (let i = 1; i < entries.length; i++) {
             const [cur, val] = entries[i];
             const secondary = document.createElement('small');
-            secondary.className = `text-${colorKey}-emphasis opacity-75 fw-semibold ms-1`;
+            secondary.className = `text-${colorKey}-emphasis opacity-75 fw-semibold ms-3`;
             secondary.textContent = this._fmtMoneda(cur, Number(val));
             amountEl.appendChild(secondary);
         }
@@ -81,7 +81,7 @@ export class DebtListTotals extends HTMLElement {
         if (!hasPendiente && !hasPagado) return;
 
         const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex flex-wrap gap-3 px-3 py-3 border-top';
+        wrapper.className = 'row g-3 mt-3';
 
         if (hasPendiente) {
             wrapper.appendChild(this._createCard(
@@ -108,7 +108,7 @@ export class DebtListTotals extends HTMLElement {
      */
     _createCard(label, amountsMap, colorKey, iconClass, vencidas, pagadosCount) {
         const col = document.createElement('div');
-        col.className = 'flex-fill';
+        col.className = 'col-12 col-md-6';
 
         const card = document.createElement('div');
         card.className = `card shadow-sm rounded-4 border-0 bg-${colorKey}-subtle`;
@@ -160,8 +160,7 @@ export class DebtListTotals extends HTMLElement {
 
         // Círculo decorativo con ícono a la derecha
         const iconCircle = document.createElement('div');
-        iconCircle.className = `d-flex align-items-center justify-content-center rounded-circle bg-${colorKey} bg-opacity-25`;
-        iconCircle.style.cssText = 'width:48px;height:48px;flex-shrink:0';
+        iconCircle.className = `d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 bg-${colorKey} bg-opacity-25 p-3`;
 
         const iconEl = document.createElement('i');
         iconEl.className = `bi ${iconClass} fs-4 text-${colorKey}-emphasis`;

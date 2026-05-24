@@ -214,16 +214,23 @@ export class DebtList extends HTMLElement {
     }
 
     // Construye el <tr> del <thead> con 2 cabeceras para el layout unificado.
+    // Los textos están visually-hidden para mantener accesibilidad sin mostrarlos visualmente.
     _buildTheadRow() {
         const tr = document.createElement('tr');
 
         const thInfo = document.createElement('th');
-        thInfo.textContent = 'Gasto';
+        const infoLabel = document.createElement('span');
+        infoLabel.className = 'visually-hidden';
+        infoLabel.textContent = 'Gasto';
+        thInfo.appendChild(infoLabel);
         tr.appendChild(thInfo);
 
         const thPago = document.createElement('th');
         thPago.className = 'text-end';
-        thPago.textContent = 'Pago';
+        const pagoLabel = document.createElement('span');
+        pagoLabel.className = 'visually-hidden';
+        pagoLabel.textContent = 'Pago';
+        thPago.appendChild(pagoLabel);
         tr.appendChild(thPago);
 
         return tr;

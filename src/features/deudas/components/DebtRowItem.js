@@ -152,10 +152,34 @@ export class DebtRowItem {
         const nameBlock = document.createElement('div');
         nameBlock.className = 'flex-grow-1 min-w-0';
 
+        // Responsive: acreedor + date inline on desktop, stacked on mobile
+        const nameDateRow = document.createElement('div');
+        nameDateRow.className = 'd-flex flex-column flex-md-row align-items-md-baseline gap-md-2 min-w-0';
+
         const nameEl = document.createElement('h6');
         nameEl.className = 'fw-semibold text-truncate mb-0';
         nameEl.textContent = row.acreedor ?? '';
-        nameBlock.appendChild(nameEl);
+        nameDateRow.appendChild(nameEl);
+
+        const venc = String(row.vencimiento ?? '').trim();
+
+        // Helper para construir el elemento de fecha (siempre visible)
+        const makeDateEl = () => {
+            const el = document.createElement('small');
+            el.className = 'd-flex align-items-center text-muted mt-1 mt-md-0';
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-calendar3 me-1';
+            icon.setAttribute('aria-hidden', 'true');
+            el.appendChild(icon);
+            el.appendChild(document.createTextNode(formatDate(venc)));
+            return el;
+        };
+
+        if (venc) {
+            nameDateRow.appendChild(makeDateEl());
+        }
+
+        nameBlock.appendChild(nameDateRow);
 
         const tipo = String(row.tipoDeuda ?? '').trim();
         if (tipo && !excl.includes('tipoDeuda')) {
@@ -169,24 +193,6 @@ export class DebtRowItem {
             nameBlock.appendChild(tipoBadge);
         }
 
-        const venc = String(row.vencimiento ?? '').trim();
-
-        // Helper para construir el elemento de fecha (siempre visible, sin clases responsive)
-        const makeDateEl = () => {
-            const el = document.createElement('small');
-            el.className = 'd-flex align-items-center text-muted mt-1';
-            const icon = document.createElement('i');
-            icon.className = 'bi bi-calendar3 me-1';
-            icon.setAttribute('aria-hidden', 'true');
-            el.appendChild(icon);
-            el.appendChild(document.createTextNode(formatDate(venc)));
-            return el;
-        };
-
-        if (venc) {
-            nameBlock.appendChild(makeDateEl());
-        }
-
         infoFlex.appendChild(nameBlock);
         tdInfo.appendChild(infoFlex);
         tr.appendChild(tdInfo);
@@ -198,13 +204,13 @@ export class DebtRowItem {
         const actWrap = document.createElement('div');
         actWrap.className = 'd-flex align-items-center';
 
-        // Estado: monto + badge en línea, alineados a la derecha
+        // Estado: monto + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex align-items-center flex-grow-1 justify-content-end me-2';
+        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-3';
 
-        // Monto y badge en la misma línea
+        // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
         const amountRow = document.createElement('div');
-        amountRow.className = 'd-flex align-items-center gap-1';
+        amountRow.className = 'd-flex flex-wrap align-items-center gap-1 justify-content-end';
 
         const amountEl = document.createElement('span');
         amountEl.className = 'fw-semibold text-nowrap';
@@ -215,10 +221,9 @@ export class DebtRowItem {
 
         actWrap.appendChild(estadoCol);
 
-        // Switch: columna de ancho fijo, centrada, independiente del estado
+        // Switch: columna flex-shrink-0 con padding para zona táctil adecuada
         const switchCol = document.createElement('div');
-        switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0';
-        switchCol.style.cssText = 'width:44px;min-width:44px';
+        switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-2';
         switchCol.addEventListener('click', e => e.stopPropagation());
         switchCol.appendChild(cb);
         actWrap.appendChild(switchCol);
@@ -228,7 +233,6 @@ export class DebtRowItem {
             const chevronBtn = document.createElement('button');
             chevronBtn.type = 'button';
             chevronBtn.className = 'btn btn-link p-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
-            chevronBtn.style.cssText = 'width:20px;min-width:20px';
             chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'esta deuda'}`);
             chevronBtn.addEventListener('click', e => {
                 e.stopPropagation();
