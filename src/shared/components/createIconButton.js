@@ -14,7 +14,8 @@ export function createIconButton({
   if (!allowedVariants.includes(variant)) {
     throw new Error(`createIconButton: variant no permitido (${variant})`);
   }
-  if (extraClasses !== undefined && typeof extraClasses !== 'string') {
+  const hasExtraClasses = extraClasses !== undefined && extraClasses !== null;
+  if (hasExtraClasses && typeof extraClasses !== 'string') {
     throw new Error('createIconButton: extraClasses debe ser string');
   }
 
@@ -25,7 +26,7 @@ export function createIconButton({
   if (title) button.title = title;
   button.setAttribute('aria-label', label);
 
-  const normalizedExtraClasses = (extraClasses ?? '').trim();
+  const normalizedExtraClasses = hasExtraClasses ? extraClasses.trim() : '';
   const additionalClasses = normalizedExtraClasses ? normalizedExtraClasses.split(/\s+/) : [];
   if (additionalClasses.length > 0) {
     button.classList.add(...additionalClasses);

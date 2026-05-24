@@ -16,12 +16,13 @@ export const tests = [
 
     async function createIconButton_usesBootstrapAndAccessibleLabel() {
         console.log('  createIconButton: usa Bootstrap y aria-label');
+        const whitespaceSeparatedExtraClasses = 'position-relative' + '\n' + 'flex-shrink-0' + '\t' + 'shadow-sm';
         const btn = createIconButton({
             id: 'test-icon-btn',
             icon: 'bi-bell',
             label: 'Ver vencimientos próximos',
             title: 'Vencimientos próximos',
-            extraClasses: 'position-relative\nflex-shrink-0\tshadow-sm',
+            extraClasses: whitespaceSeparatedExtraClasses,
         });
 
         assert(btn.tagName === 'BUTTON', 'Debe crear un button nativo');
