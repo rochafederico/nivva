@@ -46,10 +46,10 @@ export class AppHeader extends HTMLElement {
     const actions = this.querySelector('[data-header-actions]');
     const userMenu = this.querySelector('user-menu-button');
     if (!actions) {
-      throw new Error('AppHeader: missing [data-header-actions] container');
+      throw new Error('AppHeader render failed: [data-header-actions] container not found in template');
     }
     if (!userMenu) {
-      throw new Error('AppHeader: missing user-menu-button element');
+      throw new Error('AppHeader render failed: user-menu-button element not found');
     }
     actions.insertBefore(createIconButton({
       id: 'tour-btn',
