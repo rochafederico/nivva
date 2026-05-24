@@ -137,18 +137,37 @@ Texto en Edits:
 
 ### Escena 2 — Transición a Nivva: celular en escritorio
 
-Objetivo visual: presentar Nivva como una alternativa clara y ordenada al desorden anterior.
+Objetivo visual: presentar Nivva como una alternativa clara y ordenada al desorden anterior. Esta escena funciona mejor si el celular aparece como protagonista, con una composición simple y realista. La pantalla debe verse como una app real, no como una maqueta genérica ni una captura de navegador.
 
 ```text
-Vertical 9:16 realistic lifestyle product photo.
+Vertical 9:16 realistic lifestyle product photograph.
 
-A modern smartphone standing upright on a warm minimal wooden desk. On the phone screen, display a clean personal finance web app called Nivva. The interface should be simple, readable and mobile-first, with teal #3D8F8F, cream #F2EDE8, white surfaces, rounded cards and subtle icons.
+A modern smartphone standing upright on a warm minimal wooden desk, slightly below the center of the frame, with a lot of clean negative space above for later text overlay. The scene should feel like a real home desk in warm natural light, not like a corporate stock photo.
 
-The app should feel calm and organized, showing a monthly financial overview or debts dashboard. The phone screen must be sharp and realistic, without browser address bar or screenshot chrome. The background should be softly blurred, with a ceramic mug, small plant or notebook as subtle props.
+On the phone screen, show the Nivva personal finance web app open. The UI should be simple, readable and mobile-first, using teal #3D8F8F, cream #F2EDE8, white surfaces, rounded cards, soft dividers and subtle icons. Show a clear monthly overview or debts dashboard inspired by the real Nivva interface, with visual cards and simple navigation. The app should feel calm, organized and trustworthy.
 
-Leave generous empty negative space in the upper part of the image for later text overlay. No people, no faces, no bank logos, no credit card logos, no extra marketing text outside the phone, no watermark.
+Do not show a browser address bar, Safari/Chrome controls or screenshot chrome. The phone screen must be sharp, realistic and proportional, with no warped UI. The background should be softly blurred and warm, with only a few subtle props such as a ceramic mug, small plant, notebook or pen. Keep the desk minimal and ordered to contrast with the previous cluttered scene.
 
-Style: realistic photography, warm natural light, premium but simple, shallow depth of field.
+No people, no faces, no bank logos, no credit card logos, no QR codes, no private data, no extra marketing text outside the phone, no watermark.
+
+Style: realistic photography, warm natural light, premium but simple, shallow depth of field, natural desk textures, calm composition.
+Aspect ratio: 9:16.
+```
+
+Refuerzo si el resultado sale demasiado genérico:
+
+```text
+Make the phone and app feel like a real product photo. Avoid abstract dashboard mockups. Use the real Nivva visual language: teal header, cream/white background, rounded finance cards, monthly information, pending/paid visual hierarchy, and bottom mobile navigation. Keep all text on the phone small and natural; do not add big generated captions outside the screen.
+```
+
+Variante si se quiere mostrar continuidad con escritorio/desktop:
+
+```text
+Vertical 9:16 realistic home-office product photo.
+
+A generic unbranded desktop computer or all-in-one monitor placed on the right side of a warm wooden desk. The computer screen shows the Nivva debts dashboard in desktop layout: left sidebar navigation, clean debt rows, paid and overdue status badges, and two summary cards for pending and paid amounts. The screen should be readable enough to understand the layout, but still integrated naturally into a realistic photo.
+
+The scene must be different from the smartphone scene: different angle, different props and more desk depth. Use warm natural light, a neutral wall, a small plant, notebook, keyboard, mouse and mug. Keep it calm, organized and human. No visible hardware brands. No bank logos. No extra generated text outside the screen. Leave negative space for overlay text.
 Aspect ratio: 9:16.
 ```
 
