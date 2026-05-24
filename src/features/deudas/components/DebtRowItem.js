@@ -152,8 +152,8 @@ export class DebtRowItem {
         const nameBlock = document.createElement('div');
         nameBlock.className = 'flex-grow-1 min-w-0';
 
-        const nameEl = document.createElement('div');
-        nameEl.className = 'fw-semibold text-truncate';
+        const nameEl = document.createElement('h6');
+        nameEl.className = 'fw-semibold text-truncate mb-0';
         nameEl.textContent = row.acreedor ?? '';
         nameBlock.appendChild(nameEl);
 
@@ -171,10 +171,10 @@ export class DebtRowItem {
 
         const venc = String(row.vencimiento ?? '').trim();
 
-        // Helper para construir el elemento de fecha con clases de visibilidad responsive
-        const makeDateEl = (extraClass) => {
-            const el = document.createElement('div');
-            el.className = `${extraClass} align-items-center text-muted small mt-1`;
+        // Helper para construir el elemento de fecha (siempre visible, sin clases responsive)
+        const makeDateEl = () => {
+            const el = document.createElement('small');
+            el.className = 'd-flex align-items-center text-muted mt-1';
             const icon = document.createElement('i');
             icon.className = 'bi bi-calendar3 me-1';
             icon.setAttribute('aria-hidden', 'true');
@@ -184,8 +184,7 @@ export class DebtRowItem {
         };
 
         if (venc) {
-            // Solo mobile: fecha debajo del nombre del acreedor
-            nameBlock.appendChild(makeDateEl('d-flex d-md-none'));
+            nameBlock.appendChild(makeDateEl());
         }
 
         infoFlex.appendChild(nameBlock);
@@ -199,11 +198,11 @@ export class DebtRowItem {
         const actWrap = document.createElement('div');
         actWrap.className = 'd-flex align-items-center';
 
-        // Estado: columna vertical (monto+badge en línea, fecha abajo en desktop)
+        // Estado: monto + badge en línea, alineados a la derecha
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-2';
+        estadoCol.className = 'd-flex align-items-center flex-grow-1 justify-content-end me-2';
 
-        // Línea 1: monto y badge en la misma línea
+        // Monto y badge en la misma línea
         const amountRow = document.createElement('div');
         amountRow.className = 'd-flex align-items-center gap-1';
 
@@ -213,11 +212,6 @@ export class DebtRowItem {
         amountRow.appendChild(amountEl);
         amountRow.appendChild(badgeSpan);
         estadoCol.appendChild(amountRow);
-
-        // Línea 2: fecha a la derecha del monto (solo desktop)
-        if (venc) {
-            estadoCol.appendChild(makeDateEl('d-none d-md-flex'));
-        }
 
         actWrap.appendChild(estadoCol);
 
