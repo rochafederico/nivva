@@ -41,15 +41,15 @@ export class DebtListTotals extends HTMLElement {
      * Actualiza los totales y re-renderiza el componente.
      * @param {Object} pendiente     - Mapa moneda → monto pendiente (ej. { ARS: 15000, USD: 100 })
      * @param {Object} pagado        - Mapa moneda → monto pagado   (ej. { ARS: 5000 })
-     * @param {Object} summary       - { debts } para calcular indicadores, o { vencidas, pagadosCount }
+     * @param {Object} summary       - { debts } para calcular indicadores
      */
     update(pendiente, pagado, summary = {}) {
         this._pendiente = pendiente || {};
         this._pagado = pagado || {};
 
-        const calculated = summarizeDebtListTotals(summary?.debts || [], summary?.today);
-        this._vencidas = Number(summary?.vencidas ?? calculated.vencidas) || 0;
-        this._pagadosCount = Number(summary?.pagadosCount ?? calculated.pagadosCount) || 0;
+        const { vencidas, pagadosCount } = summarizeDebtListTotals(summary?.debts || [], summary?.today);
+        this._vencidas = vencidas;
+        this._pagadosCount = pagadosCount;
 
         this._render();
     }
