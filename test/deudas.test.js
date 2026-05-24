@@ -4,7 +4,7 @@ import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
-import { getInitials, getAvatarClasses, getTipoIcon, getEstado, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
+import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -1465,7 +1465,16 @@ async function testDebtRowItem() {
     assert(estadoPendiente !== null && estadoPendiente.label === 'Pendiente', 'Pendiente sin vencer → Pendiente');
     assert(estadoPendiente.className === 'text-bg-secondary', 'getEstado pendiente → gris secondary');
 
-    // DebtRowItem: renderiza <tr> con celdas mobile (d-table-cell d-md-none) y desktop (d-none d-md-table-cell)
+    // formatDate: convierte YYYY-MM-DD → DD/MM/YYYY
+    assert(formatDate('2026-12-01') === '01/12/2026', 'formatDate: fecha estándar');
+    assert(formatDate('2024-01-15') === '15/01/2024', 'formatDate: día y mes con cero');
+    assert(formatDate('') === '', 'formatDate: cadena vacía → vacía');
+    assert(formatDate(null) === '', 'formatDate: null → vacío');
+    assert(formatDate(undefined) === '', 'formatDate: undefined → vacío');
+    assert(formatDate('no-date') === 'no-date', 'formatDate: formato inválido → sin cambios');
+    assert(formatDate('2026-13') === '2026-13', 'formatDate: formato incompleto → sin cambios');
+
+    // DebtRowItem: renderiza <tr> con layout unificado (sin breakpoints separados)
     const row = {
         id: 99,
         acreedor: 'Test Acreedor',
@@ -1490,9 +1499,13 @@ async function testDebtRowItem() {
     const tr = rowItem.element;
     assert(tr !== null && tr.tagName === 'TR', 'DebtRowItem.element debe ser un <tr> directo');
 
-    // Celdas mobile (d-table-cell d-md-none)
-    const mobileCells = tr.querySelectorAll('td.d-table-cell.d-md-none');
-    assert(mobileCells.length >= 2, 'Debe haber al menos 2 celdas mobile (d-table-cell d-md-none)');
+    // Layout unificado: 2 celdas visibles en todos los breakpoints (sin d-md-none)
+    const allCells = tr.querySelectorAll('td.d-table-cell');
+    assert(allCells.length >= 2, 'Debe haber al menos 2 celdas visibles en todos los breakpoints');
+
+    // Sin celdas exclusivas de desktop (layout unificado)
+    const desktopCells = tr.querySelectorAll('td.d-none.d-md-table-cell');
+    assert(desktopCells.length === 0, 'No debe haber celdas exclusivas de desktop (layout unificado)');
 
     // Avatar circular con iniciales
     const avatarEl = tr.querySelector('.debt-card-avatar.rounded-circle');
@@ -1509,17 +1522,15 @@ async function testDebtRowItem() {
     assert(tipoBadge !== null, 'Debe renderizar badge de tipo');
     assert(tipoBadge.querySelector('i.bi-bank2') !== null, 'Badge Prestamo debe tener bi-bank2');
 
-    // Fecha con ícono de calendario
+    // Fecha con ícono de calendario (formateada DD/MM/YYYY)
     const calIcon = tr.querySelector('i.bi-calendar3');
     assert(calIcon !== null, 'Debe mostrar ícono de calendario');
+    const dateText = calIcon.parentElement?.textContent || '';
+    assert(dateText.includes('01/12/2026'), 'Fecha debe mostrarse como DD/MM/YYYY');
 
     // Chevron (affordance de navegación)
     const chevron = tr.querySelector('i.bi-chevron-right');
     assert(chevron !== null, 'Con _onRowClick debe mostrar chevron');
-
-    // Celdas desktop (d-none d-md-table-cell)
-    const desktopCells = tr.querySelectorAll('td.d-none.d-md-table-cell');
-    assert(desktopCells.length >= 4, 'Debe haber al menos 4 celdas desktop');
 
     // _renderEstadoPago y _renderEstadoPagoCard deben quedar registrados en el row
     assert(typeof row._renderEstadoPago === 'function', 'Debe exponer _renderEstadoPago en el row');

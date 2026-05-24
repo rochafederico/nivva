@@ -1,7 +1,6 @@
 // src/features/deudas/components/DebtRowItem.js
-// Clase JS que construye una fila <tr> de deuda con diseño responsivo Bootstrap.
-// En mobile (< md): 2 celdas — info (avatar + nombre + tipo + fecha) y acciones (monto + badge + toggle).
-// En desktop (md+): celdas individuales por columna — acreedor, tipo, vencimiento, monto, toggle.
+// Clase JS que construye una fila <tr> de deuda con diseño consistente en todos los breakpoints.
+// 2 celdas: info (avatar + nombre + tipo + fecha) y acciones (monto + badge + toggle + chevron).
 
 import '../../../shared/components/AppCheckbox.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
@@ -26,6 +25,12 @@ export function getAvatarClasses(name) {
         'bg-dark-subtle text-dark-emphasis',
     ];
     return palettes[(name?.charCodeAt(0) || 0) % palettes.length];
+}
+
+export function formatDate(isoDate) {
+    if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(String(isoDate))) return String(isoDate || '');
+    const [y, m, d] = String(isoDate).split('-');
+    return `${d}/${m}/${y}`;
 }
 
 export function getTipoIcon(tipo) {
@@ -67,62 +72,37 @@ export class DebtRowItem {
         if (!row) return document.createElement('tr');
         const excl = this._excludeColumns;
 
-        // ── Estado badges (mobile + desktop compartidos) ──────────────
-        const mobileBadgeDiv = document.createElement('span');
-        const desktopBadgeDiv = document.createElement('div');
-        desktopBadgeDiv.className = 'mt-1';
+        // ── Estado badge (compartido) ──────────────────────────────────
+        const badgeSpan = document.createElement('span');
 
-        const renderEstadoMobile = () => {
-            mobileBadgeDiv.innerHTML = '';
+        const renderEstado = () => {
+            badgeSpan.innerHTML = '';
             const estado = getEstado(row);
             if (!estado) return;
             const b = document.createElement('span');
             b.className = `badge ${estado.className} text-nowrap`;
             b.textContent = estado.label;
-            mobileBadgeDiv.appendChild(b);
+            badgeSpan.appendChild(b);
         };
 
-        const renderEstadoDesktop = () => {
-            desktopBadgeDiv.innerHTML = '';
-            const estado = getEstado(row);
-            if (!estado) { desktopBadgeDiv.classList.add('d-none'); return; }
-            desktopBadgeDiv.classList.remove('d-none');
-            const b = document.createElement('span');
-            b.className = `badge ${estado.className} text-nowrap`;
-            b.textContent = estado.label;
-            desktopBadgeDiv.appendChild(b);
-        };
+        // Exponer callbacks para sincronización externa
+        row._renderEstadoPago = () => renderEstado();
+        row._renderEstadoPagoCard = () => renderEstado();
 
-        // Exponer callbacks para sincronización externa (ej. debtTableColumns en vista agrupada)
-        row._renderEstadoPago = () => { renderEstadoMobile(); renderEstadoDesktop(); };
-        row._renderEstadoPagoCard = () => { renderEstadoMobile(); renderEstadoDesktop(); };
+        renderEstado();
 
-        renderEstadoMobile();
-        renderEstadoDesktop();
-
-        // ── Checkboxes (mobile + desktop) — se sincronizan entre sí ──────
-        const cbMobile = document.createElement('app-checkbox');
-        cbMobile.inputId = `debt-m-${row.id ?? Math.random().toString(36).slice(2)}`;
-        cbMobile.checked = !!row.pagado;
-        cbMobile.title = 'Marcar como pagado';
-
-        const cbDesktop = document.createElement('app-checkbox');
-        cbDesktop.inputId = `debt-d-${row.id ?? Math.random().toString(36).slice(2)}`;
-        cbDesktop.checked = !!row.pagado;
-        cbDesktop.title = 'Marcar como pagado';
-
-        const syncChecked = (val) => {
-            cbMobile.checked = val;
-            cbDesktop.checked = val;
-        };
+        // ── Checkbox ─────────────────────────────────────────────────
+        const cb = document.createElement('app-checkbox');
+        cb.inputId = `debt-m-${row.id ?? Math.random().toString(36).slice(2)}`;
+        cb.checked = !!row.pagado;
+        cb.title = 'Marcar como pagado';
 
         const handleToggle = async (e) => {
             const nextChecked = !!e.detail.checked;
             const previousChecked = !!row.pagado;
             row.pagado = nextChecked;
-            syncChecked(nextChecked);
-            renderEstadoMobile();
-            renderEstadoDesktop();
+            cb.checked = nextChecked;
+            renderEstado();
             try {
                 const { setPagado } = await import('../../montos/montoRepository.js');
                 await setPagado(row.id, nextChecked);
@@ -137,9 +117,8 @@ export class DebtRowItem {
                 if (typeof row._reload === 'function') row._reload();
             } catch {
                 row.pagado = previousChecked;
-                syncChecked(previousChecked);
-                renderEstadoMobile();
-                renderEstadoDesktop();
+                cb.checked = previousChecked;
+                renderEstado();
                 window.dispatchEvent(new CustomEvent('app:notify', {
                     detail: {
                         message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',
@@ -149,8 +128,7 @@ export class DebtRowItem {
             }
         };
 
-        cbMobile.addEventListener('checkbox-change', handleToggle);
-        cbDesktop.addEventListener('checkbox-change', handleToggle);
+        cb.addEventListener('checkbox-change', handleToggle);
 
         // ── Fila principal ────────────────────────────────────────────
         const tr = document.createElement('tr');
@@ -159,9 +137,9 @@ export class DebtRowItem {
             tr.addEventListener('click', () => row._onRowClick(row, tr));
         }
 
-        // ── MOBILE COL 1: info (avatar + nombre + tipo + fecha) ───────
+        // ── COL 1: info (avatar + nombre + tipo + fecha) ─────────────
         const tdInfo = document.createElement('td');
-        tdInfo.className = 'd-table-cell d-md-none py-3';
+        tdInfo.className = 'd-table-cell py-3';
 
         const infoFlex = document.createElement('div');
         infoFlex.className = 'd-flex align-items-center gap-3';
@@ -199,7 +177,7 @@ export class DebtRowItem {
             calIcon.className = 'bi bi-calendar3 me-1';
             calIcon.setAttribute('aria-hidden', 'true');
             vencEl.appendChild(calIcon);
-            vencEl.appendChild(document.createTextNode(venc));
+            vencEl.appendChild(document.createTextNode(formatDate(venc)));
             nameBlock.appendChild(vencEl);
         }
 
@@ -207,17 +185,14 @@ export class DebtRowItem {
         tdInfo.appendChild(infoFlex);
         tr.appendChild(tdInfo);
 
-        // ── MOBILE COL 2: estado + switch + chevron ──────────────────
-        // 3 sub-columnas fijas independientes dentro del td:
-        //   [estado: flex-grow-1] · [switch: ancho fijo] · [chevron: ancho fijo]
-        // Los montos largos se expanden hacia la izquierda sin mover switch/chevron.
-        const tdMActions = document.createElement('td');
-        tdMActions.className = 'd-table-cell d-md-none py-3 pe-1 align-middle';
+        // ── COL 2: estado + switch + chevron ─────────────────────────
+        const tdActions = document.createElement('td');
+        tdActions.className = 'd-table-cell py-3 pe-1 align-middle';
 
-        const mActWrap = document.createElement('div');
-        mActWrap.className = 'd-flex align-items-center';
+        const actWrap = document.createElement('div');
+        actWrap.className = 'd-flex align-items-center';
 
-        // Col 3 — Estado: monto y badge en la misma línea (crece, no comprime a sus vecinos)
+        // Estado: monto y badge en la misma línea (crece, no comprime a sus vecinos)
         const estadoCol = document.createElement('div');
         estadoCol.className = 'd-flex align-items-center justify-content-end flex-grow-1 me-2 gap-1';
 
@@ -225,18 +200,18 @@ export class DebtRowItem {
         amountEl.className = 'fw-semibold text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
         estadoCol.appendChild(amountEl);
-        estadoCol.appendChild(mobileBadgeDiv);
-        mActWrap.appendChild(estadoCol);
+        estadoCol.appendChild(badgeSpan);
+        actWrap.appendChild(estadoCol);
 
-        // Col 4 — Switch: columna de ancho fijo, centrada, independiente del estado
+        // Switch: columna de ancho fijo, centrada, independiente del estado
         const switchCol = document.createElement('div');
         switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0';
         switchCol.style.cssText = 'width:44px;min-width:44px';
         switchCol.addEventListener('click', e => e.stopPropagation());
-        switchCol.appendChild(cbMobile);
-        mActWrap.appendChild(switchCol);
+        switchCol.appendChild(cb);
+        actWrap.appendChild(switchCol);
 
-        // Col 5 — Chevron: columna de ancho fijo, centrada, siempre pegada al borde derecho
+        // Chevron: columna de ancho fijo, siempre pegada al borde derecho
         if (typeof row._onRowClick === 'function') {
             const chevronBtn = document.createElement('button');
             chevronBtn.type = 'button';
@@ -251,71 +226,11 @@ export class DebtRowItem {
             chevron.className = 'bi bi-chevron-right';
             chevron.setAttribute('aria-hidden', 'true');
             chevronBtn.appendChild(chevron);
-            mActWrap.appendChild(chevronBtn);
+            actWrap.appendChild(chevronBtn);
         }
 
-        tdMActions.appendChild(mActWrap);
-        tr.appendChild(tdMActions);
-
-        // ── DESKTOP COLS (d-none d-md-table-cell) ─────────────────────
-
-        // Acreedor
-        const tdAcreedor = document.createElement('td');
-        tdAcreedor.className = 'd-none d-md-table-cell fw-semibold align-middle';
-        tdAcreedor.textContent = row.acreedor ?? '';
-        tr.appendChild(tdAcreedor);
-
-        // Tipo (si no está excluido)
-        if (!excl.includes('tipoDeuda')) {
-            const tdTipo = document.createElement('td');
-            tdTipo.className = 'd-none d-md-table-cell align-middle';
-            tdTipo.textContent = row.tipoDeuda ?? '';
-            tr.appendChild(tdTipo);
-        }
-
-        // Vencimiento
-        const tdVenc = document.createElement('td');
-        tdVenc.className = 'd-none d-md-table-cell align-middle';
-        tdVenc.textContent = row.vencimiento ?? '';
-        tr.appendChild(tdVenc);
-
-        // Monto + badge de estado
-        const tdMonto = document.createElement('td');
-        tdMonto.className = 'd-none d-md-table-cell align-middle';
-        const montoWrap = document.createElement('div');
-        montoWrap.className = 'd-flex flex-column align-items-start';
-        const montoSpan = document.createElement('span');
-        montoSpan.className = 'text-nowrap';
-        montoSpan.textContent = formatMoneda(row.monto, row.moneda);
-        montoWrap.appendChild(montoSpan);
-        montoWrap.appendChild(desktopBadgeDiv);
-        tdMonto.appendChild(montoWrap);
-        tr.appendChild(tdMonto);
-
-        // Toggle + botón ver (si showDetailAction)
-        const tdToggle = document.createElement('td');
-        tdToggle.className = 'd-none d-md-table-cell align-middle';
-        tdToggle.addEventListener('click', e => e.stopPropagation());
-
-        const toggleWrap = document.createElement('div');
-        toggleWrap.className = 'd-flex align-items-center justify-content-end gap-2';
-        toggleWrap.appendChild(cbDesktop);
-
-        if (this._showDetailAction && typeof row._onDetail === 'function') {
-            const eyeBtn = document.createElement('button');
-            eyeBtn.type = 'button';
-            eyeBtn.className = 'btn btn-sm btn-outline-secondary';
-            eyeBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || ''}`);
-            eyeBtn.innerHTML = '<i class="bi bi-eye" aria-hidden="true"></i>';
-            eyeBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                await row._onDetail(row, eyeBtn);
-            });
-            toggleWrap.appendChild(eyeBtn);
-        }
-
-        tdToggle.appendChild(toggleWrap);
-        tr.appendChild(tdToggle);
+        tdActions.appendChild(actWrap);
+        tr.appendChild(tdActions);
 
         return tr;
     }

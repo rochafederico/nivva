@@ -160,8 +160,7 @@ export class DebtList extends HTMLElement {
     }
 
     // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
-    // Las celdas usan d-table-cell/d-md-none y d-none/d-md-table-cell
-    // para mostrar el layout de card en mobile y columnas en desktop.
+    // Usa un layout unificado con 2 columnas (info + acciones) en todos los breakpoints.
     _renderRowTable(container, tableData) {
         let tableWrapper = container.querySelector('.table-responsive');
         let thead, tbody;
@@ -214,38 +213,18 @@ export class DebtList extends HTMLElement {
         });
     }
 
-    // Construye el <tr> del <thead> con cabeceras responsivas Bootstrap.
+    // Construye el <tr> del <thead> con 2 cabeceras para el layout unificado.
     _buildTheadRow() {
         const tr = document.createElement('tr');
-        const excl = this._excludeColumns || [];
 
-        // Cabeceras mobile (2 columnas: info + pago)
         const thInfo = document.createElement('th');
-        thInfo.className = 'd-table-cell d-md-none';
         thInfo.textContent = 'Gasto';
         tr.appendChild(thInfo);
 
         const thPago = document.createElement('th');
-        thPago.className = 'd-table-cell d-md-none text-end';
+        thPago.className = 'text-end';
         thPago.textContent = 'Pago';
         tr.appendChild(thPago);
-
-        // Cabeceras desktop (columnas individuales)
-        const desktopCols = [
-            { label: 'Acreedor', key: 'acreedor' },
-            { label: 'Tipo', key: 'tipoDeuda' },
-            { label: 'Vencimiento', key: 'vencimiento' },
-            { label: 'Monto', key: 'monedaymonto' },
-            { label: 'Pagado', key: 'acciones' },
-        ];
-
-        desktopCols.forEach(({ label, key }) => {
-            if (excl.includes(key)) return;
-            const th = document.createElement('th');
-            th.className = 'd-none d-md-table-cell';
-            th.textContent = label;
-            tr.appendChild(th);
-        });
 
         return tr;
     }
