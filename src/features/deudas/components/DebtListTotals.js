@@ -18,7 +18,7 @@ export function summarizeDebtListTotals(debts = [], today = getLocalTodayYmd()) 
 
     (debts || []).forEach(deuda => {
         (deuda.montos || []).forEach(monto => {
-            const vencimiento = String(monto.vencimiento ?? '').trim();
+            const vencimiento = typeof monto.vencimiento === 'string' ? monto.vencimiento.trim() : '';
             if (!monto.pagado && isValidYmd(vencimiento) && vencimiento < today) vencidas++;
             if (monto.pagado) pagadosCount++;
         });

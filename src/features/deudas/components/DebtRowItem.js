@@ -64,7 +64,7 @@ export class DebtRowItem {
         this._rowData = row;
         this._excludeColumns = options.excludeColumns || [];
         this._showDetailAction = !!options.showDetailAction;
-        this._showPaymentAction = options.showPaymentAction !== false;
+        this._showPaymentAction = options.showPaymentAction ?? true;
         this.element = this._build();
     }
 
