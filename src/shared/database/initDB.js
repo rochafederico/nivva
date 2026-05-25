@@ -32,9 +32,16 @@ export function initDB() {
                 montosStore.createIndex('by_periodo', 'periodo');
             }
             // Crear store para ingresos
+            let ingresosStore;
             if (!db.objectStoreNames.contains(INGRESOS_STORE)) {
-                const ingresosStore = db.createObjectStore(INGRESOS_STORE, { keyPath: 'id', autoIncrement: true });
+                ingresosStore = db.createObjectStore(INGRESOS_STORE, { keyPath: 'id', autoIncrement: true });
+            } else {
+                ingresosStore = request.transaction.objectStore(INGRESOS_STORE);
+            }
+            if (!ingresosStore.indexNames.contains('by_periodo')) {
                 ingresosStore.createIndex('by_periodo', 'periodo');
+            }
+            if (!ingresosStore.indexNames.contains('by_fecha')) {
                 ingresosStore.createIndex('by_fecha', 'fecha');
             }
             // Crear store para inversiones

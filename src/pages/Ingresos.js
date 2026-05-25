@@ -1,8 +1,9 @@
 // src/pages/Ingresos.js
 import '../layout/PageSectionLayout.js';
 import '../features/ingresos/components/IngresoModal.js';
-import '../features/stats/components/StatsCard.js';
 import '../shared/components/AppButton.js';
+import '../shared/components/AppTable.js';
+import StatsIndicators from '../features/stats/components/StatsIndicators.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
@@ -34,8 +35,7 @@ export default function Ingresos() {
     const contentSlot = document.createElement('div');
     contentSlot.className = 'd-grid gap-3';
 
-    const stats = document.createElement('stats-card');
-    contentSlot.appendChild(stats);
+    contentSlot.appendChild(StatsIndicators());
 
     layout.content = contentSlot;
     container.appendChild(layout);

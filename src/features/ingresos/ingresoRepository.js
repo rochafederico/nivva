@@ -27,6 +27,7 @@ export function addIngreso(ingresoModel) {
 
 export function listIngresos({ mes } = {}) {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
+        const resolveRows = (rows) => resolve(mes ? rows.filter(row => row.periodo === mes) : rows);
         try {
             const index = store.index('by_periodo');
             const req = mes ? index.getAll(mes) : index.getAll();
@@ -35,7 +36,7 @@ export function listIngresos({ mes } = {}) {
         } catch (err) {
             // Fallback: no índice
             const req = store.getAll();
-            req.onsuccess = () => resolve(req.result);
+            req.onsuccess = () => resolveRows(req.result || []);
             req.onerror = (e) => reject(new Error('Error listing ingresos: ' + e.target.errorCode));
         }
     });
@@ -59,10 +60,15 @@ export function deleteAllIngresos() {
 
 export function sumIngresosByMonth({ mes } = {}) {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
-        const index = store.index('by_periodo');
-        const request = mes ? index.getAll(mes) : index.getAll();
+        let request;
+        try {
+            const index = store.index('by_periodo');
+            request = mes ? index.getAll(mes) : index.getAll();
+        } catch (err) {
+            request = store.getAll();
+        }
         request.onsuccess = () => {
-            const rows = request.result || [];
+            const rows = mes ? (request.result || []).filter(row => row.periodo === mes) : (request.result || []);
             const totals = {};
             rows.forEach(r => {
                 totals[r.moneda] = (totals[r.moneda] || 0) + (Number(r.monto) || 0);
@@ -72,4 +78,3 @@ export function sumIngresosByMonth({ mes } = {}) {
         request.onerror = (e) => reject(new Error('Error summing ingresos: ' + e.target.errorCode));
     });
 }
-
