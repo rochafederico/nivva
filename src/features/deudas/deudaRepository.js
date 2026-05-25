@@ -235,23 +235,48 @@ export function deleteDeudas() {
             const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
             const deudasStore = transaction.objectStore(DEUDAS_STORE);
             const montosStore = transaction.objectStore(MONTOS_STORE);
+            let settled = false;
+            let failedStoreName = '';
+            let failedDetail = '';
+
+            const rejectOnce = (error) => {
+                if (settled) return;
+                settled = true;
+                reject(error);
+            };
+            const markRequestFailure = (storeName, event) => {
+                failedStoreName = storeName;
+                failedDetail = getIDBErrorDetail(event);
+                rejectOnce(new Error(`Error clearing ${storeName}: ${failedDetail}`));
+            };
 
             transaction.onerror = (event) => {
-                reject(new Error('Transaction error clearing data: ' + event.target.errorCode));
+                const target = failedStoreName || 'data';
+                const detail = failedDetail || getIDBErrorDetail(event);
+                rejectOnce(new Error(`Transaction error clearing ${target}: ${detail}`));
+            };
+
+            transaction.onabort = (event) => {
+                const target = failedStoreName || 'data';
+                const detail = failedDetail || getIDBErrorDetail(event);
+                rejectOnce(new Error(`Transaction aborted clearing ${target}: ${detail}`));
+            };
+
+            transaction.oncomplete = () => {
+                if (settled) return;
+                settled = true;
+                resolve();
             };
 
             const clearMontosRequest = montosStore.clear();
             clearMontosRequest.onsuccess = () => {
                 const clearDeudasRequest = deudasStore.clear();
-                clearDeudasRequest.onsuccess = () => {
-                    resolve();
-                };
                 clearDeudasRequest.onerror = (event) => {
-                    reject(new Error('Error clearing deudas: ' + event.target.errorCode));
+                    markRequestFailure(DEUDAS_STORE, event);
                 };
             };
             clearMontosRequest.onerror = (event) => {
-                reject(new Error('Error clearing montos: ' + event.target.errorCode));
+                markRequestFailure(MONTOS_STORE, event);
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));

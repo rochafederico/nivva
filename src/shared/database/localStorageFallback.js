@@ -59,32 +59,57 @@ function _nextId(name) {
 // Imita la interfaz de un IDBRequest: onsuccess/onerror se asignan sincrónicamente
 // y el callback se dispara en el siguiente macrotask (igual que IDB real).
 class FakeRequest {
-    constructor(fn) {
+    constructor(fn, transaction) {
         this.result = undefined;
         this.onsuccess = null;
         this.onerror = null;
+        transaction?._requestStarted();
         setTimeout(() => {
+            let fnFailed = false;
             try {
                 this.result = fn();
+            } catch (e) {
+                fnFailed = true;
+                const event = { target: { errorCode: e.message, error: e } };
+                if (typeof this.onerror === 'function') {
+                    this.onerror(event);
+                }
+                transaction?._requestFailed(event);
+            }
+
+            if (fnFailed) return;
+
+            try {
                 if (typeof this.onsuccess === 'function') {
                     this.onsuccess({ target: this });
                 }
             } catch (e) {
-                if (typeof this.onerror === 'function') {
-                    this.onerror({ target: { errorCode: e.message } });
-                }
+                setTimeout(() => {
+                    throw e;
+                }, 0);
+            } finally {
+                transaction?._requestFinished();
             }
         }, 0);
     }
 }
 
 class FakeObjectStore {
-    constructor(name) {
+    constructor(name, transaction = null) {
         this._name = name;
+        this.transaction = transaction;
+    }
+
+    _request(fn) {
+        return new FakeRequest(fn, this.transaction);
+    }
+
+    withTransaction(transaction) {
+        return new FakeObjectStore(this._name, transaction);
     }
 
     add(entity) {
-        return new FakeRequest(() => {
+        return this._request(() => {
             const data = _load(this._name);
             const copy = { ...entity };
             if (copy.id == null) copy.id = _nextId(this._name);
@@ -95,7 +120,7 @@ class FakeObjectStore {
     }
 
     put(entity) {
-        return new FakeRequest(() => {
+        return this._request(() => {
             const data = _load(this._name);
             const copy = { ...entity };
             if (copy.id == null) copy.id = _nextId(this._name);
@@ -108,44 +133,45 @@ class FakeObjectStore {
     }
 
     get(id) {
-        return new FakeRequest(() => _load(this._name).find(r => r.id === id));
+        return this._request(() => _load(this._name).find(r => r.id === id));
     }
 
     delete(id) {
-        return new FakeRequest(() => {
+        return this._request(() => {
             _save(this._name, _load(this._name).filter(r => r.id !== id));
         });
     }
 
     getAll() {
-        return new FakeRequest(() => _load(this._name));
+        return this._request(() => _load(this._name));
     }
 
     getAllKeys() {
-        return new FakeRequest(() => _load(this._name).map(r => r.id));
+        return this._request(() => _load(this._name).map(r => r.id));
     }
 
     clear() {
-        return new FakeRequest(() => { _save(this._name, []); });
+        return this._request(() => { _save(this._name, []); });
     }
 
     // Convención: 'by_campo' → filtra por record.campo
     index(indexName) {
         const field = indexName.replace(/^by_/, '');
         const name = this._name;
+        const transaction = this.transaction;
         return {
             getAll(key) {
                 return new FakeRequest(() => {
                     const data = _load(name);
                     return key !== undefined ? data.filter(r => r[field] === key) : data;
-                });
+                }, transaction);
             },
             getAllKeys(key) {
                 return new FakeRequest(() => {
                     const data = _load(name);
                     const filtered = key !== undefined ? data.filter(r => r[field] === key) : data;
                     return filtered.map(r => r.id);
-                });
+                }, transaction);
             }
         };
     }
@@ -155,9 +181,48 @@ class FakeTransaction {
     constructor(storeMap) {
         this._storeMap = storeMap;
         this.onerror = null;
+        this.onabort = null;
+        this.oncomplete = null;
+        this._pending = 0;
+        this._settled = false;
     }
+
     objectStore(name) {
         return this._storeMap[name];
+    }
+
+    abort() {
+        if (this._settled) return;
+        this._settled = true;
+        const event = { target: { errorCode: 'abort' } };
+        if (typeof this.onabort === 'function') this.onabort(event);
+    }
+
+    _requestStarted() {
+        if (this._settled) return;
+        this._pending += 1;
+    }
+
+    _requestFinished() {
+        if (this._settled) return;
+        this._pending -= 1;
+        this._queueComplete();
+    }
+
+    _requestFailed(event) {
+        if (this._settled) return;
+        this._settled = true;
+        if (typeof this.onerror === 'function') this.onerror(event);
+        if (typeof this.onabort === 'function') this.onabort(event);
+    }
+
+    _queueComplete() {
+        if (this._pending !== 0) return;
+        setTimeout(() => {
+            if (this._settled || this._pending !== 0) return;
+            this._settled = true;
+            if (typeof this.oncomplete === 'function') this.oncomplete({ target: this });
+        }, 0);
     }
 }
 
@@ -170,8 +235,10 @@ export class FakeIDB {
     }
     transaction(storeNames) {
         const names = Array.isArray(storeNames) ? storeNames : [storeNames];
+        const tx = new FakeTransaction({});
         const map = {};
-        names.forEach(n => { map[n] = this._stores[n]; });
-        return new FakeTransaction(map);
+        names.forEach(n => { map[n] = this._stores[n].withTransaction(tx); });
+        tx._storeMap = map;
+        return tx;
     }
 }
