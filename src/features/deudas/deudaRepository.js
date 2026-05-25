@@ -6,7 +6,12 @@ import { getDB } from '../../shared/database/initDB.js';
 import { DEUDAS_STORE, MONTOS_STORE } from '../../shared/database/schema.js';
 import { DeudaEntity } from './DeudaEntity.js';
 import { MontoEntity } from '../montos/MontoEntity.js';
-import { trackEvent } from '../../shared/observability/index.js';
+import { mergeDeudaUseCase } from './use-cases/mergeDeudaUseCase.js';
+import { syncMontosUseCase } from './use-cases/syncMontosUseCase.js';
+
+function getIDBErrorDetail(event) {
+    return event?.target?.error?.message || event?.target?.errorCode || 'unknown';
+}
 
 export function addDeuda(deudaModel) {
     const db = getDB();
@@ -14,6 +19,29 @@ export function addDeuda(deudaModel) {
         const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
         const montosStore = transaction.objectStore(MONTOS_STORE);
+        let deudaId = null;
+        let settled = false;
+
+        const rejectOnce = (error) => {
+            if (settled) return;
+            settled = true;
+            reject(error);
+        };
+
+        transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            resolve(deudaId);
+        };
+
+        transaction.onerror = (event) => {
+            rejectOnce(new Error('Error adding deuda: ' + getIDBErrorDetail(event)));
+        };
+
+        transaction.onabort = (event) => {
+            rejectOnce(new Error('Transaction aborted adding deuda: ' + getIDBErrorDetail(event)));
+        };
+
         const deudaEntity = new DeudaEntity({
             acreedor: deudaModel.acreedor,
             tipoDeuda: deudaModel.tipoDeuda,
@@ -21,7 +49,7 @@ export function addDeuda(deudaModel) {
         });
         const deudaRequest = deudasStore.add(deudaEntity);
         deudaRequest.onsuccess = () => {
-            const deudaId = deudaRequest.result;
+            deudaId = deudaRequest.result;
             if (deudaModel.montos && deudaModel.montos.length > 0) {
                 deudaModel.montos.forEach(monto => {
                     const montoEntity = new MontoEntity({
@@ -29,16 +57,16 @@ export function addDeuda(deudaModel) {
                         monto: monto.monto,
                         moneda: monto.moneda,
                         vencimiento: monto.vencimiento,
+                        periodo: monto.periodo,
                         pagado: !!monto.pagado
                     });
                     montosStore.add(montoEntity);
                 });
             }
-            resolve(deudaId);
         };
-            deudaRequest.onerror = (event) => {
-                reject(new Error('Error adding deuda: ' + event.target.errorCode));
-            };
+        deudaRequest.onerror = (event) => {
+            rejectOnce(new Error('Error adding deuda: ' + getIDBErrorDetail(event)));
+        };
     });
 }
 
@@ -49,87 +77,11 @@ export function addDeuda(deudaModel) {
  */
 export function addOrMergeDeuda(deudaModel) {
     const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
-        const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
-
-        // Obtener todas las deudas para buscar coincidencia por acreedor+tipoDeuda
-        const getAllReq = deudasStore.getAll();
-        getAllReq.onsuccess = () => {
-            const existing = (getAllReq.result || []).find(d => {
-                const a = (d.acreedor || '').toString().trim().toLowerCase();
-                const t = (d.tipoDeuda || '').toString().trim().toLowerCase();
-                const a2 = (deudaModel.acreedor || '').toString().trim().toLowerCase();
-                const t2 = (deudaModel.tipoDeuda || '').toString().trim().toLowerCase();
-                return a === a2 && t === t2;
-            });
-
-            if (!existing) {
-                // No existe: delegar a addDeuda para evitar duplicar la lógica de inserción
-                // addDeuda retornará una promesa que resuelve con el id creado
-                addDeuda(deudaModel).then(resolve).catch(reject);
-                return;
-            }
-
-            // Si existe: obtener montos actuales y fusionar usando updateDeuda
-            const existingId = existing.id;
-            const index = montosStore.index('by_deudaId');
-            const getMontosReq = index.getAll(existingId);
-            getMontosReq.onsuccess = () => {
-                const montosActuales = getMontosReq.result || [];
-                const incoming = deudaModel.montos || [];
-
-                // Helper para comparar igualdad de montos (monto, moneda, periodo/vencimiento)
-                const montoEqual = (a, b) => {
-                    const ma = Number(a.monto);
-                    const mb = Number(b.monto);
-                    if (ma !== mb) return false;
-                    if ((a.moneda || 'ARS') !== (b.moneda || 'ARS')) return false;
-                    const pa = a.periodo || (a.vencimiento ? a.vencimiento.slice(0,7) : '');
-                    const pb = b.periodo || (b.vencimiento ? b.vencimiento.slice(0,7) : '');
-                    if (pa && pb) {
-                        if (pa === pb) return true;
-                    }
-                    // Fallback: comparar vencimiento exacto
-                    if (a.vencimiento && b.vencimiento && a.vencimiento === b.vencimiento) return true;
-                    return false;
-                };
-
-                // Filtrar incoming para quedarnos sólo con montos que no están en montosActuales
-                const nuevosMontos = incoming.filter(inc => {
-                    return !montosActuales.some(actual => montoEqual(actual, inc));
-                });
-
-                // Construir la unión: montos actuales (con id) + nuevos montos (sin id)
-                const unionMontos = montosActuales.concat(nuevosMontos.map(m => ({
-                    monto: m.monto,
-                    moneda: m.moneda,
-                    vencimiento: m.vencimiento,
-                    periodo: m.periodo,
-                    pagado: !!m.pagado
-                })));
-
-                // Delegar la lógica de sincronización/actualización a updateDeuda
-                updateDeuda({
-                    id: existingId,
-                    acreedor: deudaModel.acreedor,
-                    tipoDeuda: deudaModel.tipoDeuda,
-                    notas: deudaModel.notas,
-                    montos: unionMontos
-                }).then(() => {
-                    resolve(existingId);
-                }).catch(err => {
-                    reject(err);
-                });
-            };
-            getMontosReq.onerror = (event) => {
-                    reject(new Error('Error getting montos for merge: ' + event.target.errorCode));
-                };
-        };
-        getAllReq.onerror = (event) => {
-                reject(new Error('Error reading deudas: ' + event.target.errorCode));
-            };
+    return mergeDeudaUseCase({
+        db,
+        deudaModel,
+        addDeuda,
+        updateDeuda
     });
 }
 
@@ -151,45 +103,14 @@ export function updateDeuda(deudaModel) {
         });
         const deudaRequest = deudasStore.put(deudaEntity);
         deudaRequest.onsuccess = () => {
-            // Obtener todos los montos actuales de la deuda
-            const index = montosStore.index('by_deudaId');
-            const getMontos = index.getAll(deudaModel.id);
-            getMontos.onsuccess = () => {
-                const montosActuales = getMontos.result || [];
-                const nuevosMontos = deudaModel.montos || [];
-                // Montos a eliminar: los que están en la BD pero no en la nueva lista
-                const nuevosIds = nuevosMontos.filter(m => m.id).map(m => m.id);
-                montosActuales.forEach(montoBD => {
-                    if (!nuevosIds.includes(montoBD.id)) {
-                        montosStore.delete(montoBD.id);
-                    }
-                });
-                // Montos a agregar o actualizar
-                nuevosMontos.forEach(monto => {
-                    // Si tiene id, actualizar; si no, agregar
-                    const montoEntity = new MontoEntity({
-                        deudaId: deudaModel.id,
-                        monto: monto.monto,
-                        moneda: monto.moneda,
-                        vencimiento: monto.vencimiento,
-                        periodo: monto.periodo,
-                        pagado: !!monto.pagado
-                    });
-                    if (monto.id) {
-                        montoEntity.id = monto.id;
-                        montosStore.put(montoEntity);
-                    } else {
-                        montosStore.add(montoEntity);
-                    }
-                });
-                resolve();
-            };
-                getMontos.onerror = (event) => {
-                    reject(new Error('Error updating montos: ' + event.target.errorCode));
-                };
+            syncMontosUseCase({
+                montosStore,
+                deudaId: deudaModel.id,
+                montos: deudaModel.montos || []
+            }).then(resolve).catch(reject);
         };
         deudaRequest.onerror = (event) => {
-            reject('Error updating deuda: ' + event.target.errorCode);
+            reject(new Error('Error updating deuda: ' + getIDBErrorDetail(event)));
         };
     });
 }
@@ -200,28 +121,45 @@ export function deleteDeuda(id) {
         const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
         const montosStore = transaction.objectStore(MONTOS_STORE);
+        let deletedMontosCount = 0;
+        let settled = false;
+
+        const rejectOnce = (error) => {
+            if (settled) return;
+            settled = true;
+            reject(error);
+        };
+
+        transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            resolve(deletedMontosCount);
+        };
+
+        transaction.onerror = (event) => {
+            rejectOnce(new Error('Error deleting deuda: ' + getIDBErrorDetail(event)));
+        };
+
+        transaction.onabort = (event) => {
+            rejectOnce(new Error('Transaction aborted deleting deuda: ' + getIDBErrorDetail(event)));
+        };
+
         const deudaRequest = deudasStore.delete(id);
         deudaRequest.onsuccess = () => {
             const index = montosStore.index('by_deudaId');
             const getMontos = index.getAllKeys(id);
             getMontos.onsuccess = () => {
                 const keys = getMontos.result;
+                deletedMontosCount = keys.length;
                 keys.forEach(key => montosStore.delete(key));
-                trackEvent('delete_debt_completed', {
-                    flow: 'delete_debt',
-                    status: 'completed',
-                    deudaId: id,
-                    deletedMontos: keys.length
-                });
-                resolve();
             };
-                getMontos.onerror = (event) => {
-                    reject(new Error('Error deleting montos: ' + event.target.errorCode));
-                };
+            getMontos.onerror = (event) => {
+                rejectOnce(new Error('Error deleting montos: ' + getIDBErrorDetail(event)));
+            };
         };
         deudaRequest.onerror = (event) => {
-                reject(new Error('Error deleting deuda: ' + event.target.errorCode));
-            };
+            rejectOnce(new Error('Error deleting deuda: ' + getIDBErrorDetail(event)));
+        };
     });
 }
 

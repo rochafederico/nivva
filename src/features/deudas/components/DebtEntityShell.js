@@ -177,8 +177,8 @@ export class DebtEntityShell extends HTMLElement {
                 const id = Number(btn.dataset.deleteId);
                 const acreedor = btn.dataset.acreedor;
                 if (!confirm(`¿Eliminar la deuda con "${acreedor}" y todos sus montos?`)) return;
-                import('../deudaRepository.js').then(({ deleteDeuda }) => {
-                    deleteDeuda(id).then(() => {
+                import('../use-cases/deleteDeudaWithTrackingUseCase.js').then(({ deleteDeudaWithTrackingUseCase }) => {
+                    deleteDeudaWithTrackingUseCase(id).then(() => {
                         window.dispatchEvent(new CustomEvent('deuda:deleted'));
                     });
                 });
