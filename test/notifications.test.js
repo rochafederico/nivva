@@ -565,6 +565,7 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     const userBtn = header.querySelector('#user-menu-btn');
     assert(actions !== null, 'El header renderiza el contenedor de acciones del navbar');
     assert(actions.firstElementChild?.tagName === 'NOTIFICATIONS-BUTTON', 'El botón de notificaciones es el primer ítem del navbar');
+    assert(actions.children[1]?.tagName === 'TOUR-BUTTON', 'El botón del tour queda en el medio del navbar');
     assert(userBtn !== null, 'El header renderiza el ícono de usuario');
     assert(actions.lastElementChild?.tagName === 'USER-MENU-BUTTON', 'El menú de usuario es el último ítem del navbar');
 

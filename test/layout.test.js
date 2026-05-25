@@ -10,8 +10,85 @@ import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import HomeQuickActions from '../src/pages/HomeQuickActions.js';
+import { createIconButton } from '../src/shared/components/createIconButton.js';
 
 export const tests = [
+
+    function createIconButton_usesBootstrapAndAccessibleLabel() {
+        console.log('  createIconButton: usa Bootstrap y aria-label');
+        const whitespaceSeparatedExtraClasses = `position-relative\nflex-shrink-0\tshadow-sm`;
+        const btn = createIconButton({
+            id: 'test-icon-btn',
+            icon: 'bi-bell',
+            label: 'Ver vencimientos próximos',
+            title: 'Vencimientos próximos',
+            extraClasses: whitespaceSeparatedExtraClasses,
+        });
+
+        assert(btn.tagName === 'BUTTON', 'Debe crear un button nativo');
+        assert(btn.id === 'test-icon-btn', 'Debe aplicar id');
+        assert(btn.type === 'button', 'Debe usar type button');
+        assert(btn.classList.contains('btn'), 'Debe usar clase btn');
+        assert(btn.classList.contains('btn-primary'), 'Debe usar variant primary por defecto');
+        assert(btn.classList.contains('d-inline-flex'), 'Debe mantener layout inline-flex');
+        assert(btn.classList.contains('position-relative'), 'Debe aceptar clases extra');
+        assert(btn.classList.contains('flex-shrink-0'), 'Debe separar clases extra por cualquier whitespace');
+        assert(btn.classList.contains('shadow-sm'), 'Debe separar clases extra con tabs');
+        assert(btn.getAttribute('aria-label') === 'Ver vencimientos próximos', 'Debe aplicar aria-label');
+        assert(btn.title === 'Vencimientos próximos', 'Debe aplicar title opcional');
+        assert(btn.querySelector('i.bi.bi-bell') !== null, 'Debe renderizar el ícono Bootstrap');
+    },
+
+    function createIconButton_rejectsNonStringExtraClasses() {
+        console.log('  createIconButton: valida extraClasses string');
+        let failed = false;
+        try {
+            createIconButton({
+                icon: 'bi-bell',
+                label: 'Ver vencimientos próximos',
+                extraClasses: ['position-relative'],
+            });
+        } catch (err) {
+            failed = err instanceof Error;
+        }
+
+        assert(failed, 'Debe rechazar extraClasses si no es string');
+    },
+
+    function createIconButton_requiresIconAndLabel() {
+        console.log('  createIconButton: requiere icon y label');
+        const cases = [
+            { label: 'Ver vencimientos próximos' },
+            { icon: 'bi-bell' },
+        ];
+
+        for (const options of cases) {
+            let failed = false;
+            try {
+                createIconButton(options);
+            } catch (err) {
+                failed = err instanceof Error;
+            }
+
+            assert(failed, 'Debe rechazar si falta icon o label');
+        }
+    },
+
+    function createIconButton_rejectsInvalidVariant() {
+        console.log('  createIconButton: valida variant permitido');
+        let failed = false;
+        try {
+            createIconButton({
+                icon: 'bi-bell',
+                label: 'Ver vencimientos próximos',
+                variant: 'outline-primary',
+            });
+        } catch (err) {
+            failed = err instanceof Error;
+        }
+
+        assert(failed, 'Debe rechazar variant no permitido');
+    },
 
     // ===================================================================
     // UC1: navConfig provides title and subtitle for each route
