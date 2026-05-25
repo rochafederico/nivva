@@ -1,5 +1,10 @@
 import { MontoEntity } from '../../montos/MontoEntity.js';
 
+/**
+ * Sincroniza montos usando un objectStore que pertenece a una transacción
+ * readwrite creada externamente.
+ * El Promise se resuelve/rechaza cuando esa transacción externa completa o falla.
+ */
 export function syncMontosUseCase({ montosStore, deudaId, montos }) {
     return new Promise((resolve, reject) => {
         const transaction = montosStore.transaction;

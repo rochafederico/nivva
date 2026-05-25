@@ -28,6 +28,9 @@ function toMergeMonto(monto) {
 }
 
 export function mergeDeudaUseCase({ db, deudaModel, addDeuda, updateDeuda }) {
+    // Este merge prioriza simplicidad sobre atomicidad total.
+    // La lectura de coincidencias y la escritura final ocurren en transacciones separadas.
+    // En el uso actual de la app, las operaciones se ejecutan desde un único cliente local.
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readonly');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
