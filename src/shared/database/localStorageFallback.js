@@ -173,6 +173,7 @@ class FakeTransaction {
         this.oncomplete = null;
         this._pending = 0;
         this._settled = false;
+        this._completionQueued = false;
     }
 
     objectStore(name) {
@@ -181,6 +182,7 @@ class FakeTransaction {
 
     _requestStarted() {
         if (this._settled) return;
+        this._completionQueued = false;
         this._pending += 1;
     }
 
@@ -198,8 +200,10 @@ class FakeTransaction {
     }
 
     _queueComplete() {
-        if (this._pending !== 0) return;
+        if (this._pending !== 0 || this._completionQueued) return;
+        this._completionQueued = true;
         setTimeout(() => {
+            this._completionQueued = false;
             if (this._settled || this._pending !== 0) return;
             this._settled = true;
             if (typeof this.oncomplete === 'function') this.oncomplete({ target: this });

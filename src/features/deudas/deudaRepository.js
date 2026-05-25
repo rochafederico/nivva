@@ -259,13 +259,7 @@ export function deleteDeudas() {
 
             const clearMontosRequest = montosStore.clear();
             clearMontosRequest.onsuccess = () => {
-                const clearDeudasRequest = deudasStore.clear();
-                clearDeudasRequest.onerror = (event) => {
-                    rejectOnce(new Error('Error clearing deudas: ' + getIDBErrorDetail(event)));
-                };
-            };
-            clearMontosRequest.onerror = (event) => {
-                rejectOnce(new Error('Error clearing montos: ' + getIDBErrorDetail(event)));
+                deudasStore.clear();
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));
