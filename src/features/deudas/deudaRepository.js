@@ -9,6 +9,10 @@ import { MontoEntity } from '../montos/MontoEntity.js';
 import { mergeDeudaUseCase } from './use-cases/mergeDeudaUseCase.js';
 import { syncMontosUseCase } from './use-cases/syncMontosUseCase.js';
 
+function getIDBErrorDetail(event) {
+    return event?.target?.error?.message || event?.target?.errorCode || 'unknown';
+}
+
 export function addDeuda(deudaModel) {
     const db = getDB();
     return new Promise((resolve, reject) => {
@@ -31,11 +35,11 @@ export function addDeuda(deudaModel) {
         };
 
         transaction.onerror = (event) => {
-            rejectOnce(new Error('Error adding deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Error adding deuda: ' + getIDBErrorDetail(event)));
         };
 
         transaction.onabort = (event) => {
-            rejectOnce(new Error('Transaction aborted adding deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Transaction aborted adding deuda: ' + getIDBErrorDetail(event)));
         };
 
         const deudaEntity = new DeudaEntity({
@@ -61,7 +65,7 @@ export function addDeuda(deudaModel) {
             }
         };
         deudaRequest.onerror = (event) => {
-            rejectOnce(new Error('Error adding deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Error adding deuda: ' + getIDBErrorDetail(event)));
         };
     });
 }
@@ -106,7 +110,7 @@ export function updateDeuda(deudaModel) {
             }).then(resolve).catch(reject);
         };
         deudaRequest.onerror = (event) => {
-            reject(new Error('Error updating deuda: ' + event.target.errorCode));
+            reject(new Error('Error updating deuda: ' + getIDBErrorDetail(event)));
         };
     });
 }
@@ -133,11 +137,11 @@ export function deleteDeuda(id) {
         };
 
         transaction.onerror = (event) => {
-            rejectOnce(new Error('Error deleting deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Error deleting deuda: ' + getIDBErrorDetail(event)));
         };
 
         transaction.onabort = (event) => {
-            rejectOnce(new Error('Transaction aborted deleting deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Transaction aborted deleting deuda: ' + getIDBErrorDetail(event)));
         };
 
         const deudaRequest = deudasStore.delete(id);
@@ -150,11 +154,11 @@ export function deleteDeuda(id) {
                 keys.forEach(key => montosStore.delete(key));
             };
             getMontos.onerror = (event) => {
-                rejectOnce(new Error('Error deleting montos: ' + event.target.errorCode));
+                rejectOnce(new Error('Error deleting montos: ' + getIDBErrorDetail(event)));
             };
         };
         deudaRequest.onerror = (event) => {
-            rejectOnce(new Error('Error deleting deuda: ' + event.target.errorCode));
+            rejectOnce(new Error('Error deleting deuda: ' + getIDBErrorDetail(event)));
         };
     });
 }
