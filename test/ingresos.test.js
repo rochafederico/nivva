@@ -373,8 +373,8 @@ async function testIngresoModelCalculaPeriodo() {
     await cleanup();
 }
 
-async function testIngresoModalPersisteDespuesDeMoverseAlModal() {
-    console.log('  UC7: IngresoModal persiste ingresos después de montarse dentro del modal');
+async function testIngresoModalPersisteIngresoCreado() {
+    console.log('  UC7: IngresoModal persiste el ingreso creado');
     await cleanup();
 
     const ingresoModal = document.createElement('ingreso-modal');
@@ -450,6 +450,6 @@ export const tests = [
     testTotalesIngresosPorMoneda,
     testFlujoCompletoIngresosUI,
     testIngresoModelCalculaPeriodo,
-    testIngresoModalPersisteDespuesDeMoverseAlModal,
+    testIngresoModalPersisteIngresoCreado,
     testPaginaIngresosListaIngresoCreadoDesdeModal
 ];
