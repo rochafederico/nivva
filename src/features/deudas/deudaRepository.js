@@ -236,7 +236,7 @@ export function deleteDeudas() {
             const deudasStore = transaction.objectStore(DEUDAS_STORE);
             const montosStore = transaction.objectStore(MONTOS_STORE);
             let settled = false;
-            let failedClearTarget = 'data';
+            let failedStoreName = '';
 
             const rejectOnce = (error) => {
                 if (settled) return;
@@ -245,7 +245,8 @@ export function deleteDeudas() {
             };
 
             transaction.onerror = (event) => {
-                rejectOnce(new Error(`Transaction error clearing ${failedClearTarget}: ${getIDBErrorDetail(event)}`));
+                const target = failedStoreName || 'data';
+                rejectOnce(new Error(`Transaction error clearing ${target}: ${getIDBErrorDetail(event)}`));
             };
 
             transaction.onabort = (event) => {
@@ -262,11 +263,11 @@ export function deleteDeudas() {
             clearMontosRequest.onsuccess = () => {
                 const clearDeudasRequest = deudasStore.clear();
                 clearDeudasRequest.onerror = () => {
-                    failedClearTarget = 'deudas';
+                    failedStoreName = DEUDAS_STORE;
                 };
             };
             clearMontosRequest.onerror = () => {
-                failedClearTarget = 'montos';
+                failedStoreName = MONTOS_STORE;
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));
