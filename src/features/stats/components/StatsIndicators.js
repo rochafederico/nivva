@@ -8,7 +8,7 @@ import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 // Each call to StatsIndicators() replaces the previous listeners with ones
 // that render into the current (newly created) container node.
 let _monthHandler = null;
-let _importHandler = null;
+let _dataChangedHandler = null;
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
@@ -70,14 +70,20 @@ export default function StatsIndicators({ mes } = {}) {
   };
   window.addEventListener('ui:month', _monthHandler);
 
-  if (_importHandler) {
-    window.removeEventListener('data-imported', _importHandler);
+  if (_dataChangedHandler) {
+    window.removeEventListener('data-imported', _dataChangedHandler);
+    window.removeEventListener('ingreso:added', _dataChangedHandler);
+    window.removeEventListener('deuda:saved', _dataChangedHandler);
+    window.removeEventListener('deuda:updated', _dataChangedHandler);
   }
-  _importHandler = () => {
+  _dataChangedHandler = () => {
     if (!container.isConnected) return;
     render(getSelectedMonth());
   };
-  window.addEventListener('data-imported', _importHandler);
+  window.addEventListener('data-imported', _dataChangedHandler);
+  window.addEventListener('ingreso:added', _dataChangedHandler);
+  window.addEventListener('deuda:saved', _dataChangedHandler);
+  window.addEventListener('deuda:updated', _dataChangedHandler);
 
   return container;
 }
