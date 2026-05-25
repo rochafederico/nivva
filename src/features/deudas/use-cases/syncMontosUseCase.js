@@ -18,11 +18,11 @@ export function syncMontosUseCase({ montosStore, deudaId, montos }) {
         };
 
         transaction.onerror = (event) => {
-            rejectOnce(new Error('Error updating montos: ' + event.target.errorCode));
+            rejectOnce(new Error('Error syncing montos: ' + event.target.errorCode));
         };
 
         transaction.onabort = (event) => {
-            rejectOnce(new Error('Transaction aborted updating montos: ' + event.target.errorCode));
+            rejectOnce(new Error('Transaction aborted syncing montos: ' + event.target.errorCode));
         };
 
         const index = montosStore.index('by_deudaId');
@@ -59,7 +59,7 @@ export function syncMontosUseCase({ montosStore, deudaId, montos }) {
         };
 
         getMontos.onerror = (event) => {
-            rejectOnce(new Error('Error updating montos: ' + event.target.errorCode));
+            rejectOnce(new Error('Error getting montos for sync: ' + event.target.errorCode));
         };
     });
 }
