@@ -3,6 +3,7 @@
 import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
+import { getDB } from '../src/shared/database/initDB.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
 import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
 import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtListTotals.js';
@@ -236,6 +237,41 @@ async function testEliminarDeudas() {
     assert(montos.length === 0, 'Despues de eliminar todo: 0 montos');
 
     document.body.removeChild(form);
+}
+
+async function testDeleteDeudasWaitsForTransactionComplete() {
+    console.log('  UC4b: deleteDeudas espera a que complete la transacción');
+    await cleanup();
+
+    await addOrMergeDeuda({
+        acreedor: 'Consistencia',
+        tipoDeuda: 'IndexedDB',
+        notas: '',
+        montos: [{ monto: 1, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }]
+    });
+
+    const db = getDB();
+    const originalTransaction = db.transaction.bind(db);
+    let clearTransactionCompleted = false;
+
+    db.transaction = (storeNames, mode, ...args) => {
+        const transaction = originalTransaction(storeNames, mode, ...args);
+        const names = Array.isArray(storeNames) ? storeNames : [storeNames];
+        if (mode === 'readwrite' && names.includes('deudas') && names.includes('montos')) {
+            transaction.addEventListener('complete', () => {
+                clearTransactionCompleted = true;
+            }, { once: true });
+        }
+        return transaction;
+    };
+
+    try {
+        await deleteDeudas();
+        assert(clearTransactionCompleted, 'deleteDeudas debe resolver despues del complete de IndexedDB');
+    } finally {
+        db.transaction = originalTransaction;
+        await cleanup();
+    }
 }
 
 // ===================================================================
@@ -1625,6 +1661,7 @@ export const tests = [
     testEditarDeudaDesdeFormulario,
     testImportarConMerge,
     testEliminarDeudas,
+    testDeleteDeudasWaitsForTransactionComplete,
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
     testAcreedorColumnMobileRender,
