@@ -237,28 +237,29 @@ export function deleteDeudas() {
             const montosStore = transaction.objectStore(MONTOS_STORE);
             let settled = false;
             let failedStoreName = '';
+            let failedDetail = '';
 
             const rejectOnce = (error) => {
                 if (settled) return;
                 settled = true;
                 reject(error);
             };
-            const abortTransaction = () => {
-                try {
-                    transaction.abort();
-                } catch {
-                    // La transacción puede estar abortándose ya; el handler onabort resolverá el rechazo.
-                }
+            const markRequestFailure = (storeName, event) => {
+                failedStoreName = storeName;
+                failedDetail = getIDBErrorDetail(event);
+                rejectOnce(new Error(`Error clearing ${storeName}: ${failedDetail}`));
             };
 
             transaction.onerror = (event) => {
                 const target = failedStoreName || 'data';
-                rejectOnce(new Error(`Transaction error clearing ${target}: ${getIDBErrorDetail(event)}`));
+                const detail = failedDetail || getIDBErrorDetail(event);
+                rejectOnce(new Error(`Transaction error clearing ${target}: ${detail}`));
             };
 
             transaction.onabort = (event) => {
                 const target = failedStoreName || 'data';
-                rejectOnce(new Error(`Transaction aborted clearing ${target}: ${getIDBErrorDetail(event)}`));
+                const detail = failedDetail || getIDBErrorDetail(event);
+                rejectOnce(new Error(`Transaction aborted clearing ${target}: ${detail}`));
             };
 
             transaction.oncomplete = () => {
@@ -270,14 +271,12 @@ export function deleteDeudas() {
             const clearMontosRequest = montosStore.clear();
             clearMontosRequest.onsuccess = () => {
                 const clearDeudasRequest = deudasStore.clear();
-                clearDeudasRequest.onerror = () => {
-                    failedStoreName = DEUDAS_STORE;
-                    abortTransaction();
+                clearDeudasRequest.onerror = (event) => {
+                    markRequestFailure(DEUDAS_STORE, event);
                 };
             };
-            clearMontosRequest.onerror = () => {
-                failedStoreName = MONTOS_STORE;
-                abortTransaction();
+            clearMontosRequest.onerror = (event) => {
+                markRequestFailure(MONTOS_STORE, event);
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));

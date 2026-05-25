@@ -65,18 +65,30 @@ class FakeRequest {
         this.onerror = null;
         transaction?._requestStarted();
         setTimeout(() => {
+            let fnFailed = false;
             try {
                 this.result = fn();
-                if (typeof this.onsuccess === 'function') {
-                    this.onsuccess({ target: this });
-                }
-                transaction?._requestFinished();
             } catch (e) {
+                fnFailed = true;
                 const event = { target: { errorCode: e.message, error: e } };
                 if (typeof this.onerror === 'function') {
                     this.onerror(event);
                 }
                 transaction?._requestFailed(event);
+            }
+
+            if (fnFailed) return;
+
+            try {
+                if (typeof this.onsuccess === 'function') {
+                    this.onsuccess({ target: this });
+                }
+            } catch (e) {
+                setTimeout(() => {
+                    throw e;
+                }, 0);
+            } finally {
+                transaction?._requestFinished();
             }
         }, 0);
     }
