@@ -2,6 +2,29 @@ import { MontoEntity } from '../../montos/MontoEntity.js';
 
 export function syncMontosUseCase({ montosStore, deudaId, montos }) {
     return new Promise((resolve, reject) => {
+        const transaction = montosStore.transaction;
+        let settled = false;
+
+        const rejectOnce = (error) => {
+            if (settled) return;
+            settled = true;
+            reject(error);
+        };
+
+        transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+        };
+
+        transaction.onerror = (event) => {
+            rejectOnce(new Error('Error updating montos: ' + event.target.errorCode));
+        };
+
+        transaction.onabort = (event) => {
+            rejectOnce(new Error('Transaction aborted updating montos: ' + event.target.errorCode));
+        };
+
         const index = montosStore.index('by_deudaId');
         const getMontos = index.getAll(deudaId);
 
@@ -33,12 +56,10 @@ export function syncMontosUseCase({ montosStore, deudaId, montos }) {
                     montosStore.add(montoEntity);
                 }
             });
-
-            resolve();
         };
 
         getMontos.onerror = (event) => {
-            reject(new Error('Error updating montos: ' + event.target.errorCode));
+            rejectOnce(new Error('Error updating montos: ' + event.target.errorCode));
         };
     });
 }

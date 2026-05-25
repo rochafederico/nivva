@@ -29,7 +29,7 @@ function toMergeMonto(monto) {
 
 export function mergeDeudaUseCase({ db, deudaModel, addDeuda, updateDeuda }) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readonly');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
         const montosStore = transaction.objectStore(MONTOS_STORE);
         const getAllReq = deudasStore.getAll();
