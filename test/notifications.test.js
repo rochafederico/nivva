@@ -16,6 +16,7 @@ import {
     showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
 import { createNavbarPopover } from '../src/layout/navbarPopoversController.js';
+import { createPopover, destroyPopover } from '../src/shared/ui/bootstrap/index.js';
 
 function localDate(year, month, day) {
     return new Date(year, month - 1, day, 12, 0, 0);
@@ -710,10 +711,45 @@ async function testNavbarPopoverControllerSharedWiring() {
 }
 
 // ===================================================================
-// UC18: navbarPopoversController – factory de popover de navbar
+// UC18: shared/ui/bootstrap – helpers de Bootstrap Popover
+// ===================================================================
+async function testBootstrapPopoverHelpers() {
+    console.log('  UC18: createPopover/destroyPopover encapsulan Bootstrap Popover');
+
+    const originalBootstrap = window.bootstrap;
+    let capturedButton = null;
+    let capturedOptions = null;
+    let disposeCalls = 0;
+    const MockPopover = class {
+        constructor(el, opts) {
+            capturedButton = el;
+            capturedOptions = opts;
+        }
+        dispose() { disposeCalls += 1; }
+    };
+    window.bootstrap = { Popover: MockPopover };
+
+    const btn = document.createElement('button');
+    const popover = createPopover(btn, { trigger: 'focus' });
+    assert(popover instanceof MockPopover, 'createPopover devuelve una instancia de bootstrap.Popover');
+    assert(capturedButton === btn, 'createPopover usa el elemento recibido');
+    assert(capturedOptions?.trigger === 'focus', 'createPopover conserva las opciones recibidas');
+
+    destroyPopover(popover);
+    assert(disposeCalls === 1, 'destroyPopover llama dispose en la instancia');
+
+    window.bootstrap = {};
+    assert(createPopover(btn, {}) === null, 'createPopover devuelve null si Bootstrap Popover no está disponible');
+    destroyPopover(null);
+
+    window.bootstrap = originalBootstrap;
+}
+
+// ===================================================================
+// UC19: navbarPopoversController – factory de popover de navbar
 // ===================================================================
 async function testNavbarPopoverControllerCreatePopoverFactory() {
-    console.log('  UC18: createNavbarPopover aplica defaults de navbar sin perder opciones');
+    console.log('  UC19: createNavbarPopover aplica defaults de navbar sin perder opciones');
 
     const originalBootstrap = window.bootstrap;
     let capturedButton = null;
@@ -724,17 +760,25 @@ async function testNavbarPopoverControllerCreatePopoverFactory() {
             capturedOptions = opts;
         }
     };
+    MockPopover.Default = { allowList: { '*': ['class'], a: ['href'] } };
     window.bootstrap = { Popover: MockPopover };
 
     const btn = document.createElement('button');
     btn.id = 'factory-test-btn';
-    const popover = createNavbarPopover(btn, { html: true, content: '<p>ok</p>' });
+    const popover = createNavbarPopover(btn, {
+        html: true,
+        content: '<p>ok</p>',
+        allowList: { a: ['data-notif-navigate'], button: ['type'] },
+    });
     assert(popover instanceof MockPopover, 'createNavbarPopover devuelve una instancia de bootstrap.Popover');
     assert(capturedButton === btn, 'createNavbarPopover usa el botón recibido');
     assert(capturedOptions?.trigger === 'click', 'El trigger por defecto se mantiene en click');
     assert(capturedOptions?.container === 'body', 'El contenedor por defecto se mantiene en body');
     assert(capturedOptions?.placement === 'bottom', 'El placement base se mantiene en bottom');
     assert(capturedOptions?.html === true, 'Las opciones personalizadas se mantienen');
+    assert(capturedOptions?.allowList?.a?.includes('href'), 'allowList preserva atributos default de Bootstrap');
+    assert(capturedOptions?.allowList?.a?.includes('data-notif-navigate'), 'allowList agrega atributos personalizados');
+    assert(capturedOptions?.allowList?.button?.includes('type'), 'allowList agrega tags personalizados');
 
     const popperConfigInput = { placement: 'bottom', strategy: 'fixed', modifiers: [{ name: 'offset', options: { y: 8 } }] };
     const popperConfigResult = capturedOptions?.popperConfig(popperConfigInput);
@@ -770,5 +814,6 @@ export const tests = [
     testBuildUpcomingPaymentsHTMLEmpty,
     testCheckAndNotifyEmptyAlwaysShowsPanel,
     testNavbarPopoverControllerSharedWiring,
+    testBootstrapPopoverHelpers,
     testNavbarPopoverControllerCreatePopoverFactory,
 ];

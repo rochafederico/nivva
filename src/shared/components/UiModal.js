@@ -1,5 +1,6 @@
 // src/components/UiModal.js
 // Web Component <ui-modal> - Modal usando Bootstrap 5 Modal JS (sin Shadow DOM)
+import { createModal } from '../ui/bootstrap/index.js';
 
 export class UiModal extends HTMLElement {
     constructor() {
@@ -25,9 +26,7 @@ export class UiModal extends HTMLElement {
         this._footerEl = modalEl.querySelector('.modal-footer');
         this._titleEl = modalEl.querySelector('.modal-title');
         // Use Bootstrap Modal JS if available
-        if (window.bootstrap && window.bootstrap.Modal) {
-            this._bsModal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: true });
-        }
+        this._bsModal = createModal(modalEl, { backdrop: 'static', keyboard: true });
         // Listen for hidden event to return focus
         modalEl.addEventListener('hidden.bs.modal', () => this._onClose());
     }

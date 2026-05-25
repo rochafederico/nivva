@@ -1,6 +1,7 @@
 import { createNavbarPopover } from './navbarPopoversController.js';
 import { openSettingsFrom } from './settingsShortcutAction.js';
 import { createIconButton } from '../shared/components/createIconButton.js';
+import { destroyPopover } from '../shared/ui/bootstrap/index.js';
 
 export class UserMenuButton extends HTMLElement {
   connectedCallback() {
@@ -18,7 +19,7 @@ export class UserMenuButton extends HTMLElement {
   disconnectedCallback() {
     this._popoverController?.remove();
     this._popoverController = null;
-    this._popover?.dispose();
+    destroyPopover(this._popover);
     this._popover = null;
   }
 
@@ -48,19 +49,19 @@ export class UserMenuButton extends HTMLElement {
 
   _updatePopover() {
     const btn = this.querySelector('#user-menu-btn');
-    if (!btn || !window.bootstrap?.Popover) return;
-    if (this._popover) this._popover.dispose();
+    if (!btn) return;
+    destroyPopover(this._popover);
     this._popover = createNavbarPopover(btn, {
       html: true,
       content: '<div class="list-group list-group-flush">' +
         '<button type="button" class="list-group-item list-group-item-action" data-user-settings><i class="bi bi-gear me-2" aria-hidden="true"></i>Configuración</button>' +
         '</div>',
       allowList: {
-        ...window.bootstrap.Popover.Default.allowList,
         button: ['type', 'class', 'data-user-settings'],
         i: ['class', 'aria-hidden'],
       },
     });
+    if (!this._popover) return;
   }
 
   render() {

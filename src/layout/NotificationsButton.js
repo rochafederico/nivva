@@ -1,5 +1,6 @@
 import { createNavbarPopover } from './navbarPopoversController.js';
 import { createIconButton } from '../shared/components/createIconButton.js';
+import { destroyPopover } from '../shared/ui/bootstrap/index.js';
 
 export class NotificationsButton extends HTMLElement {
   connectedCallback() {
@@ -19,7 +20,7 @@ export class NotificationsButton extends HTMLElement {
     this._popoverController?.remove();
     this._popoverController = null;
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
-    this._popover?.dispose();
+    destroyPopover(this._popover);
     this._popover = null;
   }
 
@@ -58,8 +59,8 @@ export class NotificationsButton extends HTMLElement {
 
   _updatePopover(html, _todayCount = 0, overdueCount = 0) {
     const btn = this.querySelector('#notifications-btn');
-    if (!btn || !window.bootstrap?.Popover) return;
-    if (this._popover) this._popover.dispose();
+    if (!btn) return;
+    destroyPopover(this._popover);
     this._popover = createNavbarPopover(btn, {
       html: true,
       title: '<div class="d-flex justify-content-between align-items-center w-100">' +
@@ -68,11 +69,11 @@ export class NotificationsButton extends HTMLElement {
         '</div>',
       content: html,
       allowList: {
-        ...window.bootstrap.Popover.Default.allowList,
         button: ['type', 'class', 'aria-label', 'data-notif-close'],
-        a: [...(window.bootstrap.Popover.Default.allowList.a || []), 'data-notif-navigate'],
+        a: ['data-notif-navigate'],
       },
     });
+    if (!this._popover) return;
     let badge = btn.querySelector('.notif-badge');
     if (!badge) {
       badge = document.createElement('span');
