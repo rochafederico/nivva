@@ -1,3 +1,5 @@
+import { createToast } from '../ui/bootstrap/index.js';
+
 export class AppToast extends HTMLElement {
     connectedCallback() {
         this._container = document.createElement('div');
@@ -27,7 +29,7 @@ export class AppToast extends HTMLElement {
             </div>
         `;
         this._container.appendChild(toastEl);
-        new window.bootstrap.Toast(toastEl, { delay: 5000 }).show();
+        createToast(toastEl, { delay: 5000 })?.show();
         toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
     }
 }

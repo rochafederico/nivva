@@ -1,5 +1,17 @@
+import { createPopover, getPopoverDefaultAllowList } from '../shared/ui/bootstrap/index.js';
+
+function mergeAllowList(additions = {}) {
+  const defaults = getPopoverDefaultAllowList();
+  const merged = { ...defaults };
+  Object.entries(additions).forEach(([key, value]) => {
+    const base = Array.isArray(defaults[key]) ? defaults[key] : [];
+    merged[key] = Array.isArray(value) ? [...new Set([...base, ...value])] : value;
+  });
+  return merged;
+}
+
 export function createNavbarPopover(button, options) {
-  if (!button || !window.bootstrap?.Popover) return null;
+  if (!button) return null;
   const cloneModifier = (modifier) => {
     if (!modifier || typeof modifier !== 'object') return modifier;
     return {
@@ -9,7 +21,8 @@ export function createNavbarPopover(button, options) {
         : modifier.options,
     };
   };
-  return new window.bootstrap.Popover(button, {
+  const { allowList, ...popoverOptions } = options ?? {};
+  return createPopover(button, {
     trigger: 'click',
     placement: 'bottom',
     container: 'body',
@@ -19,7 +32,8 @@ export function createNavbarPopover(button, options) {
         : defaultConfig?.modifiers;
       return { ...defaultConfig, modifiers, placement: 'bottom-end' };
     },
-    ...options,
+    ...popoverOptions,
+    ...(allowList ? { allowList: mergeAllowList(allowList) } : {}),
   });
 }
 
