@@ -7,7 +7,7 @@ import {
 } from '../src/features/ingresos/ingresoRepository.js';
 import { IngresoModel } from '../src/features/ingresos/IngresoModel.js';
 import Ingresos from '../src/pages/Ingresos.js';
-import { setSelectedMonth } from '../src/shared/MonthFilter.js';
+import { getSelectedMonth, setSelectedMonth } from '../src/shared/MonthFilter.js';
 
 // Import ingresos UI components (registers custom elements)
 import '../src/features/ingresos/components/IngresoForm.js';
@@ -407,37 +407,44 @@ async function testIngresoModalPersisteIngresoCreado() {
 
 async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
     console.log('  UC8: Página Ingresos lista el ingreso creado desde su modal');
+    const previousMonth = getSelectedMonth();
     await cleanup();
     setSelectedMonth('2026-05');
 
-    const page = Ingresos();
-    document.body.appendChild(page);
-    await new Promise(r => setTimeout(r, 0));
+    let page = null;
+    try {
+        page = Ingresos();
+        document.body.appendChild(page);
+        await new Promise(r => setTimeout(r, 0));
 
-    const ingresoModal = page.querySelector('ingreso-modal');
-    ingresoModal.openCreate();
-    await new Promise(r => setTimeout(r, 0));
+        const ingresoModal = page.querySelector('ingreso-modal');
+        ingresoModal.openCreate();
+        await new Promise(r => setTimeout(r, 0));
 
-    const appForm = ingresoModal.form.querySelector('app-form');
-    appForm.dispatchEvent(new CustomEvent('form:submit', {
-        detail: {
-            fecha: '2026-05-15',
-            descripcion: 'Salario',
-            monto: 1000,
-            moneda: 'ARS'
-        },
-        bubbles: true,
-        composed: true
-    }));
-    await new Promise(r => setTimeout(r, 50));
+        const appForm = ingresoModal.form.querySelector('app-form');
+        appForm.dispatchEvent(new CustomEvent('form:submit', {
+            detail: {
+                fecha: '2026-05-15',
+                descripcion: 'Salario',
+                monto: 1000,
+                moneda: 'ARS'
+            },
+            bubbles: true,
+            composed: true
+        }));
+        await new Promise(r => setTimeout(r, 50));
 
-    const tableText = page.querySelector('app-table')?.textContent || '';
-    assert(tableText.includes('Salario'), 'La tabla de Ingresos debe mostrar el ingreso creado');
-    assert(tableText.includes('$ 1.000,00'), 'La tabla de Ingresos debe mostrar el monto creado');
-
-    document.body.removeChild(page);
-    page.cleanup?.();
-    await cleanup();
+        const tableText = page.querySelector('app-table')?.textContent || '';
+        assert(tableText.includes('Salario'), 'La tabla de Ingresos debe mostrar el ingreso creado');
+        assert(tableText.includes('$ 1.000,00'), 'La tabla de Ingresos debe mostrar el monto creado');
+    } finally {
+        if (page && page.parentNode) {
+            document.body.removeChild(page);
+        }
+        page?.cleanup?.();
+        setSelectedMonth(previousMonth);
+        await cleanup();
+    }
 }
 
 export const tests = [

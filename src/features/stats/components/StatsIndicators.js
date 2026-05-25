@@ -9,7 +9,7 @@ import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 // that render into the current (newly created) container node.
 let _monthHandler = null;
 let _dataChangedHandler = null;
-const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated'];
+const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted'];
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
