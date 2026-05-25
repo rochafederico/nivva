@@ -243,6 +243,13 @@ export function deleteDeudas() {
                 settled = true;
                 reject(error);
             };
+            const abortTransaction = () => {
+                try {
+                    transaction.abort();
+                } catch {
+                    // La transacción puede estar abortándose ya; el handler onabort resolverá el rechazo.
+                }
+            };
 
             transaction.onerror = (event) => {
                 const target = failedStoreName || 'data';
@@ -250,7 +257,8 @@ export function deleteDeudas() {
             };
 
             transaction.onabort = (event) => {
-                rejectOnce(new Error('Transaction aborted clearing data: ' + getIDBErrorDetail(event)));
+                const target = failedStoreName || 'data';
+                rejectOnce(new Error(`Transaction aborted clearing ${target}: ${getIDBErrorDetail(event)}`));
             };
 
             transaction.oncomplete = () => {
@@ -264,10 +272,12 @@ export function deleteDeudas() {
                 const clearDeudasRequest = deudasStore.clear();
                 clearDeudasRequest.onerror = () => {
                     failedStoreName = DEUDAS_STORE;
+                    abortTransaction();
                 };
             };
             clearMontosRequest.onerror = () => {
                 failedStoreName = MONTOS_STORE;
+                abortTransaction();
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));

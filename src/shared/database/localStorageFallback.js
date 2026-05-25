@@ -179,6 +179,13 @@ class FakeTransaction {
         return this._storeMap[name];
     }
 
+    abort() {
+        if (this._settled) return;
+        this._settled = true;
+        const event = { target: { errorCode: 'abort' } };
+        if (typeof this.onabort === 'function') this.onabort(event);
+    }
+
     _requestStarted() {
         if (this._settled) return;
         this._pending += 1;
