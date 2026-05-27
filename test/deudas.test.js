@@ -609,6 +609,47 @@ async function testAltaInlineAgregarYGuardar() {
 }
 
 // ===================================================================
+// UC8b: Alta inline — _saveInline muestra errores en campos vacíos
+// ===================================================================
+async function testAltaInlineValidacionErrores() {
+    console.log('  UC8b: Alta inline — _saveInline muestra errores cuando campos están vacíos');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.openInlineAdd();
+    const tbody = form.querySelector('#montos-tbody');
+    const inlineRow = tbody.querySelector('.inline-edit-row');
+    assert(inlineRow !== null, 'Debe haber una fila inline');
+
+    const montoInput = inlineRow.querySelector('input[name="monto"]');
+    const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
+
+    // Intentar guardar con campos vacíos
+    form._saveInline();
+    assert(form._inlineEditIdx === 'new', 'El inline sigue abierto tras guardar con campos inválidos');
+    assert(form.montos.length === 0, 'No se agregó ningún monto');
+    assert(montoInput.classList.contains('is-invalid'), 'Monto debe marcarse como inválido');
+    assert(montoInput.getAttribute('aria-invalid') === 'true', 'Monto debe tener aria-invalid=true');
+    const montoFeedback = montoInput.nextElementSibling;
+    assert(montoFeedback !== null && montoFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para monto');
+    assert(montoFeedback.textContent.length > 0, 'El mensaje de error de monto no debe estar vacío');
+    assert(vencInput.classList.contains('is-invalid'), 'Vencimiento debe marcarse como inválido');
+    const vencFeedback = vencInput.nextElementSibling;
+    assert(vencFeedback !== null && vencFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para vencimiento');
+
+    // Corregir el campo monto y verificar que se limpia el error
+    montoInput.value = '1000';
+    montoInput.dispatchEvent(new Event('input'));
+    assert(!montoInput.classList.contains('is-invalid'), 'Error de monto debe limpiarse al corregir');
+    assert(montoInput.getAttribute('aria-invalid') === null, 'aria-invalid debe limpiarse al corregir');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
 // UC9: Cancel alta inline — no modifica form.montos ni deja fila basura
 // ===================================================================
 async function testCancelarAltaInline() {
@@ -1667,6 +1708,7 @@ export const tests = [
     testAcreedorColumnMobileRender,
     testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
+    testAltaInlineValidacionErrores,
     testCancelarAltaInline,
     testEdicionInlineGuardar,
     testCancelarEdicionInline,

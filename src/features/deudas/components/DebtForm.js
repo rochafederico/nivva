@@ -281,10 +281,36 @@ export class DebtForm extends HTMLElement {
         const montoInput = row.querySelector('input[name="monto"]');
         const monedaSelect = row.querySelector('select[name="moneda"]');
         const vencimientoInput = row.querySelector('input[name="vencimiento"]');
-        // Use native HTML validation; stay in edit mode if invalid
-        if (!montoInput.reportValidity() || !monedaSelect.reportValidity() || !vencimientoInput.reportValidity()) {
-            return;
+        const _showError = (input, msg) => {
+            input.classList.add('is-invalid');
+            input.setAttribute('aria-invalid', 'true');
+            const fb = input.nextElementSibling;
+            if (fb && fb.classList.contains('invalid-feedback')) fb.textContent = msg;
+        };
+        const _clearError = (input) => {
+            input.classList.remove('is-invalid');
+            input.removeAttribute('aria-invalid');
+        };
+        let hasError = false;
+        if (!montoInput.checkValidity()) {
+            _showError(montoInput, 'Ingresá un monto válido mayor que 0.');
+            hasError = true;
+        } else {
+            _clearError(montoInput);
         }
+        if (!monedaSelect.checkValidity()) {
+            _showError(monedaSelect, 'Seleccioná una moneda.');
+            hasError = true;
+        } else {
+            _clearError(monedaSelect);
+        }
+        if (!vencimientoInput.checkValidity()) {
+            _showError(vencimientoInput, 'Ingresá la fecha de vencimiento.');
+            hasError = true;
+        } else {
+            _clearError(vencimientoInput);
+        }
+        if (hasError) return;
         const existing = this._inlineEditRef; // null when adding new
         const nuevoMonto = {
             monto: parseFloat(montoInput.value),
@@ -330,6 +356,11 @@ export class DebtForm extends HTMLElement {
                 ...(monto ? { value: String(monto.monto) } : {})
             }
         });
+        const montoFeedback = el('div', { className: 'invalid-feedback', text: 'Ingresá un monto válido mayor que 0.' });
+        montoInput.addEventListener('input', () => {
+            montoInput.classList.remove('is-invalid');
+            montoInput.removeAttribute('aria-invalid');
+        });
         const monedaSelect = el('select', {
             attrs: { name: 'moneda', required: '', class: 'form-select form-select-sm' }
         });
@@ -338,12 +369,22 @@ export class DebtForm extends HTMLElement {
             if (monto && monto.moneda === m) opt.selected = true;
             monedaSelect.appendChild(opt);
         });
+        const monedaFeedback = el('div', { className: 'invalid-feedback', text: 'Seleccioná una moneda.' });
+        monedaSelect.addEventListener('change', () => {
+            monedaSelect.classList.remove('is-invalid');
+            monedaSelect.removeAttribute('aria-invalid');
+        });
         const vencInput = el('input', {
             attrs: {
                 type: 'date', name: 'vencimiento', required: '',
                 class: 'form-control form-control-sm',
                 ...(monto ? { value: monto.vencimiento } : {})
             }
+        });
+        const vencFeedback = el('div', { className: 'invalid-feedback', text: 'Ingresá la fecha de vencimiento.' });
+        vencInput.addEventListener('input', () => {
+            vencInput.classList.remove('is-invalid');
+            vencInput.removeAttribute('aria-invalid');
         });
         const saveBtn = el('app-button', {
             className: 'save-inline', text: '✓',
@@ -356,9 +397,9 @@ export class DebtForm extends HTMLElement {
             on: { click: () => this._cancelInline() }
         });
         const tr = el('tr', { className: 'inline-edit-row' });
-        tr.appendChild(el('td', { children: [montoInput] }));
-        tr.appendChild(el('td', { children: [monedaSelect] }));
-        tr.appendChild(el('td', { children: [vencInput] }));
+        tr.appendChild(el('td', { children: [montoInput, montoFeedback] }));
+        tr.appendChild(el('td', { children: [monedaSelect, monedaFeedback] }));
+        tr.appendChild(el('td', { children: [vencInput, vencFeedback] }));
         tr.appendChild(el('td', { children: [el('div', { className: 'd-flex gap-1 align-items-center', children: [saveBtn, cancelBtn] })] }));
         return tr;
     }
