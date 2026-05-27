@@ -13,6 +13,10 @@ import {
     updateFlowStep
 } from '../../../shared/observability/index.js';
 
+const INLINE_MONTO_ERROR = 'Ingresá un monto válido mayor que 0.';
+const INLINE_MONEDA_ERROR = 'Seleccioná una moneda.';
+const INLINE_VENC_ERROR = 'Ingresá la fecha de vencimiento.';
+
 export class DebtForm extends HTMLElement {
     constructor() {
         super();
@@ -293,19 +297,19 @@ export class DebtForm extends HTMLElement {
         };
         let hasError = false;
         if (!montoInput.checkValidity()) {
-            _showError(montoInput, 'Ingresá un monto válido mayor que 0.');
+            _showError(montoInput, INLINE_MONTO_ERROR);
             hasError = true;
         } else {
             _clearError(montoInput);
         }
         if (!monedaSelect.checkValidity()) {
-            _showError(monedaSelect, 'Seleccioná una moneda.');
+            _showError(monedaSelect, INLINE_MONEDA_ERROR);
             hasError = true;
         } else {
             _clearError(monedaSelect);
         }
         if (!vencimientoInput.checkValidity()) {
-            _showError(vencimientoInput, 'Ingresá la fecha de vencimiento.');
+            _showError(vencimientoInput, INLINE_VENC_ERROR);
             hasError = true;
         } else {
             _clearError(vencimientoInput);
@@ -356,7 +360,7 @@ export class DebtForm extends HTMLElement {
                 ...(monto ? { value: String(monto.monto) } : {})
             }
         });
-        const montoFeedback = el('div', { className: 'invalid-feedback', text: 'Ingresá un monto válido mayor que 0.' });
+        const montoFeedback = el('div', { className: 'invalid-feedback', text: INLINE_MONTO_ERROR });
         montoInput.addEventListener('input', () => {
             montoInput.classList.remove('is-invalid');
             montoInput.removeAttribute('aria-invalid');
@@ -369,7 +373,7 @@ export class DebtForm extends HTMLElement {
             if (monto && monto.moneda === m) opt.selected = true;
             monedaSelect.appendChild(opt);
         });
-        const monedaFeedback = el('div', { className: 'invalid-feedback', text: 'Seleccioná una moneda.' });
+        const monedaFeedback = el('div', { className: 'invalid-feedback', text: INLINE_MONEDA_ERROR });
         monedaSelect.addEventListener('change', () => {
             monedaSelect.classList.remove('is-invalid');
             monedaSelect.removeAttribute('aria-invalid');
@@ -381,7 +385,7 @@ export class DebtForm extends HTMLElement {
                 ...(monto ? { value: monto.vencimiento } : {})
             }
         });
-        const vencFeedback = el('div', { className: 'invalid-feedback', text: 'Ingresá la fecha de vencimiento.' });
+        const vencFeedback = el('div', { className: 'invalid-feedback', text: INLINE_VENC_ERROR });
         vencInput.addEventListener('input', () => {
             vencInput.classList.remove('is-invalid');
             vencInput.removeAttribute('aria-invalid');
