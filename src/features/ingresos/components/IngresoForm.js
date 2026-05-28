@@ -57,7 +57,7 @@ export class IngresoForm extends HTMLElement {
     reset() {
         const form = this.querySelector('app-form');
         if (form) {
-            form.initialValues = { moneda: 'ARS' };
+            form.initialValues = {};
             this._applyMobileFirstLayout(form);
             form.clearValidationState();
         }
@@ -76,7 +76,6 @@ export class IngresoForm extends HTMLElement {
         form.fields = fields;
         form.submitText = 'Agregar ingreso';
         form.cancelText = 'Cancelar';
-        form.initialValues = { moneda: 'ARS' };
         this.appendChild(form);
         this._applyMobileFirstLayout(form);
     }
