@@ -1,10 +1,10 @@
 import { DeudaModel } from '../DeudaModel.js';
 import { el } from '../../../shared/utils/dom.js';
-import monedas from '../../../shared/config/monedas.js';
 import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppCheckbox.js';
 import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
+import '../../montos/components/MontoForm.js';
 import {
     trackFlowStart,
     trackFlowComplete,
@@ -12,10 +12,6 @@ import {
     trackFlowAbandoned,
     updateFlowStep
 } from '../../../shared/observability/index.js';
-
-const INLINE_MONTO_ERROR = 'Ingresá un monto válido mayor que 0.';
-const INLINE_MONEDA_ERROR = 'Seleccioná una moneda.';
-const INLINE_VENC_ERROR = 'Ingresá la fecha de vencimiento.';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -278,63 +274,6 @@ export class DebtForm extends HTMLElement {
         this._focusFirstInlineInput();
     }
 
-    // Save the currently open inline form.
-    _saveInline() {
-        const row = this.montosTbody && this.montosTbody.querySelector('.inline-edit-row');
-        if (!row) return;
-        const montoInput = row.querySelector('input[name="monto"]');
-        const monedaSelect = row.querySelector('select[name="moneda"]');
-        const vencimientoInput = row.querySelector('input[name="vencimiento"]');
-        const _showError = (input, msg) => {
-            input.classList.add('is-invalid');
-            input.setAttribute('aria-invalid', 'true');
-            const fb = input.nextElementSibling;
-            if (fb && fb.classList.contains('invalid-feedback')) fb.textContent = msg;
-        };
-        const _clearError = (input) => {
-            input.classList.remove('is-invalid');
-            input.removeAttribute('aria-invalid');
-        };
-        let hasError = false;
-        if (!montoInput.checkValidity()) {
-            _showError(montoInput, INLINE_MONTO_ERROR);
-            hasError = true;
-        } else {
-            _clearError(montoInput);
-        }
-        if (!monedaSelect.checkValidity()) {
-            _showError(monedaSelect, INLINE_MONEDA_ERROR);
-            hasError = true;
-        } else {
-            _clearError(monedaSelect);
-        }
-        if (!vencimientoInput.checkValidity()) {
-            _showError(vencimientoInput, INLINE_VENC_ERROR);
-            hasError = true;
-        } else {
-            _clearError(vencimientoInput);
-        }
-        if (hasError) return;
-        const existing = this._inlineEditRef; // null when adding new
-        const nuevoMonto = {
-            monto: parseFloat(montoInput.value),
-            moneda: monedaSelect.value,
-            vencimiento: vencimientoInput.value,
-            pagado: existing ? (existing.pagado ?? false) : false,
-            ...(existing && existing.id !== undefined ? { id: existing.id } : {})
-        };
-        if (this._inlineEditIdx === 'new') {
-            this.montos.push(nuevoMonto);
-        } else {
-            // Use indexOf on the stored reference to survive sort/splice shifts
-            const editIdx = this.montos.indexOf(this._inlineEditRef);
-            if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
-        }
-        this._inlineEditIdx = null;
-        this._inlineEditRef = null;
-        this.renderMontosList();
-    }
-
     // Cancel the currently open inline form without saving changes.
     _cancelInline() {
         // montos array was never modified during inline editing, just clear the UI state
@@ -351,60 +290,41 @@ export class DebtForm extends HTMLElement {
         }, 0);
     }
 
-    // Build the inline editing row (used for both add and edit).
+    // Build the inline editing row using monto-form (delegates validation to AppForm).
     _buildInlineRow(monto) {
-        const montoInput = el('input', {
-            attrs: {
-                type: 'number', name: 'monto', min: '0', required: '',
-                class: 'form-control form-control-sm',
-                ...(monto ? { value: String(monto.monto) } : {})
+        const montoFormEl = document.createElement('monto-form');
+        if (monto) {
+            // Set before appending so connectedCallback renders with the correct values.
+            montoFormEl.monto = {
+                monto: monto.monto,
+                moneda: monto.moneda,
+                vencimiento: monto.vencimiento
+            };
+        }
+        montoFormEl.addEventListener('monto:save', (e) => {
+            const existing = this._inlineEditRef;
+            const nuevoMonto = {
+                monto: parseFloat(e.detail.monto),
+                moneda: e.detail.moneda,
+                vencimiento: e.detail.vencimiento,
+                pagado: existing ? (existing.pagado ?? false) : false,
+                ...(existing && existing.id !== undefined ? { id: existing.id } : {})
+            };
+            if (this._inlineEditIdx === 'new') {
+                this.montos.push(nuevoMonto);
+            } else {
+                const editIdx = this.montos.indexOf(this._inlineEditRef);
+                if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
             }
+            this._inlineEditIdx = null;
+            this._inlineEditRef = null;
+            this.renderMontosList();
         });
-        const montoFeedback = el('div', { className: 'invalid-feedback', text: INLINE_MONTO_ERROR });
-        montoInput.addEventListener('input', () => {
-            montoInput.classList.remove('is-invalid');
-            montoInput.removeAttribute('aria-invalid');
-        });
-        const monedaSelect = el('select', {
-            attrs: { name: 'moneda', required: '', class: 'form-select form-select-sm' }
-        });
-        monedas.forEach(m => {
-            const opt = el('option', { text: m, attrs: { value: m } });
-            if (monto && monto.moneda === m) opt.selected = true;
-            monedaSelect.appendChild(opt);
-        });
-        const monedaFeedback = el('div', { className: 'invalid-feedback', text: INLINE_MONEDA_ERROR });
-        monedaSelect.addEventListener('change', () => {
-            monedaSelect.classList.remove('is-invalid');
-            monedaSelect.removeAttribute('aria-invalid');
-        });
-        const vencInput = el('input', {
-            attrs: {
-                type: 'date', name: 'vencimiento', required: '',
-                class: 'form-control form-control-sm',
-                ...(monto ? { value: monto.vencimiento } : {})
-            }
-        });
-        const vencFeedback = el('div', { className: 'invalid-feedback', text: INLINE_VENC_ERROR });
-        vencInput.addEventListener('input', () => {
-            vencInput.classList.remove('is-invalid');
-            vencInput.removeAttribute('aria-invalid');
-        });
-        const saveBtn = el('app-button', {
-            className: 'save-inline', text: '✓',
-            attrs: { title: 'Guardar', 'aria-label': 'Guardar monto' },
-            on: { click: () => this._saveInline() }
-        });
-        const cancelBtn = el('app-button', {
-            className: 'cancel-inline', text: '✕',
-            attrs: { variant: 'secondary', title: 'Cancelar', 'aria-label': 'Cancelar' },
-            on: { click: () => this._cancelInline() }
+        montoFormEl.addEventListener('monto:cancel', () => {
+            this._cancelInline();
         });
         const tr = el('tr', { className: 'inline-edit-row' });
-        tr.appendChild(el('td', { children: [montoInput, montoFeedback] }));
-        tr.appendChild(el('td', { children: [monedaSelect, monedaFeedback] }));
-        tr.appendChild(el('td', { children: [vencInput, vencFeedback] }));
-        tr.appendChild(el('td', { children: [el('div', { className: 'd-flex gap-1 align-items-center', children: [saveBtn, cancelBtn] })] }));
+        tr.appendChild(el('td', { attrs: { colspan: '4' }, children: [montoFormEl] }));
         return tr;
     }
 

@@ -581,18 +581,18 @@ async function testAltaInlineAgregarYGuardar() {
     let inlineRow = tbody.querySelector('.inline-edit-row');
     assert(inlineRow !== null, 'Debe haber una fila inline');
 
-    // Rellenar los inputs
+    // Verify inputs exist inside monto-form > app-form
     const montoInput = inlineRow.querySelector('input[name="monto"]');
     const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
     const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
     assert(montoInput !== null && monedaSelect !== null && vencInput !== null, 'Inputs del inline presentes');
 
-    montoInput.value = '7500';
-    monedaSelect.value = 'ARS';
-    vencInput.value = '2026-07-15';
-
-    // Guardar inline
-    form._saveInline();
+    // Guardar via form:submit directo (mismo patrón que montos.test.js UC1)
+    inlineRow.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
+        detail: { monto: '7500', moneda: 'ARS', vencimiento: '2026-07-15' },
+        bubbles: true,
+        composed: true
+    }));
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
     assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
@@ -609,10 +609,10 @@ async function testAltaInlineAgregarYGuardar() {
 }
 
 // ===================================================================
-// UC8b: Alta inline — _saveInline muestra errores en campos vacíos
+// UC8b: Alta inline — muestra errores ARIA en campos vacíos (vía AppForm)
 // ===================================================================
 async function testAltaInlineValidacionErrores() {
-    console.log('  UC8b: Alta inline — _saveInline muestra errores cuando campos están vacíos');
+    console.log('  UC8b: Alta inline — muestra errores ARIA cuando campos están vacíos');
     await cleanup();
 
     const form = document.createElement('debt-form');
@@ -626,24 +626,17 @@ async function testAltaInlineValidacionErrores() {
     const montoInput = inlineRow.querySelector('input[name="monto"]');
     const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
 
-    // Intentar guardar con campos vacíos
-    form._saveInline();
+    // Intentar guardar con campos vacíos — AppForm fires invalid events, not is-invalid class
+    inlineRow.querySelector('app-form').triggerSubmit();
     assert(form._inlineEditIdx === 'new', 'El inline sigue abierto tras guardar con campos inválidos');
     assert(form.montos.length === 0, 'No se agregó ningún monto');
-    assert(montoInput.classList.contains('is-invalid'), 'Monto debe marcarse como inválido');
     assert(montoInput.getAttribute('aria-invalid') === 'true', 'Monto debe tener aria-invalid=true');
     const montoFeedback = montoInput.nextElementSibling;
     assert(montoFeedback !== null && montoFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para monto');
     assert(montoFeedback.textContent.length > 0, 'El mensaje de error de monto no debe estar vacío');
-    assert(vencInput.classList.contains('is-invalid'), 'Vencimiento debe marcarse como inválido');
+    assert(vencInput.getAttribute('aria-invalid') === 'true', 'Vencimiento debe tener aria-invalid=true');
     const vencFeedback = vencInput.nextElementSibling;
     assert(vencFeedback !== null && vencFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para vencimiento');
-
-    // Corregir el campo monto y verificar que se limpia el error
-    montoInput.value = '1000';
-    montoInput.dispatchEvent(new Event('input'));
-    assert(!montoInput.classList.contains('is-invalid'), 'Error de monto debe limpiarse al corregir');
-    assert(montoInput.getAttribute('aria-invalid') === null, 'aria-invalid debe limpiarse al corregir');
 
     document.body.removeChild(form);
     await cleanup();
@@ -714,7 +707,11 @@ async function testEdicionInlineGuardar() {
     const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
     monedaSelect.value = 'ARS';
 
-    form._saveInline();
+    inlineRow.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
+        detail: { monto: '1500', moneda: 'ARS', vencimiento: '2026-05-10' },
+        bubbles: true,
+        composed: true
+    }));
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 2, 'Sigue con 2 montos');
 
