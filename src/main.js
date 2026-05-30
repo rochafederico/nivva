@@ -1,4 +1,6 @@
 // src/main.js
+import './styles/main.scss';
+import './styles/mobile-pwa.css';
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
