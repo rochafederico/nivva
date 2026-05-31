@@ -76,10 +76,9 @@ export class MontoForm extends HTMLElement {
             field.classList.remove('mb-2');
             field.classList.add('mb-0', 'flex-fill');
         });
-        const btnRow = formEl.querySelector('#cancelBtn')?.parentElement;
-        if (btnRow) {
-            btnRow.classList.add('mt-md-4', 'flex-shrink-0');
-        }
+        const cancelBtn = formEl.querySelector('#cancelBtn');
+        if (!cancelBtn?.parentElement) return;
+        cancelBtn.parentElement.classList.add('mt-md-4', 'flex-shrink-0');
     }
 }
 customElements.define('monto-form', MontoForm);
