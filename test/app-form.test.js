@@ -123,5 +123,57 @@ export const tests = [
         assert(!form.classList.contains('was-validated'), 'clearValidationState debe limpiar la clase was-validated');
 
         document.body.removeChild(appForm);
+    },
+
+    async function appForm_rendersInvalidFeedbackPerField() {
+        console.log('  AppForm: renders invalid-feedback elements with field-specific messages');
+        const appForm = document.createElement('app-form');
+        appForm.fields = [
+            { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
+            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' },
+            { name: 'fecha', type: 'date', label: 'Fecha', required: true }
+        ];
+        document.body.appendChild(appForm);
+
+        const acreedorWrapper = appForm.querySelector('[data-field-name="acreedor"]');
+        const montoWrapper = appForm.querySelector('[data-field-name="monto"]');
+        const monedaWrapper = appForm.querySelector('[data-field-name="moneda"]');
+        const fechaWrapper = appForm.querySelector('[data-field-name="fecha"]');
+
+        assert(acreedorWrapper.querySelector('.invalid-feedback') !== null, 'Acreedor debe tener elemento invalid-feedback');
+        assert(montoWrapper.querySelector('.invalid-feedback') !== null, 'Monto debe tener elemento invalid-feedback');
+        assert(monedaWrapper.querySelector('.invalid-feedback') !== null, 'Moneda debe tener elemento invalid-feedback');
+        assert(fechaWrapper.querySelector('.invalid-feedback') !== null, 'Fecha debe tener elemento invalid-feedback');
+
+        assert(acreedorWrapper.querySelector('.invalid-feedback').textContent === 'Este campo es obligatorio.', 'Mensaje de texto requerido correcto');
+        assert(montoWrapper.querySelector('.invalid-feedback').textContent.includes('número'), 'Mensaje numérico menciona número');
+        assert(monedaWrapper.querySelector('.invalid-feedback').textContent.includes('opción'), 'Mensaje de select menciona opción');
+        assert(fechaWrapper.querySelector('.invalid-feedback').textContent.includes('fecha'), 'Mensaje de fecha menciona fecha');
+
+        document.body.removeChild(appForm);
+    },
+
+    async function appForm_setsAriaInvalidOnInvalidSubmit() {
+        console.log('  AppForm: sets aria-invalid and aria-describedby on invalid fields after submit');
+        const appForm = document.createElement('app-form');
+        appForm.fields = [
+            { name: 'acreedor', type: 'text', label: 'Acreedor', required: true }
+        ];
+        document.body.appendChild(appForm);
+
+        const acreedorInput = appForm.querySelector('input[name="acreedor"]');
+        assert(acreedorInput.getAttribute('aria-invalid') === null, 'aria-invalid no debe estar presente antes de submit inválido');
+
+        appForm.triggerSubmit();
+
+        assert(acreedorInput.getAttribute('aria-invalid') === 'true', 'aria-invalid debe ser "true" tras submit inválido');
+        assert(acreedorInput.getAttribute('aria-describedby') !== null, 'aria-describedby debe apuntar al mensaje de error');
+
+        appForm.clearValidationState();
+        assert(acreedorInput.getAttribute('aria-invalid') === null, 'clearValidationState debe limpiar aria-invalid');
+        assert(acreedorInput.getAttribute('aria-describedby') === null, 'clearValidationState debe limpiar aria-describedby');
+
+        document.body.removeChild(appForm);
     }
 ];

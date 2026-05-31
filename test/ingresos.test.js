@@ -131,6 +131,8 @@ async function testIngresoFormLayoutMobileFirst() {
     assert(formEl.children[2] === fechaField, 'Fecha debe ir después del grupo Monto+Moneda');
     assert(montoField.classList.contains('col-8'), 'Monto debe priorizar mayor ancho');
     assert(monedaField.classList.contains('col-4'), 'Moneda debe ocupar menor ancho');
+    assert(montoField.classList.contains('align-self-start'), 'Monto debe alinearse arriba dentro de la fila');
+    assert(monedaField.classList.contains('align-self-start'), 'Moneda debe alinearse arriba dentro de la fila');
 
     document.body.removeChild(ingresoForm);
 }

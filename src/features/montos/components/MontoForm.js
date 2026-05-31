@@ -2,6 +2,8 @@
 import monedas from '../../../shared/config/monedas.js';
 import '../../../shared/components/AppForm.js';
 
+export const MONTO_FORM_GENERAL_ERROR_MESSAGE = 'Completá monto, moneda y vencimiento para agregar el monto.';
+
 export class MontoForm extends HTMLElement {
     constructor() {
         super();
@@ -16,6 +18,30 @@ export class MontoForm extends HTMLElement {
         return this._monto;
     }
 
+    get inline() {
+        return this.hasAttribute('inline');
+    }
+    set inline(value) {
+        if (value) {
+            this.setAttribute('inline', '');
+        } else {
+            this.removeAttribute('inline');
+        }
+        this.render();
+    }
+
+    get compactErrors() {
+        return this.hasAttribute('compact-errors');
+    }
+    set compactErrors(value) {
+        if (value) {
+            this.setAttribute('compact-errors', '');
+        } else {
+            this.removeAttribute('compact-errors');
+        }
+        this.render();
+    }
+
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
@@ -28,7 +54,8 @@ export class MontoForm extends HTMLElement {
                     composed: true
                 }));
             });
-            this.form.addEventListener('form:cancel', () => {
+            this.form.addEventListener('form:cancel', (e) => {
+                e.stopPropagation();
                 this.dispatchEvent(new CustomEvent('monto:cancel', { bubbles: true, composed: true }));
             });
         }
@@ -49,7 +76,99 @@ export class MontoForm extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
+        if (this.compactErrors) {
+            this._applyCompactErrors(form);
+        }
         this.appendChild(form);
+        this._applyFormLayout(form);
+        if (this.inline) {
+            this._applyInlineLayout(form);
+        }
+    }
+
+    _applyFormLayout(appForm) {
+        const formEl = appForm.querySelector('form');
+        if (!formEl) return;
+
+        const fieldsRow = document.createElement('div');
+        fieldsRow.className = 'row g-2 align-items-end';
+        const fieldNames = ['monto', 'moneda', 'vencimiento'];
+        const fields = fieldNames.map(fieldName => formEl.querySelector(`[data-field-name="${fieldName}"]`));
+        if (fields.some(field => field === null)) return;
+        fields.forEach(field => {
+            field.classList.add('col-12', 'col-md-4');
+            fieldsRow.appendChild(field);
+        });
+
+        formEl.insertBefore(fieldsRow, formEl.firstChild);
+
+        const actionRow = formEl.querySelector('[data-form-actions="true"]');
+        if (actionRow) {
+            formEl.appendChild(actionRow);
+        }
+    }
+
+    _applyInlineLayout(form) {
+        const formEl = form.querySelector('form');
+        if (!formEl) return;
+        const actionRow = formEl.querySelector('[data-form-actions="true"]');
+        const generalError = formEl.querySelector('[data-monto-general-error="true"]');
+
+        if (generalError) {
+            generalError.classList.add('w-100', 'mt-0');
+            if (actionRow) {
+                formEl.insertBefore(generalError, actionRow);
+            }
+        }
+
+        if (actionRow) {
+            actionRow.classList.remove('mt-0', 'mt-2', 'mt-md-4', 'flex-shrink-0');
+            actionRow.classList.add('mt-3', 'justify-content-end', 'w-100');
+            const cancelBtn = actionRow.querySelector('#cancelBtn');
+            const saveBtn = actionRow.querySelector('button[type="submit"]');
+            cancelBtn?.classList.remove('btn-primary');
+            cancelBtn?.classList.add('btn-outline-secondary', 'btn-sm');
+            saveBtn?.classList.add('btn-sm');
+        }
+    }
+
+    _applyCompactErrors(form) {
+        form.querySelectorAll('.invalid-feedback').forEach(feedbackEl => {
+            feedbackEl.classList.add('d-none');
+            const input = feedbackEl.previousElementSibling;
+            if (!input) return;
+            const fieldName = input.name;
+            if (fieldName === 'monto') {
+                feedbackEl.textContent = 'Ingresá un monto válido.';
+            } else if (fieldName === 'moneda') {
+                feedbackEl.textContent = 'Seleccioná una moneda.';
+            } else if (fieldName === 'vencimiento') {
+                feedbackEl.textContent = 'Ingresá una fecha válida.';
+            } else {
+                feedbackEl.textContent = 'Campo inválido.';
+            }
+        });
+
+        const formEl = form.querySelector('form');
+        if (!formEl) return;
+        const generalError = document.createElement('div');
+        generalError.className = 'invalid-feedback mt-2 d-none';
+        generalError.dataset.montoGeneralError = 'true';
+        generalError.textContent = MONTO_FORM_GENERAL_ERROR_MESSAGE;
+        formEl.appendChild(generalError);
+
+        const clearGeneralError = () => {
+            generalError.classList.add('d-none');
+            generalError.classList.remove('d-block');
+        };
+        const showGeneralError = () => {
+            generalError.classList.remove('d-none');
+            generalError.classList.add('d-block');
+        };
+        form.addEventListener('form:validation-error', showGeneralError);
+        form.addEventListener('form:submit', clearGeneralError);
+        form.addEventListener('input', clearGeneralError);
+        form.addEventListener('change', clearGeneralError);
     }
 }
 customElements.define('monto-form', MontoForm);

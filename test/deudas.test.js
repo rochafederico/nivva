@@ -11,6 +11,7 @@ import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtL
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
 import '../src/features/montos/components/DuplicateMontoModal.js';
+import { MONTO_FORM_GENERAL_ERROR_MESSAGE } from '../src/features/montos/components/MontoForm.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/deudas/components/DebtModal.js';
 import '../src/features/deudas/components/DebtEntityShell.js';
@@ -559,9 +560,9 @@ async function testPagoToggleVisualFeedback() {
 }
 
 // ===================================================================
-// UC8: Alta inline — openInlineAdd() inserta fila inline al final
-// Verifica que _inlineEditIdx = 'new' y hay una .inline-edit-row en el tbody.
-// Al guardar con datos válidos, form.montos crece en 1 y la fila vuelve a lectura.
+// UC8: Alta inline — openInlineAdd() muestra sólo el formulario de monto
+// Verifica estados de visibilidad: en creating se ocultan tabla y botón Agregar monto.
+// Al guardar con datos válidos, form.montos crece en 1 y vuelve el modo lista.
 // ===================================================================
 async function testAltaInlineAgregarYGuardar() {
     console.log('  UC8: Alta inline — agregar monto y guardar');
@@ -574,25 +575,48 @@ async function testAltaInlineAgregarYGuardar() {
 
     // Abrir inline add
     form.openInlineAdd();
+    assert(form._amountMode === 'creating', '_amountMode debe ser "creating"');
     assert(form._inlineEditIdx === 'new', '_inlineEditIdx debe ser "new"');
 
-    const tbody = form.querySelector('#montos-tbody');
-    assert(tbody !== null, 'tbody existe');
-    let inlineRow = tbody.querySelector('.inline-edit-row');
-    assert(inlineRow !== null, 'Debe haber una fila inline');
+    const tableWrapper = form.querySelector('#montos-table-wrapper');
+    const addMontoBtnRow = form.querySelector('#add-monto-btn-row');
+    const title = form.querySelector('#monto-form-title');
+    const inlineAddContainer = form.querySelector('#add-monto-form-container');
+    assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de monto');
+    assert(!inlineAddContainer.classList.contains('d-none'), 'El formulario de alta debe estar visible');
+    assert(tableWrapper.classList.contains('d-none'), 'La tabla/lista debe ocultarse al crear');
+    assert(addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto debe ocultarse al crear');
+    assert(title.textContent === 'Nuevo monto', 'El formulario debe titularse "Nuevo monto"');
+    let inlineForm = inlineAddContainer.querySelector('monto-form');
+    assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
-    // Rellenar los inputs
-    const montoInput = inlineRow.querySelector('input[name="monto"]');
-    const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
-    const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
+    // Verify inputs exist inside monto-form > app-form
+    const appFormEl = inlineForm.querySelector('app-form form');
+    const fieldsRow = appFormEl.firstElementChild;
+    const generalFeedback = appFormEl.querySelector('[data-monto-general-error="true"]');
+    const actionRow = appFormEl.querySelector('[data-form-actions="true"]');
+    const cancelBtn = actionRow.querySelector('#cancelBtn');
+    const saveBtn = actionRow.querySelector('button[type="submit"]');
+    assert(!appFormEl.classList.contains('flex-md-row'), 'El formulario inline no debe forzar flex-md-row');
+    assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
+    assert(generalFeedback?.previousElementSibling === fieldsRow, 'El mensaje general debe ir debajo de la fila de campos');
+    assert(generalFeedback?.nextElementSibling === actionRow, 'Las acciones deben ir debajo del mensaje general');
+    assert(actionRow?.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
+    assert(actionRow?.classList.contains('mt-3'), 'Las acciones inline deben separarse visualmente de los campos');
+    assert(cancelBtn?.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria');
+    assert(saveBtn?.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
+    const montoInput = inlineForm.querySelector('input[name="monto"]');
+    const monedaSelect = inlineForm.querySelector('select[name="moneda"]');
+    const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
     assert(montoInput !== null && monedaSelect !== null && vencInput !== null, 'Inputs del inline presentes');
 
-    montoInput.value = '7500';
-    monedaSelect.value = 'ARS';
-    vencInput.value = '2026-07-15';
-
-    // Guardar inline
-    form._saveInline();
+    // Guardar via form:submit directo (mismo patrón que montos.test.js UC1)
+    inlineForm.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
+        detail: { monto: '7500', moneda: 'ARS', vencimiento: '2026-07-15' },
+        bubbles: true,
+        composed: true
+    }));
+    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
     assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
@@ -600,9 +624,46 @@ async function testAltaInlineAgregarYGuardar() {
     assert(form.montos[0].vencimiento === '2026-07-15', 'Vencimiento guardado');
     assert(form.montos[0].pagado === false, 'pagado = false por defecto');
 
-    // La fila inline ya no debe estar presente
-    inlineRow = tbody.querySelector('.inline-edit-row');
-    assert(inlineRow === null, 'Fila inline desaparecida tras guardar');
+    // El formulario inline ya no debe estar presente
+    inlineForm = inlineAddContainer.querySelector('monto-form');
+    assert(inlineForm === null, 'Formulario inline desaparecido tras guardar');
+    assert(inlineAddContainer.classList.contains('d-none'), 'El contenedor de alta vuelve a ocultarse tras guardar');
+    assert(!tableWrapper.classList.contains('d-none'), 'La tabla/lista vuelve a mostrarse tras guardar');
+    assert(!addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto vuelve a mostrarse tras guardar');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC8b: Alta inline — marca campos inválidos y muestra error general corto
+// ===================================================================
+async function testAltaInlineValidacionErrores() {
+    console.log('  UC8b: Alta inline — muestra errores ARIA cuando campos están vacíos');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.openInlineAdd();
+    const inlineAddContainer = form.querySelector('#add-monto-form-container');
+    const inlineForm = inlineAddContainer.querySelector('monto-form');
+    assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
+
+    const montoInput = inlineForm.querySelector('input[name="monto"]');
+    const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
+    const appForm = inlineForm.querySelector('app-form');
+
+    // Intentar guardar con campos vacíos — AppForm fires invalid events, not is-invalid class
+    appForm.triggerSubmit();
+    assert(form._inlineEditIdx === 'new', 'El inline sigue abierto tras guardar con campos inválidos');
+    assert(form.montos.length === 0, 'No se agregó ningún monto');
+    assert(montoInput.getAttribute('aria-invalid') === 'true', 'Monto debe tener aria-invalid=true');
+    assert(vencInput.getAttribute('aria-invalid') === 'true', 'Vencimiento debe tener aria-invalid=true');
+    const generalFeedback = appForm.querySelector('[data-monto-general-error="true"]');
+    assert(generalFeedback !== null, 'Debe existir mensaje general de validación');
+    assert(generalFeedback.classList.contains('d-block'), 'El mensaje general de validación debe mostrarse');
+    assert(generalFeedback.textContent === MONTO_FORM_GENERAL_ERROR_MESSAGE, 'El mensaje general debe ser corto y claro');
 
     document.body.removeChild(form);
     await cleanup();
@@ -624,14 +685,16 @@ async function testCancelarAltaInline() {
 
     form.openInlineAdd();
     assert(form._inlineEditIdx === 'new', 'Inline add abierto');
+    assert(form._amountMode === 'creating', 'Debe quedar en modo creating');
 
     form._cancelInline();
+    assert(form._amountMode === 'idle', 'Debe volver a modo idle tras cancelar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
     assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
 
-    const inlineRow = form.querySelector('.inline-edit-row');
-    assert(inlineRow === null, 'No hay fila inline tras cancelar');
+    const inlineForm = form.querySelector('#add-monto-form-container monto-form');
+    assert(inlineForm === null, 'No hay formulario inline tras cancelar');
 
     document.body.removeChild(form);
     await cleanup();
@@ -659,9 +722,13 @@ async function testEdicionInlineGuardar() {
     assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
     assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
 
-    const tbody = form.querySelector('#montos-tbody');
-    const inlineRow = tbody.querySelector('.inline-edit-row');
-    assert(inlineRow !== null, 'Fila inline presente para edición');
+    assert(form._amountMode === 'editing', 'Debe quedar en modo editing');
+    const inlineContainer = form.querySelector('#add-monto-form-container');
+    const inlineRow = inlineContainer.querySelector('monto-form');
+    assert(inlineRow !== null, 'Formulario inline presente para edición');
+    assert(form.querySelector('#monto-form-title').textContent === 'Editar monto', 'Debe usar título "Editar monto"');
+    assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La tabla debe ocultarse durante edición');
+    assert(form.querySelector('#add-monto-btn-row').classList.contains('d-none'), 'El botón Agregar monto debe ocultarse durante edición');
 
     const montoInput = inlineRow.querySelector('input[name="monto"]');
     assert(montoInput.value === '1000', 'Input monto precargado con 1000');
@@ -673,7 +740,12 @@ async function testEdicionInlineGuardar() {
     const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
     monedaSelect.value = 'ARS';
 
-    form._saveInline();
+    inlineRow.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
+        detail: { monto: '1500', moneda: 'ARS', vencimiento: '2026-05-10' },
+        bubbles: true,
+        composed: true
+    }));
+    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar edición');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 2, 'Sigue con 2 montos');
 
@@ -702,12 +774,12 @@ async function testCancelarEdicionInline() {
     form.openInlineEdit(form.montos[0], 0);
 
     // Modificar inputs pero cancelar sin guardar
-    const tbody = form.querySelector('#montos-tbody');
-    const inlineRow = tbody.querySelector('.inline-edit-row');
+    const inlineRow = form.querySelector('#add-monto-form-container monto-form');
     inlineRow.querySelector('input[name="monto"]').value = '99999';
 
     form._cancelInline();
 
+    assert(form._amountMode === 'idle', 'Cancelar edición vuelve a modo lista');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'Sigue con 1 monto');
     assert(form.montos[0].monto === 9000, 'Monto original sin cambios: 9000');
@@ -960,7 +1032,12 @@ async function testShowFormErrorNearMontos() {
     assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
     assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
-    assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
+    const montoFormTitle = form.querySelector('#monto-form-title');
+    const montoFormContainer = form.querySelector('#add-monto-form-container');
+    const addMontoBtn = form.querySelector('#add-monto');
+    assert(errEl.nextElementSibling === montoFormTitle, 'El título del formulario de monto debe quedar debajo del mensaje de error');
+    assert(montoFormTitle.nextElementSibling === montoFormContainer, 'El contenedor del formulario de alta debe quedar debajo del título');
+    assert(montoFormContainer.nextElementSibling?.querySelector('#add-monto') === addMontoBtn, 'El botón Agregar monto debe quedar debajo del mensaje de error y del formulario de alta');
     assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
     assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
     assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
@@ -1013,6 +1090,43 @@ async function testDebtModalCancelClosesModal() {
     debtForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
 
     assert(closed === true, 'El modal debe cerrarse cuando se dispara form:cancel');
+
+    modal.ui.close = origClose;
+    document.body.removeChild(modal);
+}
+
+// ===================================================================
+// UC17b: Cancelar monto inline no debe cerrar el DebtModal
+// ===================================================================
+async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
+    console.log('  UC17b: Cancelar monto inline no cierra el modal de deuda');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    let closeCalls = 0;
+    const origClose = modal.ui.close.bind(modal.ui);
+    modal.ui.close = () => { closeCalls += 1; };
+
+    const debtForm = modal.querySelector('debt-form');
+    debtForm.openInlineAdd();
+    const inlineMontoForm = debtForm.querySelector('#add-monto-form-container app-form');
+    const inlineActionRow = inlineMontoForm?.querySelector('[data-form-actions="true"]');
+    const inlineCancelBtn = inlineActionRow?.querySelector('#cancelBtn');
+    const inlineSaveBtn = inlineActionRow?.querySelector('button[type="submit"]');
+    const footerCancelBtn = modal.querySelector('.modal-footer .btn.btn-primary');
+    const footerSaveBtn = modal.querySelector('.modal-footer .btn.btn-success');
+    assert(inlineMontoForm !== null, 'Debe existir app-form inline para cancelar monto');
+    assert(inlineCancelBtn?.classList.contains('btn-sm'), 'Cancelar del monto inline debe usar tamaño chico');
+    assert(inlineSaveBtn?.classList.contains('btn-sm'), 'Guardar del monto inline debe usar tamaño chico');
+    assert(!footerCancelBtn?.classList.contains('btn-sm'), 'Cancelar del footer del modal no debe usar tamaño chico');
+    assert(!footerSaveBtn?.classList.contains('btn-sm'), 'Guardar del footer del modal no debe usar tamaño chico');
+
+    inlineMontoForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+
+    assert(closeCalls === 0, 'Cancelar el monto inline no debe cerrar el modal de deuda');
+    assert(debtForm._inlineEditIdx === null, 'Cancelar monto inline debe cerrar sólo la fila inline');
 
     modal.ui.close = origClose;
     document.body.removeChild(modal);
@@ -1667,6 +1781,7 @@ export const tests = [
     testAcreedorColumnMobileRender,
     testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
+    testAltaInlineValidacionErrores,
     testCancelarAltaInline,
     testEdicionInlineGuardar,
     testCancelarEdicionInline,
@@ -1680,6 +1795,7 @@ export const tests = [
     testShowFormErrorNearMontos,
     testDebtFormRequiereMontosAlEnviar,
     testDebtModalCancelClosesModal,
+    testDebtModalInlineMontoCancelDoesNotCloseModal,
     testDebtModalFooterUxValidacionConsistente,
     testDebtModalReopenClearsValidationState,
     testDebtEntityShellRenderVacio,

@@ -150,6 +150,12 @@ export class AppForm extends HTMLElement {
 
             wrapper.appendChild(input);
 
+            const feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            feedback.id = `${this._formId}-${name}-error`;
+            feedback.textContent = this._getFieldErrorMessage(field);
+            wrapper.appendChild(feedback);
+
             return wrapper;
         });
 
@@ -162,6 +168,7 @@ export class AppForm extends HTMLElement {
             // Buttons
             const btnRow = document.createElement('div');
             btnRow.className = 'd-flex justify-content-end gap-2 mt-2';
+            btnRow.dataset.formActions = 'true';
 
             const cancelBtn = document.createElement('button');
             cancelBtn.type = 'button';
@@ -223,12 +230,33 @@ export class AppForm extends HTMLElement {
         this.querySelectorAll('[data-field-name].was-validated').forEach(field => {
             field.classList.remove('was-validated');
         });
+        this.querySelectorAll('[aria-invalid]').forEach(el => {
+            el.removeAttribute('aria-invalid');
+            el.removeAttribute('aria-describedby');
+        });
+    }
+
+    _getFieldErrorMessage(field) {
+        if (field.type === 'number') {
+            const min = field.min !== undefined ? Number(field.min) : null;
+            return (min !== null && min > 0)
+                ? `El valor debe ser un número mayor que ${min}.`
+                : 'El valor debe ser un número válido.';
+        }
+        if (field.type === 'select') return 'Seleccioná una opción válida.';
+        if (field.type === 'date') return 'Ingresá una fecha válida.';
+        return 'Este campo es obligatorio.';
     }
 
     handleInvalid(e) {
         this.form?.classList.add('was-validated');
         const invalidField = e?.target;
         if (!invalidField || invalidField === this.form) return;
+        invalidField.setAttribute('aria-invalid', 'true');
+        const feedbackId = `${this._formId}-${invalidField.name || invalidField.id}-error`;
+        if (this.querySelector(`#${feedbackId}`)) {
+            invalidField.setAttribute('aria-describedby', feedbackId);
+        }
         const fieldName = invalidField.name || invalidField.id || 'unknown_field';
         this.dispatchEvent(new CustomEvent('form:validation-error', {
             detail: {

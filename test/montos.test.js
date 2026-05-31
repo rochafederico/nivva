@@ -296,6 +296,72 @@ async function testMontosFormsUxValidacionConsistente() {
     await cleanup();
 }
 
+async function testMontoFormLayoutCamposYAcciones() {
+    console.log('  UC4c: MontoForm separa campos y acciones en dos filas');
+    await cleanup();
+
+    const montoForm = document.createElement('monto-form');
+    document.body.appendChild(montoForm);
+    await customElements.whenDefined('monto-form');
+    await Promise.resolve();
+
+    const formEl = montoForm.querySelector('app-form form');
+    const fieldsRow = formEl.firstElementChild;
+    const actionRow = fieldsRow.nextElementSibling;
+    const fields = [...fieldsRow.children];
+    const fieldNames = fields.map(field => field.dataset.fieldName);
+
+    assert(fieldsRow.classList.contains('row'), 'La primera fila debe contener los campos');
+    assert(fieldNames[0] === 'monto', 'El primer campo debe ser Monto');
+    assert(fieldNames[1] === 'moneda', 'El segundo campo debe ser Moneda');
+    assert(fieldNames[2] === 'vencimiento', 'El tercer campo debe ser Vencimiento');
+    assert(fields.every(field => field.classList.contains('col-12')), 'Cada campo debe ocupar ancho completo en mobile');
+    assert(fields.every(field => field.classList.contains('col-md-4')), 'Los tres campos deben compartir la fila en desktop');
+    assert(actionRow.classList.contains('justify-content-end'), 'La fila de acciones debe alinearse a la derecha');
+    assert(actionRow.querySelector('#cancelBtn') !== null, 'La fila de acciones debe incluir Cancelar');
+    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones debe incluir Guardar');
+
+    document.body.removeChild(montoForm);
+    await cleanup();
+}
+
+async function testMontoFormInlineLayoutSeparatesValidationAndActions() {
+    console.log('  UC4d: MontoForm inline mantiene validación y acciones debajo de los campos');
+    await cleanup();
+
+    const montoForm = document.createElement('monto-form');
+    montoForm.inline = true;
+    montoForm.compactErrors = true;
+    document.body.appendChild(montoForm);
+    await customElements.whenDefined('monto-form');
+    await Promise.resolve();
+
+    const formEl = montoForm.querySelector('app-form form');
+    const fieldsRow = formEl.firstElementChild;
+    const generalError = formEl.querySelector('[data-monto-general-error="true"]');
+    const actionRow = formEl.querySelector('[data-form-actions="true"]');
+    const cancelBtn = actionRow.querySelector('#cancelBtn');
+    const saveBtn = actionRow.querySelector('button[type="submit"]');
+
+    assert(!formEl.classList.contains('flex-md-row'), 'El inline no debe forzar flex-md-row');
+    assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
+    assert(generalError !== null, 'El inline debe renderizar el mensaje general compacto');
+    assert(generalError.previousElementSibling === fieldsRow, 'El mensaje general debe ir debajo de la fila de campos');
+    assert(generalError.nextElementSibling === actionRow, 'La fila de acciones debe ir debajo del mensaje general');
+    assert(generalError.classList.contains('w-100'), 'El mensaje general debe ocupar todo el ancho');
+    assert(actionRow.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
+    assert(actionRow.classList.contains('mt-3'), 'Las acciones inline deben separarse de los campos con margen superior');
+    assert(cancelBtn !== null, 'La fila de acciones inline debe incluir Cancelar');
+    assert(saveBtn !== null, 'La fila de acciones inline debe incluir Guardar');
+    assert(cancelBtn.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria liviana');
+    assert(cancelBtn.classList.contains('btn-sm'), 'Cancelar inline debe usar tamaño chico');
+    assert(saveBtn.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
+    assert(saveBtn.classList.contains('btn-sm'), 'Guardar inline debe usar tamaño chico');
+
+    document.body.removeChild(montoForm);
+    await cleanup();
+}
+
 // ===================================================================
 // UC5: Flujo completo — crear deuda con montos via DebtForm, listar
 // por mes, marcar pagado, verificar totales, eliminar monto individual
@@ -430,6 +496,8 @@ export const tests = [
     testDuplicarMontoDesdeModal,
     testCancelarFormularios,
     testMontosFormsUxValidacionConsistente,
+    testMontoFormLayoutCamposYAcciones,
+    testMontoFormInlineLayoutSeparatesValidationAndActions,
     testFlujoCompletoMontosViaDebtForm,
     testTotalesMixtosPorMoneda
 ];
