@@ -192,6 +192,31 @@ export const tests = [
         document.body.removeChild(modal);
     },
 
+    async function feedbackModal_initializesBootstrapDropdownWhenAvailable() {
+        console.log('  FeedbackModal: inicializa Dropdown de Bootstrap para el botón de envío');
+        const originalBootstrap = window.bootstrap;
+        let capturedElement = null;
+        let disposeCalls = 0;
+        const MockDropdown = class {
+            constructor(el) {
+                capturedElement = el;
+            }
+            dispose() { disposeCalls += 1; }
+        };
+        window.bootstrap = { ...(originalBootstrap ?? {}), Dropdown: MockDropdown };
+
+        const modal = document.createElement('feedback-modal');
+        document.body.appendChild(modal);
+        modal.render();
+
+        assert(modal._sendDropdown instanceof MockDropdown, 'Debe crear una instancia de bootstrap.Dropdown');
+        assert(capturedElement === modal._sendBtn, 'Dropdown debe inicializarse sobre el botón Enviar por…');
+
+        document.body.removeChild(modal);
+        assert(disposeCalls === 1, 'Debe liberar la instancia Dropdown al desconectar el modal');
+        window.bootstrap = originalBootstrap;
+    },
+
     async function feedbackModal_sendButtonEnabledWhenValid() {
         console.log('  FeedbackModal: send button enabled when tipo and comentario are filled');
         const modal = document.createElement('feedback-modal');

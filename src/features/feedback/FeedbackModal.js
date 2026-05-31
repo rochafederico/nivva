@@ -3,6 +3,10 @@
 
 import '../../shared/components/UiModal.js';
 import {
+    createDropdown,
+    destroyDropdown,
+} from '../../shared/ui/bootstrap/index.js';
+import {
     validateFeedback,
     formatFeedbackGitHub,
     formatFeedbackWhatsApp,
@@ -12,6 +16,11 @@ import {
 } from './feedbackService.js';
 
 export class FeedbackModal extends HTMLElement {
+    disconnectedCallback() {
+        destroyDropdown(this._sendDropdown);
+        this._sendDropdown = null;
+    }
+
     connectedCallback() {
         if (!this._rendered) this.render();
     }
@@ -147,6 +156,7 @@ export class FeedbackModal extends HTMLElement {
         const actionsEl = this.querySelector('#feedback-actions');
         const ui = this.querySelector('ui-modal');
         if (actionsEl && ui) ui.addFooter(actionsEl);
+        this._sendDropdown = createDropdown(this._sendBtn);
 
         // Live update: rebuild URLs and toggle send button on every change
         this._tipoEl?.addEventListener('change', () => this._updateLinks());

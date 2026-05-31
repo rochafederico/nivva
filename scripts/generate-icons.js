@@ -2,8 +2,8 @@
 /**
  * scripts/generate-icons.js
  *
- * Genera src/icons/icon-192.png y src/icons/icon-512.png
- * extrayendo el isotipo directamente del favicon.ico existente,
+ * Genera public/icons/icon-192.png y public/icons/icon-512.png
+ * extrayendo el isotipo directamente del public/favicon.ico,
  * para garantizar consistencia visual en todas las superficies.
  * Usa únicamente módulos built-in de Node.js — sin dependencias adicionales.
  */
@@ -15,7 +15,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT    = join(__dirname, '..');
-const OUT_DIR = join(ROOT, 'src', 'icons');
+const PUBLIC_DIR = join(ROOT, 'public');
+const OUT_DIR = join(PUBLIC_DIR, 'icons');
 mkdirSync(OUT_DIR, { recursive: true });
 
 // ── CRC32 ────────────────────────────────────────────────────────────────────
@@ -213,7 +214,7 @@ function resizeAndCenter(src, outSize) {
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
-const icoBuf = readFileSync(join(ROOT, 'favicon.ico'));
+const icoBuf = readFileSync(join(PUBLIC_DIR, 'favicon.ico'));
 const pngBuf = extractLargestPNG(icoBuf);
 if (!pngBuf) throw new Error('favicon.ico no contiene imágenes PNG embebidas');
 
@@ -227,4 +228,4 @@ for (const size of [192, 512]) {
     writeFileSync(outPath, pngData);
     process.stdout.write(`✔  icon-${size}.png  (${pngData.length} bytes)\n`);
 }
-process.stdout.write('Íconos generados en src/icons/\n');
+process.stdout.write('Íconos generados en public/icons/\n');

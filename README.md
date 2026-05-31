@@ -67,8 +67,19 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 
 ## Cómo usar
 1. Clona el repositorio.
-2. Abre `index.html` en tu navegador (no requiere servidor).
-3. Comienza a registrar y gestionar tus deudas.
+2. Instala dependencias con `npm install`.
+3. Inicia el entorno de desarrollo con `npm run dev`.
+4. Abre la URL que muestra Vite y comienza a registrar y gestionar tus deudas.
+
+## Build
+
+- `npm run build`: genera la aplicación optimizada en `dist/`.
+- `npm run preview`: sirve localmente el build de `dist/`.
+
+### Assets públicos y PWA
+
+- `manifest.json`, `sw.js`, `favicon.ico` e íconos PWA viven en `public/` para que Vite los publique sin rehacer rutas.
+- Los estilos principales ahora entran por `src/main.js`, así que no hace falta mantener un paso separado `build:css`.
 
 ## Requisitos
 - Navegador moderno compatible con Web Components y IndexedDB.

@@ -1,11 +1,11 @@
 // src/routes.js
 
 import { navItems, DEFAULT_SUBTITLE } from './layout/navConfig.js';
-import Home from '/src/pages/Home.js';
-import Gastos from '/src/pages/Gastos.js';
-import GastosMensual from '/src/pages/GastosMensual.js';
-import Ingresos from '/src/pages/Ingresos.js';
-import Inversiones from '/src/pages/Inversiones.js';
+import Home from './pages/Home.js';
+import Gastos from './pages/Gastos.js';
+import GastosMensual from './pages/GastosMensual.js';
+import Ingresos from './pages/Ingresos.js';
+import Inversiones from './pages/Inversiones.js';
 
 const componentMap = {
   '/': Home,
