@@ -83,6 +83,27 @@ export class MontoForm extends HTMLElement {
             this._applyCompactErrors(form);
         }
         this.appendChild(form);
+        this._applyFormLayout(form);
+    }
+
+    _applyFormLayout(appForm) {
+        const formEl = appForm.querySelector('form');
+        if (!formEl) return;
+
+        const fieldsRow = document.createElement('div');
+        fieldsRow.className = 'row g-2 align-items-end';
+
+        ['monto', 'moneda', 'vencimiento'].forEach(fieldName => {
+            const field = formEl.querySelector(`[data-field-name="${fieldName}"]`);
+            if (!field) return;
+            field.classList.remove('mb-2');
+            field.classList.add('col-12', 'col-md-4', 'mb-0');
+            fieldsRow.appendChild(field);
+        });
+
+        if (fieldsRow.children.length > 0) {
+            formEl.insertBefore(fieldsRow, formEl.firstChild);
+        }
     }
 
     _applyInlineLayout(form) {

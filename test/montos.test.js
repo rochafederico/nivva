@@ -296,6 +296,30 @@ async function testMontosFormsUxValidacionConsistente() {
     await cleanup();
 }
 
+async function testMontoFormLayoutCamposYAcciones() {
+    console.log('  UC4c: MontoForm separa campos y acciones en dos filas');
+    await cleanup();
+
+    const montoForm = document.createElement('monto-form');
+    document.body.appendChild(montoForm);
+
+    const formEl = montoForm.querySelector('app-form form');
+    const fieldsRow = formEl.firstElementChild;
+    const actionRow = fieldsRow.nextElementSibling;
+    const fields = [...fieldsRow.children];
+
+    assert(fieldsRow.classList.contains('row'), 'La primera fila debe contener los campos');
+    assert(fields.map(field => field.dataset.fieldName).join(',') === 'monto,moneda,vencimiento', 'Los campos deben ordenarse Monto, Moneda, Vencimiento');
+    assert(fields.every(field => field.classList.contains('col-12')), 'Cada campo debe ocupar ancho completo en mobile');
+    assert(fields.every(field => field.classList.contains('col-md-4')), 'Los tres campos deben compartir la fila en desktop');
+    assert(actionRow.classList.contains('justify-content-end'), 'La fila de acciones debe alinearse a la derecha');
+    assert(actionRow.querySelector('#cancelBtn') !== null, 'La fila de acciones debe incluir Cancelar');
+    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones debe incluir Guardar');
+
+    document.body.removeChild(montoForm);
+    await cleanup();
+}
+
 // ===================================================================
 // UC5: Flujo completo — crear deuda con montos via DebtForm, listar
 // por mes, marcar pagado, verificar totales, eliminar monto individual
@@ -430,6 +454,7 @@ export const tests = [
     testDuplicarMontoDesdeModal,
     testCancelarFormularios,
     testMontosFormsUxValidacionConsistente,
+    testMontoFormLayoutCamposYAcciones,
     testFlujoCompletoMontosViaDebtForm,
     testTotalesMixtosPorMoneda
 ];
