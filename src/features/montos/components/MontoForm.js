@@ -104,7 +104,6 @@ export class MontoForm extends HTMLElement {
 
         const actionRow = formEl.querySelector('[data-form-actions="true"]');
         if (actionRow) {
-            actionRow.classList.add('d-flex', 'justify-content-end', 'gap-2', 'mt-2');
             formEl.appendChild(actionRow);
         }
     }
