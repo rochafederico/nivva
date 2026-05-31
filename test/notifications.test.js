@@ -16,7 +16,7 @@ import {
     showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
 import { createNavbarPopover } from '../src/layout/navbarPopoversController.js';
-import { createPopover, destroyPopover } from '../src/shared/ui/bootstrap/index.js';
+import { createDropdown, createPopover, destroyDropdown, destroyPopover } from '../src/shared/ui/bootstrap/index.js';
 
 function localDate(year, month, day) {
     return new Date(year, month - 1, day, 12, 0, 0);
@@ -745,6 +745,38 @@ async function testBootstrapPopoverHelpers() {
     window.bootstrap = originalBootstrap;
 }
 
+async function testBootstrapDropdownHelpers() {
+    console.log('  UC18: createDropdown/destroyDropdown encapsulan Bootstrap Dropdown');
+
+    const originalBootstrap = window.bootstrap;
+    let capturedButton = null;
+    let capturedOptions = null;
+    let disposeCalls = 0;
+    const MockDropdown = class {
+        constructor(el, opts) {
+            capturedButton = el;
+            capturedOptions = opts;
+        }
+        dispose() { disposeCalls += 1; }
+    };
+    window.bootstrap = { ...(originalBootstrap ?? {}), Dropdown: MockDropdown };
+
+    const btn = document.createElement('button');
+    const dropdown = createDropdown(btn, { autoClose: 'outside' });
+    assert(dropdown instanceof MockDropdown, 'createDropdown devuelve una instancia de bootstrap.Dropdown');
+    assert(capturedButton === btn, 'createDropdown usa el elemento recibido');
+    assert(capturedOptions?.autoClose === 'outside', 'createDropdown conserva las opciones recibidas');
+
+    destroyDropdown(dropdown);
+    assert(disposeCalls === 1, 'destroyDropdown llama dispose en la instancia');
+
+    window.bootstrap = {};
+    assert(createDropdown(btn, {}) === null, 'createDropdown devuelve null si Bootstrap Dropdown no está disponible');
+    destroyDropdown(null);
+
+    window.bootstrap = originalBootstrap;
+}
+
 // ===================================================================
 // UC19: navbarPopoversController – factory de popover de navbar
 // ===================================================================
@@ -815,5 +847,6 @@ export const tests = [
     testCheckAndNotifyEmptyAlwaysShowsPanel,
     testNavbarPopoverControllerSharedWiring,
     testBootstrapPopoverHelpers,
+    testBootstrapDropdownHelpers,
     testNavbarPopoverControllerCreatePopoverFactory,
 ];
