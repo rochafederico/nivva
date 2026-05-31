@@ -289,9 +289,10 @@ export class DebtForm extends HTMLElement {
     // Focus the first input/select in the active inline row.
     _focusFirstInlineInput() {
         setTimeout(() => {
-            const editInput = this.querySelector('.inline-edit-row input, .inline-edit-row select');
-            const addInput = this.querySelector('#add-monto-form-container input, #add-monto-form-container select');
-            const input = editInput || addInput;
+            const selector = this._inlineEditIdx === 'new'
+                ? '#add-monto-form-container input, #add-monto-form-container select'
+                : '.inline-edit-row input, .inline-edit-row select';
+            const input = this.querySelector(selector);
             if (input) input.focus();
         }, 0);
     }

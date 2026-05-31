@@ -581,7 +581,7 @@ async function testAltaInlineAgregarYGuardar() {
     const inlineAddContainer = form.querySelector('#add-monto-form-container');
     assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de monto');
     assert(!inlineAddContainer.classList.contains('d-none'), 'El formulario de alta debe estar visible');
-    assert(inlineAddContainer.nextElementSibling?.querySelector('#add-monto') !== null, 'El formulario debe estar justo arriba del botón Agregar monto');
+    assert(inlineAddContainer.nextElementSibling?.firstElementChild === form.querySelector('#add-monto'), 'El formulario debe estar justo arriba del botón Agregar monto');
     assert(tbody.querySelector('.inline-edit-row') === null, 'El alta de monto no debe renderizar una fila dentro de la tabla');
     let inlineForm = inlineAddContainer.querySelector('monto-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
