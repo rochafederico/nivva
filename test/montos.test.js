@@ -302,6 +302,8 @@ async function testMontoFormLayoutCamposYAcciones() {
 
     const montoForm = document.createElement('monto-form');
     document.body.appendChild(montoForm);
+    await customElements.whenDefined('monto-form');
+    await Promise.resolve();
 
     const formEl = montoForm.querySelector('app-form form');
     const fieldsRow = formEl.firstElementChild;

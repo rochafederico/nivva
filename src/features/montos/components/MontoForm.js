@@ -95,10 +95,8 @@ export class MontoForm extends HTMLElement {
         const fieldNames = ['monto', 'moneda', 'vencimiento'];
         const fields = fieldNames.map(fieldName => formEl.querySelector(`[data-field-name="${fieldName}"]`));
         if (fields.some(field => field === null)) return;
-
         fields.forEach(field => {
-            field.classList.remove('mb-2');
-            field.classList.add('col-12', 'col-md-4', 'mb-0');
+            field.classList.add('col-12', 'col-md-4');
             fieldsRow.appendChild(field);
         });
 
@@ -106,7 +104,7 @@ export class MontoForm extends HTMLElement {
 
         const actionRow = formEl.querySelector('[data-form-actions="true"]');
         if (actionRow) {
-            actionRow.className = 'd-flex justify-content-end gap-2 mt-2';
+            actionRow.classList.add('d-flex', 'justify-content-end', 'gap-2', 'mt-2');
             formEl.appendChild(actionRow);
         }
     }
