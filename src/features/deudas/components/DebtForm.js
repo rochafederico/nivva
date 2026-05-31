@@ -23,6 +23,8 @@ export class DebtForm extends HTMLElement {
         this._analyticsStep = 'form';
         this._analyticsCompleted = false;
         this._analyticsStartedFor = null;
+        // Amount section mode: idle (list), creating, editing
+        this._amountMode = 'idle';
         // Inline editing state: null = no inline open, 'new' = adding, number = editing existing
         this._inlineEditIdx = null;
         this._inlineEditRef = null; // direct reference to the monto object being edited
@@ -161,10 +163,15 @@ export class DebtForm extends HTMLElement {
                             className: 'invalid-feedback mt-2 d-none'
                         }),
                         el('div', {
+                            attrs: { id: 'monto-form-title' },
+                            className: 'fw-semibold mt-3 mb-2 d-none'
+                        }),
+                        el('div', {
                             attrs: { id: 'add-monto-form-container' },
                             className: 'mt-3 d-none'
                         }),
                         el('div', {
+                            attrs: { id: 'add-monto-btn-row' },
                             className: 'd-flex justify-content-end mt-3',
                             children: [
                                 el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
@@ -256,6 +263,7 @@ export class DebtForm extends HTMLElement {
         }
         this._analyticsStep = 'add_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
+        this._amountMode = 'creating';
         this._inlineEditIdx = 'new';
         this._inlineEditRef = null;
         this.renderMontosList();
@@ -272,6 +280,7 @@ export class DebtForm extends HTMLElement {
         }
         this._analyticsStep = 'edit_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
+        this._amountMode = 'editing';
         this._inlineEditIdx = idx;
         this._inlineEditRef = monto; // stable reference — survives sort/splice
         this.renderMontosList();
@@ -281,17 +290,16 @@ export class DebtForm extends HTMLElement {
     // Cancel the currently open inline form without saving changes.
     _cancelInline() {
         // montos array was never modified during inline editing, just clear the UI state
+        this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
         this.renderMontosList();
     }
 
-    // Focus the first input/select in the active inline row.
+    // Focus the first input/select in the active monto form container.
     _focusFirstInlineInput() {
         setTimeout(() => {
-            const selector = this._inlineEditIdx === 'new'
-                ? '#add-monto-form-container input, #add-monto-form-container select'
-                : '.inline-edit-row input, .inline-edit-row select';
+            const selector = '#add-monto-form-container input, #add-monto-form-container select';
             const input = this.querySelector(selector);
             if (input) input.focus();
         }, 0);
@@ -303,6 +311,7 @@ export class DebtForm extends HTMLElement {
         if (inline) {
             montoFormEl.inline = true;
         }
+        montoFormEl.compactErrors = true;
         if (monto) {
             // Set before appending so connectedCallback renders with the correct values.
             montoFormEl.monto = {
@@ -326,6 +335,7 @@ export class DebtForm extends HTMLElement {
                 const editIdx = this.montos.indexOf(this._inlineEditRef);
                 if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
             }
+            this._amountMode = 'idle';
             this._inlineEditIdx = null;
             this._inlineEditRef = null;
             this.renderMontosList();
@@ -336,23 +346,32 @@ export class DebtForm extends HTMLElement {
         return montoFormEl;
     }
 
-    // Build the inline editing row using monto-form (delegates validation to AppForm).
-    _buildInlineRow(monto) {
-        const montoFormEl = this._buildMontoForm(monto);
-        const tr = el('tr', { className: 'inline-edit-row' });
-        tr.appendChild(el('td', { attrs: { colspan: '4' }, children: [montoFormEl] }));
-        return tr;
-    }
-
     _renderInlineAddForm() {
         const container = this.querySelector('#add-monto-form-container');
+        const title = this.querySelector('#monto-form-title');
+        const tableWrapper = this.querySelector('#montos-table-wrapper');
+        const addMontoBtnRow = this.querySelector('#add-monto-btn-row');
         if (!container) return;
         container.innerHTML = '';
-        if (this._inlineEditIdx === 'new') {
+        if (this._amountMode === 'creating') {
             container.classList.remove('d-none');
+            title?.classList.remove('d-none');
+            if (title) title.textContent = 'Nuevo monto';
+            tableWrapper?.classList.add('d-none');
+            addMontoBtnRow?.classList.add('d-none');
             container.appendChild(this._buildMontoForm(null, { inline: true }));
+        } else if (this._amountMode === 'editing' && this._inlineEditRef) {
+            container.classList.remove('d-none');
+            title?.classList.remove('d-none');
+            if (title) title.textContent = 'Editar monto';
+            tableWrapper?.classList.add('d-none');
+            addMontoBtnRow?.classList.add('d-none');
+            container.appendChild(this._buildMontoForm(this._inlineEditRef, { inline: true }));
         } else {
+            title?.classList.add('d-none');
             container.classList.add('d-none');
+            tableWrapper?.classList.remove('d-none');
+            addMontoBtnRow?.classList.remove('d-none');
         }
     }
 
@@ -377,11 +396,6 @@ export class DebtForm extends HTMLElement {
             this.clearFormError();
         }
         this.montos.forEach((monto, idx) => {
-            if (this._inlineEditRef !== null && monto === this._inlineEditRef) {
-                // Render inline edit row for this existing monto
-                this.montosTbody.appendChild(this._buildInlineRow(monto));
-                return;
-            }
             const tr = el('tr');
             const cells = [
                 { text: monto.monto },
@@ -446,6 +460,7 @@ export class DebtForm extends HTMLElement {
         this.editing = true;
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
+        this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
         this.renderMontosList();
@@ -473,6 +488,7 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
+        this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
         const form = this.querySelector('app-form');

@@ -11,6 +11,7 @@ import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtL
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
 import '../src/features/montos/components/DuplicateMontoModal.js';
+import { MONTO_FORM_GENERAL_ERROR_MESSAGE } from '../src/features/montos/components/MontoForm.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/deudas/components/DebtModal.js';
 import '../src/features/deudas/components/DebtEntityShell.js';
@@ -559,9 +560,9 @@ async function testPagoToggleVisualFeedback() {
 }
 
 // ===================================================================
-// UC8: Alta inline — openInlineAdd() muestra formulario separado de la tabla
-// Verifica que _inlineEditIdx = 'new' y hay un formulario inline arriba del botón Agregar monto.
-// Al guardar con datos válidos, form.montos crece en 1 y la fila vuelve a lectura.
+// UC8: Alta inline — openInlineAdd() muestra sólo el formulario de monto
+// Verifica estados de visibilidad: en creating se ocultan tabla y botón Agregar monto.
+// Al guardar con datos válidos, form.montos crece en 1 y vuelve el modo lista.
 // ===================================================================
 async function testAltaInlineAgregarYGuardar() {
     console.log('  UC8: Alta inline — agregar monto y guardar');
@@ -574,15 +575,18 @@ async function testAltaInlineAgregarYGuardar() {
 
     // Abrir inline add
     form.openInlineAdd();
+    assert(form._amountMode === 'creating', '_amountMode debe ser "creating"');
     assert(form._inlineEditIdx === 'new', '_inlineEditIdx debe ser "new"');
 
-    const tbody = form.querySelector('#montos-tbody');
-    assert(tbody !== null, 'tbody existe');
+    const tableWrapper = form.querySelector('#montos-table-wrapper');
+    const addMontoBtnRow = form.querySelector('#add-monto-btn-row');
+    const title = form.querySelector('#monto-form-title');
     const inlineAddContainer = form.querySelector('#add-monto-form-container');
     assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de monto');
     assert(!inlineAddContainer.classList.contains('d-none'), 'El formulario de alta debe estar visible');
-    assert(inlineAddContainer.nextElementSibling?.firstElementChild === form.querySelector('#add-monto'), 'El formulario debe estar justo arriba del botón Agregar monto');
-    assert(tbody.querySelector('.inline-edit-row') === null, 'El alta de monto no debe renderizar una fila dentro de la tabla');
+    assert(tableWrapper.classList.contains('d-none'), 'La tabla/lista debe ocultarse al crear');
+    assert(addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto debe ocultarse al crear');
+    assert(title.textContent === 'Nuevo monto', 'El formulario debe titularse "Nuevo monto"');
     let inlineForm = inlineAddContainer.querySelector('monto-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
@@ -600,6 +604,7 @@ async function testAltaInlineAgregarYGuardar() {
         bubbles: true,
         composed: true
     }));
+    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
     assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
@@ -611,13 +616,15 @@ async function testAltaInlineAgregarYGuardar() {
     inlineForm = inlineAddContainer.querySelector('monto-form');
     assert(inlineForm === null, 'Formulario inline desaparecido tras guardar');
     assert(inlineAddContainer.classList.contains('d-none'), 'El contenedor de alta vuelve a ocultarse tras guardar');
+    assert(!tableWrapper.classList.contains('d-none'), 'La tabla/lista vuelve a mostrarse tras guardar');
+    assert(!addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto vuelve a mostrarse tras guardar');
 
     document.body.removeChild(form);
     await cleanup();
 }
 
 // ===================================================================
-// UC8b: Alta inline — muestra errores ARIA en campos vacíos (vía AppForm)
+// UC8b: Alta inline — marca campos inválidos y muestra error general corto
 // ===================================================================
 async function testAltaInlineValidacionErrores() {
     console.log('  UC8b: Alta inline — muestra errores ARIA cuando campos están vacíos');
@@ -633,18 +640,18 @@ async function testAltaInlineValidacionErrores() {
 
     const montoInput = inlineForm.querySelector('input[name="monto"]');
     const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
+    const appForm = inlineForm.querySelector('app-form');
 
     // Intentar guardar con campos vacíos — AppForm fires invalid events, not is-invalid class
-    inlineForm.querySelector('app-form').triggerSubmit();
+    appForm.triggerSubmit();
     assert(form._inlineEditIdx === 'new', 'El inline sigue abierto tras guardar con campos inválidos');
     assert(form.montos.length === 0, 'No se agregó ningún monto');
     assert(montoInput.getAttribute('aria-invalid') === 'true', 'Monto debe tener aria-invalid=true');
-    const montoFeedback = montoInput.nextElementSibling;
-    assert(montoFeedback !== null && montoFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para monto');
-    assert(montoFeedback.textContent.length > 0, 'El mensaje de error de monto no debe estar vacío');
     assert(vencInput.getAttribute('aria-invalid') === 'true', 'Vencimiento debe tener aria-invalid=true');
-    const vencFeedback = vencInput.nextElementSibling;
-    assert(vencFeedback !== null && vencFeedback.classList.contains('invalid-feedback'), 'Debe haber invalid-feedback para vencimiento');
+    const generalFeedback = appForm.querySelector('[data-monto-general-error="true"]');
+    assert(generalFeedback !== null, 'Debe existir mensaje general de validación');
+    assert(generalFeedback.classList.contains('d-block'), 'El mensaje general de validación debe mostrarse');
+    assert(generalFeedback.textContent === MONTO_FORM_GENERAL_ERROR_MESSAGE, 'El mensaje general debe ser corto y claro');
 
     document.body.removeChild(form);
     await cleanup();
@@ -666,14 +673,16 @@ async function testCancelarAltaInline() {
 
     form.openInlineAdd();
     assert(form._inlineEditIdx === 'new', 'Inline add abierto');
+    assert(form._amountMode === 'creating', 'Debe quedar en modo creating');
 
     form._cancelInline();
+    assert(form._amountMode === 'idle', 'Debe volver a modo idle tras cancelar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
     assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
 
-    const inlineRow = form.querySelector('.inline-edit-row');
-    assert(inlineRow === null, 'No hay fila inline tras cancelar');
+    const inlineForm = form.querySelector('#add-monto-form-container monto-form');
+    assert(inlineForm === null, 'No hay formulario inline tras cancelar');
 
     document.body.removeChild(form);
     await cleanup();
@@ -701,9 +710,13 @@ async function testEdicionInlineGuardar() {
     assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
     assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
 
-    const tbody = form.querySelector('#montos-tbody');
-    const inlineRow = tbody.querySelector('.inline-edit-row');
-    assert(inlineRow !== null, 'Fila inline presente para edición');
+    assert(form._amountMode === 'editing', 'Debe quedar en modo editing');
+    const inlineContainer = form.querySelector('#add-monto-form-container');
+    const inlineRow = inlineContainer.querySelector('monto-form');
+    assert(inlineRow !== null, 'Formulario inline presente para edición');
+    assert(form.querySelector('#monto-form-title').textContent === 'Editar monto', 'Debe usar título "Editar monto"');
+    assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La tabla debe ocultarse durante edición');
+    assert(form.querySelector('#add-monto-btn-row').classList.contains('d-none'), 'El botón Agregar monto debe ocultarse durante edición');
 
     const montoInput = inlineRow.querySelector('input[name="monto"]');
     assert(montoInput.value === '1000', 'Input monto precargado con 1000');
@@ -720,6 +733,7 @@ async function testEdicionInlineGuardar() {
         bubbles: true,
         composed: true
     }));
+    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar edición');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 2, 'Sigue con 2 montos');
 
@@ -748,12 +762,12 @@ async function testCancelarEdicionInline() {
     form.openInlineEdit(form.montos[0], 0);
 
     // Modificar inputs pero cancelar sin guardar
-    const tbody = form.querySelector('#montos-tbody');
-    const inlineRow = tbody.querySelector('.inline-edit-row');
+    const inlineRow = form.querySelector('#add-monto-form-container monto-form');
     inlineRow.querySelector('input[name="monto"]').value = '99999';
 
     form._cancelInline();
 
+    assert(form._amountMode === 'idle', 'Cancelar edición vuelve a modo lista');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'Sigue con 1 monto');
     assert(form.montos[0].monto === 9000, 'Monto original sin cambios: 9000');
@@ -1006,8 +1020,12 @@ async function testShowFormErrorNearMontos() {
     assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
     assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
-    assert(errEl.nextElementSibling === form.querySelector('#add-monto-form-container'), 'El contenedor del formulario de alta debe quedar debajo del mensaje de error');
-    assert(errEl.nextElementSibling?.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error y del formulario de alta');
+    const montoFormTitle = form.querySelector('#monto-form-title');
+    const montoFormContainer = form.querySelector('#add-monto-form-container');
+    const addMontoBtn = form.querySelector('#add-monto');
+    assert(errEl.nextElementSibling === montoFormTitle, 'El título del formulario de monto debe quedar debajo del mensaje de error');
+    assert(montoFormTitle.nextElementSibling === montoFormContainer, 'El contenedor del formulario de alta debe quedar debajo del título');
+    assert(montoFormContainer.nextElementSibling?.querySelector('#add-monto') === addMontoBtn, 'El botón Agregar monto debe quedar debajo del mensaje de error y del formulario de alta');
     assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
     assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
     assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
