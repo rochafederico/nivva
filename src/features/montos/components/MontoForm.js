@@ -76,14 +76,14 @@ export class MontoForm extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
-        if (this.inline) {
-            this._applyInlineLayout(form);
-        }
         if (this.compactErrors) {
             this._applyCompactErrors(form);
         }
         this.appendChild(form);
         this._applyFormLayout(form);
+        if (this.inline) {
+            this._applyInlineLayout(form);
+        }
     }
 
     _applyFormLayout(appForm) {
@@ -111,14 +111,20 @@ export class MontoForm extends HTMLElement {
     _applyInlineLayout(form) {
         const formEl = form.querySelector('form');
         if (!formEl) return;
-        formEl.classList.add('flex-md-row', 'align-items-md-start');
-        formEl.querySelectorAll('[data-field-name]').forEach(field => {
-            field.classList.remove('mb-2');
-            field.classList.add('mb-0', 'flex-fill');
-        });
-        const cancelBtn = formEl.querySelector('button[type="button"]');
-        if (!cancelBtn?.parentElement) return;
-        cancelBtn.parentElement.classList.add('mt-md-4', 'flex-shrink-0');
+        const actionRow = formEl.querySelector('[data-form-actions="true"]');
+        const generalError = formEl.querySelector('[data-monto-general-error="true"]');
+
+        if (generalError) {
+            generalError.classList.add('w-100', 'mt-0');
+            if (actionRow) {
+                formEl.insertBefore(generalError, actionRow);
+            }
+        }
+
+        if (actionRow) {
+            actionRow.classList.remove('mt-md-4', 'flex-shrink-0');
+            actionRow.classList.add('mt-0', 'justify-content-end');
+        }
     }
 
     _applyCompactErrors(form) {

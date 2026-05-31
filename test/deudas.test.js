@@ -592,7 +592,14 @@ async function testAltaInlineAgregarYGuardar() {
 
     // Verify inputs exist inside monto-form > app-form
     const appFormEl = inlineForm.querySelector('app-form form');
-    assert(appFormEl.classList.contains('flex-md-row'), 'El formulario debe alinear Monto, moneda y vencimiento en línea');
+    const fieldsRow = appFormEl.firstElementChild;
+    const generalFeedback = appFormEl.querySelector('[data-monto-general-error="true"]');
+    const actionRow = appFormEl.querySelector('[data-form-actions="true"]');
+    assert(!appFormEl.classList.contains('flex-md-row'), 'El formulario inline no debe forzar flex-md-row');
+    assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
+    assert(generalFeedback?.previousElementSibling === fieldsRow, 'El mensaje general debe ir debajo de la fila de campos');
+    assert(generalFeedback?.nextElementSibling === actionRow, 'Las acciones deben ir debajo del mensaje general');
+    assert(actionRow?.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
     const montoInput = inlineForm.querySelector('input[name="monto"]');
     const monedaSelect = inlineForm.querySelector('select[name="moneda"]');
     const vencInput = inlineForm.querySelector('input[name="vencimiento"]');

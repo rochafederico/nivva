@@ -325,6 +325,36 @@ async function testMontoFormLayoutCamposYAcciones() {
     await cleanup();
 }
 
+async function testMontoFormInlineLayoutSeparatesValidationAndActions() {
+    console.log('  UC4d: MontoForm inline mantiene validación y acciones debajo de los campos');
+    await cleanup();
+
+    const montoForm = document.createElement('monto-form');
+    montoForm.inline = true;
+    montoForm.compactErrors = true;
+    document.body.appendChild(montoForm);
+    await customElements.whenDefined('monto-form');
+    await Promise.resolve();
+
+    const formEl = montoForm.querySelector('app-form form');
+    const fieldsRow = formEl.firstElementChild;
+    const generalError = formEl.querySelector('[data-monto-general-error="true"]');
+    const actionRow = formEl.querySelector('[data-form-actions="true"]');
+
+    assert(!formEl.classList.contains('flex-md-row'), 'El inline no debe forzar flex-md-row');
+    assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
+    assert(generalError !== null, 'El inline debe renderizar el mensaje general compacto');
+    assert(generalError.previousElementSibling === fieldsRow, 'El mensaje general debe ir debajo de la fila de campos');
+    assert(generalError.nextElementSibling === actionRow, 'La fila de acciones debe ir debajo del mensaje general');
+    assert(generalError.classList.contains('w-100'), 'El mensaje general debe ocupar todo el ancho');
+    assert(actionRow.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
+    assert(actionRow.querySelector('#cancelBtn') !== null, 'La fila de acciones inline debe incluir Cancelar');
+    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones inline debe incluir Guardar');
+
+    document.body.removeChild(montoForm);
+    await cleanup();
+}
+
 // ===================================================================
 // UC5: Flujo completo — crear deuda con montos via DebtForm, listar
 // por mes, marcar pagado, verificar totales, eliminar monto individual
@@ -460,6 +490,7 @@ export const tests = [
     testCancelarFormularios,
     testMontosFormsUxValidacionConsistente,
     testMontoFormLayoutCamposYAcciones,
+    testMontoFormInlineLayoutSeparatesValidationAndActions,
     testFlujoCompletoMontosViaDebtForm,
     testTotalesMixtosPorMoneda
 ];
