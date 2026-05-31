@@ -71,14 +71,14 @@ export class MontoForm extends HTMLElement {
     _applyInlineLayout(form) {
         const formEl = form.querySelector('form');
         if (!formEl) return;
-        formEl.className = 'd-flex flex-column flex-md-row align-items-md-start gap-2';
+        formEl.classList.add('flex-md-row', 'align-items-md-start');
         formEl.querySelectorAll('[data-field-name]').forEach(field => {
             field.classList.remove('mb-2');
             field.classList.add('mb-0', 'flex-fill');
         });
         const btnRow = formEl.querySelector('#cancelBtn')?.parentElement;
         if (btnRow) {
-            btnRow.className = 'd-flex justify-content-end gap-2 mt-2 mt-md-4 flex-shrink-0';
+            btnRow.classList.add('mt-md-4', 'flex-shrink-0');
         }
     }
 }
