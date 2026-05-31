@@ -1071,10 +1071,10 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
 
     const debtForm = modal.querySelector('debt-form');
     debtForm.openInlineAdd();
-    const inlineCancelSource = debtForm.querySelector('.inline-edit-row app-form');
-    assert(inlineCancelSource !== null, 'Debe existir app-form inline para cancelar monto');
+    const inlineMontoForm = debtForm.querySelector('.inline-edit-row app-form');
+    assert(inlineMontoForm !== null, 'Debe existir app-form inline para cancelar monto');
 
-    inlineCancelSource.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+    inlineMontoForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
 
     assert(closeCalls === 0, 'Cancelar el monto inline no debe cerrar el modal de deuda');
     assert(debtForm._inlineEditIdx === null, 'Cancelar monto inline debe cerrar sólo la fila inline');
