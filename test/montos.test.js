@@ -340,6 +340,8 @@ async function testMontoFormInlineLayoutSeparatesValidationAndActions() {
     const fieldsRow = formEl.firstElementChild;
     const generalError = formEl.querySelector('[data-monto-general-error="true"]');
     const actionRow = formEl.querySelector('[data-form-actions="true"]');
+    const cancelBtn = actionRow.querySelector('#cancelBtn');
+    const saveBtn = actionRow.querySelector('button[type="submit"]');
 
     assert(!formEl.classList.contains('flex-md-row'), 'El inline no debe forzar flex-md-row');
     assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
@@ -348,8 +350,13 @@ async function testMontoFormInlineLayoutSeparatesValidationAndActions() {
     assert(generalError.nextElementSibling === actionRow, 'La fila de acciones debe ir debajo del mensaje general');
     assert(generalError.classList.contains('w-100'), 'El mensaje general debe ocupar todo el ancho');
     assert(actionRow.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
-    assert(actionRow.querySelector('#cancelBtn') !== null, 'La fila de acciones inline debe incluir Cancelar');
-    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones inline debe incluir Guardar');
+    assert(actionRow.classList.contains('mt-3'), 'Las acciones inline deben separarse de los campos con margen superior');
+    assert(cancelBtn !== null, 'La fila de acciones inline debe incluir Cancelar');
+    assert(saveBtn !== null, 'La fila de acciones inline debe incluir Guardar');
+    assert(cancelBtn.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria liviana');
+    assert(cancelBtn.classList.contains('btn-sm'), 'Cancelar inline debe usar tamaño chico');
+    assert(saveBtn.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
+    assert(saveBtn.classList.contains('btn-sm'), 'Guardar inline debe usar tamaño chico');
 
     document.body.removeChild(montoForm);
     await cleanup();

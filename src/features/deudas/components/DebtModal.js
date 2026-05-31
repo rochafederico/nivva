@@ -64,14 +64,14 @@ export class DebtModal extends HTMLElement {
 
                 const cancelBtn = document.createElement('button');
                 cancelBtn.type = 'button';
-                cancelBtn.className = 'btn btn-primary btn-sm';
+                cancelBtn.className = 'btn btn-primary';
                 cancelBtn.setAttribute('aria-label', 'Cancelar');
                 cancelBtn.textContent = 'Cancelar';
                 cancelBtn.addEventListener('click', () => appForm && appForm.triggerCancel());
 
                 const saveBtn = document.createElement('button');
                 saveBtn.type = 'button';
-                saveBtn.className = 'btn btn-success btn-sm';
+                saveBtn.className = 'btn btn-success';
                 saveBtn.setAttribute('aria-label', 'Guardar');
                 saveBtn.textContent = 'Guardar';
                 saveBtn.addEventListener('click', () => appForm && appForm.triggerSubmit());

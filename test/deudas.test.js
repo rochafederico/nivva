@@ -595,11 +595,16 @@ async function testAltaInlineAgregarYGuardar() {
     const fieldsRow = appFormEl.firstElementChild;
     const generalFeedback = appFormEl.querySelector('[data-monto-general-error="true"]');
     const actionRow = appFormEl.querySelector('[data-form-actions="true"]');
+    const cancelBtn = actionRow.querySelector('#cancelBtn');
+    const saveBtn = actionRow.querySelector('button[type="submit"]');
     assert(!appFormEl.classList.contains('flex-md-row'), 'El formulario inline no debe forzar flex-md-row');
     assert(fieldsRow.classList.contains('row'), 'La primera fila inline debe contener los campos');
     assert(generalFeedback?.previousElementSibling === fieldsRow, 'El mensaje general debe ir debajo de la fila de campos');
     assert(generalFeedback?.nextElementSibling === actionRow, 'Las acciones deben ir debajo del mensaje general');
     assert(actionRow?.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
+    assert(actionRow?.classList.contains('mt-3'), 'Las acciones inline deben separarse visualmente de los campos');
+    assert(cancelBtn?.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria');
+    assert(saveBtn?.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
     const montoInput = inlineForm.querySelector('input[name="monto"]');
     const monedaSelect = inlineForm.querySelector('select[name="moneda"]');
     const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
@@ -1098,6 +1103,7 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
 
     const modal = document.createElement('debt-modal');
     document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     let closeCalls = 0;
     const origClose = modal.ui.close.bind(modal.ui);
@@ -1106,7 +1112,16 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
     const debtForm = modal.querySelector('debt-form');
     debtForm.openInlineAdd();
     const inlineMontoForm = debtForm.querySelector('#add-monto-form-container app-form');
+    const inlineActionRow = inlineMontoForm?.querySelector('[data-form-actions="true"]');
+    const inlineCancelBtn = inlineActionRow?.querySelector('#cancelBtn');
+    const inlineSaveBtn = inlineActionRow?.querySelector('button[type="submit"]');
+    const footerCancelBtn = modal.querySelector('.modal-footer .btn.btn-primary');
+    const footerSaveBtn = modal.querySelector('.modal-footer .btn.btn-success');
     assert(inlineMontoForm !== null, 'Debe existir app-form inline para cancelar monto');
+    assert(inlineCancelBtn?.classList.contains('btn-sm'), 'Cancelar del monto inline debe usar tamaño chico');
+    assert(inlineSaveBtn?.classList.contains('btn-sm'), 'Guardar del monto inline debe usar tamaño chico');
+    assert(!footerCancelBtn?.classList.contains('btn-sm'), 'Cancelar del footer del modal no debe usar tamaño chico');
+    assert(!footerSaveBtn?.classList.contains('btn-sm'), 'Guardar del footer del modal no debe usar tamaño chico');
 
     inlineMontoForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
 

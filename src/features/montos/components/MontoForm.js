@@ -122,8 +122,13 @@ export class MontoForm extends HTMLElement {
         }
 
         if (actionRow) {
-            actionRow.classList.remove('mt-md-4', 'flex-shrink-0');
-            actionRow.classList.add('mt-0', 'justify-content-end');
+            actionRow.classList.remove('mt-0', 'mt-2', 'mt-md-4', 'flex-shrink-0');
+            actionRow.classList.add('mt-3', 'justify-content-end', 'w-100');
+            const cancelBtn = actionRow.querySelector('#cancelBtn');
+            const saveBtn = actionRow.querySelector('button[type="submit"]');
+            cancelBtn?.classList.remove('btn-primary');
+            cancelBtn?.classList.add('btn-outline-secondary', 'btn-sm');
+            saveBtn?.classList.add('btn-sm');
         }
     }
 
