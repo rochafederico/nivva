@@ -92,8 +92,8 @@ export class IngresoForm extends HTMLElement {
 
         const amountRow = document.createElement('div');
         amountRow.className = 'row g-2 align-items-start ingreso-monto-row';
-        montoField.className = 'mb-0 col-8';
-        monedaField.className = 'mb-0 col-4';
+        montoField.className = 'mb-0 col-8 align-self-start';
+        monedaField.className = 'mb-0 col-4 align-self-start';
         amountRow.appendChild(montoField);
         amountRow.appendChild(monedaField);
 
