@@ -161,6 +161,10 @@ export class DebtForm extends HTMLElement {
                             className: 'invalid-feedback mt-2 d-none'
                         }),
                         el('div', {
+                            attrs: { id: 'add-monto-form-container' },
+                            className: 'mt-3 d-none'
+                        }),
+                        el('div', {
                             className: 'd-flex justify-content-end mt-3',
                             children: [
                                 el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
@@ -285,14 +289,17 @@ export class DebtForm extends HTMLElement {
     // Focus the first input/select in the active inline row.
     _focusFirstInlineInput() {
         setTimeout(() => {
-            const input = this.montosTbody && this.montosTbody.querySelector('.inline-edit-row input, .inline-edit-row select');
+            const input = this.querySelector('.inline-edit-row input, .inline-edit-row select, #add-monto-form-container input, #add-monto-form-container select');
             if (input) input.focus();
         }, 0);
     }
 
-    // Build the inline editing row using monto-form (delegates validation to AppForm).
-    _buildInlineRow(monto) {
+    // Build the inline monto form (delegates validation to AppForm).
+    _buildMontoForm(monto, { inline = false } = {}) {
         const montoFormEl = document.createElement('monto-form');
+        if (inline) {
+            montoFormEl.inline = true;
+        }
         if (monto) {
             // Set before appending so connectedCallback renders with the correct values.
             montoFormEl.monto = {
@@ -323,9 +330,27 @@ export class DebtForm extends HTMLElement {
         montoFormEl.addEventListener('monto:cancel', () => {
             this._cancelInline();
         });
+        return montoFormEl;
+    }
+
+    // Build the inline editing row using monto-form (delegates validation to AppForm).
+    _buildInlineRow(monto) {
+        const montoFormEl = this._buildMontoForm(monto);
         const tr = el('tr', { className: 'inline-edit-row' });
         tr.appendChild(el('td', { attrs: { colspan: '4' }, children: [montoFormEl] }));
         return tr;
+    }
+
+    _renderInlineAddForm() {
+        const container = this.querySelector('#add-monto-form-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (this._inlineEditIdx === 'new') {
+            container.classList.remove('d-none');
+            container.appendChild(this._buildMontoForm(null, { inline: true }));
+        } else {
+            container.classList.add('d-none');
+        }
     }
 
     // Duplicate a monto in memory: copies monto/moneda/vencimiento, forces pagado=false.
@@ -344,6 +369,7 @@ export class DebtForm extends HTMLElement {
         // Ordenar montos por fecha de vencimiento ascendente
         this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
+        this._renderInlineAddForm();
         if (this.hasMontosAdded()) {
             this.clearFormError();
         }
@@ -411,10 +437,6 @@ export class DebtForm extends HTMLElement {
             cells.forEach(cellOpts => tr.appendChild(el('td', cellOpts)));
             this.montosTbody.appendChild(tr);
         });
-        // If adding a new monto, append the inline add row at the bottom
-        if (this._inlineEditIdx === 'new') {
-            this.montosTbody.appendChild(this._buildInlineRow(null));
-        }
     }
 
     load(deuda) {

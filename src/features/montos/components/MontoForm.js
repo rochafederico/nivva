@@ -16,6 +16,18 @@ export class MontoForm extends HTMLElement {
         return this._monto;
     }
 
+    get inline() {
+        return this.hasAttribute('inline');
+    }
+    set inline(value) {
+        if (value) {
+            this.setAttribute('inline', '');
+        } else {
+            this.removeAttribute('inline');
+        }
+        this.render();
+    }
+
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
@@ -50,7 +62,24 @@ export class MontoForm extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
+        if (this.inline) {
+            this._applyInlineLayout(form);
+        }
         this.appendChild(form);
+    }
+
+    _applyInlineLayout(form) {
+        const formEl = form.querySelector('form');
+        if (!formEl) return;
+        formEl.className = 'd-flex flex-column flex-md-row align-items-md-start gap-2';
+        formEl.querySelectorAll('[data-field-name]').forEach(field => {
+            field.classList.remove('mb-2');
+            field.classList.add('mb-0', 'flex-fill');
+        });
+        const btnRow = formEl.querySelector('#cancelBtn')?.parentElement;
+        if (btnRow) {
+            btnRow.className = 'd-flex justify-content-end gap-2 mt-2 mt-md-4 flex-shrink-0';
+        }
     }
 }
 customElements.define('monto-form', MontoForm);
