@@ -307,9 +307,12 @@ async function testMontoFormLayoutCamposYAcciones() {
     const fieldsRow = formEl.firstElementChild;
     const actionRow = fieldsRow.nextElementSibling;
     const fields = [...fieldsRow.children];
+    const fieldNames = fields.map(field => field.dataset.fieldName);
 
     assert(fieldsRow.classList.contains('row'), 'La primera fila debe contener los campos');
-    assert(fields.map(field => field.dataset.fieldName).join(',') === 'monto,moneda,vencimiento', 'Los campos deben ordenarse Monto, Moneda, Vencimiento');
+    assert(fieldNames[0] === 'monto', 'El primer campo debe ser Monto');
+    assert(fieldNames[1] === 'moneda', 'El segundo campo debe ser Moneda');
+    assert(fieldNames[2] === 'vencimiento', 'El tercer campo debe ser Vencimiento');
     assert(fields.every(field => field.classList.contains('col-12')), 'Cada campo debe ocupar ancho completo en mobile');
     assert(fields.every(field => field.classList.contains('col-md-4')), 'Los tres campos deben compartir la fila en desktop');
     assert(actionRow.classList.contains('justify-content-end'), 'La fila de acciones debe alinearse a la derecha');

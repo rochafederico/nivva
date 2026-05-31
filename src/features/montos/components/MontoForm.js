@@ -104,6 +104,12 @@ export class MontoForm extends HTMLElement {
         if (fieldsRow.children.length > 0) {
             formEl.insertBefore(fieldsRow, formEl.firstChild);
         }
+
+        const actionRow = formEl.querySelector('#cancelBtn')?.parentElement;
+        if (actionRow) {
+            actionRow.className = 'd-flex justify-content-end gap-2 mt-2';
+            formEl.appendChild(actionRow);
+        }
     }
 
     _applyInlineLayout(form) {
