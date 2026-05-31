@@ -31,6 +31,16 @@ export function openSettingsModal(returnFocus) {
   });
 }
 
+function reloadHomeAfterDelete() {
+  window.setTimeout(() => {
+    if (window.location.pathname === '/') {
+      window.location.reload();
+      return;
+    }
+    window.location.assign('/');
+  }, 700);
+}
+
 export async function deleteAllData() {
   const confirmed = confirm('Vas a eliminar todos tus egresos, ingresos e inversiones. Esta acción no se puede deshacer. ¿Continuás?');
   if (!confirmed) return;
@@ -72,6 +82,7 @@ export async function deleteAllData() {
 
   if (deleted.length === 0 && failed.length === 0) {
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '⚠️ No había datos para borrar.', type: 'warning' } }));
+    reloadHomeAfterDelete();
     return;
   }
 
@@ -82,4 +93,7 @@ export async function deleteAllData() {
 
   const type = failed.length ? 'warning' : 'success';
   window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: parts.join(' '), type } }));
+  if (failed.length === 0) {
+    reloadHomeAfterDelete();
+  }
 }
