@@ -28,7 +28,8 @@ export class MontoForm extends HTMLElement {
                     composed: true
                 }));
             });
-            this.form.addEventListener('form:cancel', () => {
+            this.form.addEventListener('form:cancel', (e) => {
+                e.stopPropagation();
                 this.dispatchEvent(new CustomEvent('monto:cancel', { bubbles: true, composed: true }));
             });
         }

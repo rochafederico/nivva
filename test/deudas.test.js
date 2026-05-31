@@ -1056,6 +1056,33 @@ async function testDebtModalCancelClosesModal() {
     document.body.removeChild(modal);
 }
 
+// ===================================================================
+// UC17b: Cancelar monto inline no debe cerrar el DebtModal
+// ===================================================================
+async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
+    console.log('  UC17b: Cancelar monto inline no cierra el modal de deuda');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+
+    let closeCalls = 0;
+    const origClose = modal.ui.close.bind(modal.ui);
+    modal.ui.close = () => { closeCalls += 1; };
+
+    const debtForm = modal.querySelector('debt-form');
+    debtForm.openInlineAdd();
+    const inlineCancelSource = debtForm.querySelector('.inline-edit-row app-form');
+    assert(inlineCancelSource !== null, 'Debe existir app-form inline para cancelar monto');
+
+    inlineCancelSource.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+
+    assert(closeCalls === 0, 'Cancelar el monto inline no debe cerrar el modal de deuda');
+    assert(debtForm._inlineEditIdx === null, 'Cancelar monto inline debe cerrar sólo la fila inline');
+
+    modal.ui.close = origClose;
+    document.body.removeChild(modal);
+}
+
 async function testDebtModalFooterUxValidacionConsistente() {
     console.log('  UC18: DebtModal mantiene Guardar habilitado y valida al enviar desde el footer');
 
@@ -1719,6 +1746,7 @@ export const tests = [
     testShowFormErrorNearMontos,
     testDebtFormRequiereMontosAlEnviar,
     testDebtModalCancelClosesModal,
+    testDebtModalInlineMontoCancelDoesNotCloseModal,
     testDebtModalFooterUxValidacionConsistente,
     testDebtModalReopenClearsValidationState,
     testDebtEntityShellRenderVacio,
