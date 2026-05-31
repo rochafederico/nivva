@@ -92,20 +92,19 @@ export class MontoForm extends HTMLElement {
 
         const fieldsRow = document.createElement('div');
         fieldsRow.className = 'row g-2 align-items-end';
+        const fieldNames = ['monto', 'moneda', 'vencimiento'];
+        const fields = fieldNames.map(fieldName => formEl.querySelector(`[data-field-name="${fieldName}"]`));
+        if (fields.some(field => field === null)) return;
 
-        ['monto', 'moneda', 'vencimiento'].forEach(fieldName => {
-            const field = formEl.querySelector(`[data-field-name="${fieldName}"]`);
-            if (!field) return;
+        fields.forEach(field => {
             field.classList.remove('mb-2');
             field.classList.add('col-12', 'col-md-4', 'mb-0');
             fieldsRow.appendChild(field);
         });
 
-        if (fieldsRow.children.length > 0) {
-            formEl.insertBefore(fieldsRow, formEl.firstChild);
-        }
+        formEl.insertBefore(fieldsRow, formEl.firstChild);
 
-        const actionRow = formEl.querySelector('#cancelBtn')?.parentElement;
+        const actionRow = formEl.querySelector('[data-form-actions="true"]');
         if (actionRow) {
             actionRow.className = 'd-flex justify-content-end gap-2 mt-2';
             formEl.appendChild(actionRow);

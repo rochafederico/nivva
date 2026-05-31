@@ -168,6 +168,7 @@ export class AppForm extends HTMLElement {
             // Buttons
             const btnRow = document.createElement('div');
             btnRow.className = 'd-flex justify-content-end gap-2 mt-2';
+            btnRow.dataset.formActions = 'true';
 
             const cancelBtn = document.createElement('button');
             cancelBtn.type = 'button';
