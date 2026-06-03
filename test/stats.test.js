@@ -3,6 +3,7 @@
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
 import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
+import { summarizeGlobalPending } from '../src/features/stats/statsService.js';
 import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
@@ -177,6 +178,95 @@ async function testStatsIndicatorsCardOrder() {
     );
 }
 
+// ===================================================================
+// UC13: summarizeGlobalPending separa vencidos y futuros no pagados
+// ===================================================================
+async function testSummarizeGlobalPendingSplit() {
+    console.log('  UC13: summarizeGlobalPending separa vencidos y futuros no pagados');
+
+    const summary = summarizeGlobalPending([
+        { monto: 1000, moneda: 'ARS', pagado: false, vencimiento: '2026-06-01' },
+        { monto: 300, moneda: 'ARS', pagado: false, vencimiento: '2026-06-15' },
+        { monto: 20, moneda: 'USD', pagado: false, vencimiento: '2026-07-01' },
+        { monto: 99, moneda: 'USD', pagado: true, vencimiento: '2026-06-01' }
+    ], '2026-06-15');
+
+    assert(summary.vencidoByCurrency.ARS === 1000, 'Vencido ARS debe sumar solo vencimientos anteriores a hoy');
+    assert(summary.futuroByCurrency.ARS === 300, 'Pendiente futuro ARS debe incluir vencimiento igual a hoy');
+    assert(summary.futuroByCurrency.USD === 20, 'Pendiente futuro USD debe incluir vencimientos posteriores');
+    assert(summary.totalByCurrency.ARS === 1300, 'Total por pagar ARS = vencido + futuro');
+    assert(summary.totalByCurrency.USD === 20, 'Total por pagar USD = vencido + futuro');
+    assert(summary.hasAnyUnpaid === true, 'Debe marcar que existen montos no pagados');
+}
+
+// ===================================================================
+// UC14: StatsIndicators muestra bloque global separado en Home
+// ===================================================================
+async function testStatsIndicatorsGlobalSummaryBlock() {
+    console.log('  UC14: StatsIndicators muestra bloque global separado en Home');
+
+    const indicators = StatsIndicators({
+        mes: '2030-01',
+        showGlobalSummary: true,
+        getSummary: async () => ({
+            byCurrency: {
+                ingresos: { ARS: 1000, USD: 0 },
+                egresos: { ARS: 400, USD: 20 },
+                saldo: { ARS: 600, USD: -20 },
+                pendientes: { ARS: 250, USD: 20 }
+            },
+            globalPending: {
+                vencidoByCurrency: { ARS: 100 },
+                futuroByCurrency: { ARS: 150, USD: 20 },
+                totalByCurrency: { ARS: 250, USD: 20 },
+                hasAnyUnpaid: true
+            }
+        })
+    });
+    await new Promise(resolve => setTimeout(resolve, 30));
+
+    const heading = indicators.querySelector('section h5');
+    assert(heading?.textContent === 'Situación total', 'Debe mostrar el título "Situación total"');
+    assert(indicators.textContent.includes('Incluye todos los meses cargados.'), 'Debe mostrar el texto aclaratorio global');
+
+    const globalTitles = [...indicators.querySelectorAll('section .card-body > div:first-child')]
+        .map((el) => el.textContent.trim());
+    assert(
+        JSON.stringify(globalTitles) === JSON.stringify(['Vencido', 'Pendiente futuro', 'Total por pagar']),
+        'El bloque global debe mostrar vencido, pendiente futuro y total por pagar'
+    );
+}
+
+// ===================================================================
+// UC15: StatsIndicators muestra estado vacío global sin pendientes
+// ===================================================================
+async function testStatsIndicatorsGlobalSummaryEmptyState() {
+    console.log('  UC15: StatsIndicators muestra estado vacío global sin pendientes');
+
+    const indicators = StatsIndicators({
+        mes: '2030-01',
+        showGlobalSummary: true,
+        getSummary: async () => ({
+            byCurrency: {
+                ingresos: {},
+                egresos: {},
+                saldo: {},
+                pendientes: {}
+            },
+            globalPending: {
+                vencidoByCurrency: {},
+                futuroByCurrency: {},
+                totalByCurrency: {},
+                hasAnyUnpaid: false
+            }
+        })
+    });
+    await new Promise(resolve => setTimeout(resolve, 30));
+
+    assert(indicators.textContent.includes('Sin montos pendientes por pagar.'), 'Debe mostrar estado vacío cuando no hay pendientes');
+    assert(indicators.textContent.includes('0'), 'Debe mostrar totales en cero de forma clara');
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
     testStatsCardItemClasses,
@@ -190,4 +280,7 @@ export const tests = [
     testCompactFormatSmall,
     testCompactFormatNull,
     testStatsIndicatorsCardOrder,
+    testSummarizeGlobalPendingSplit,
+    testStatsIndicatorsGlobalSummaryBlock,
+    testStatsIndicatorsGlobalSummaryEmptyState,
 ];

@@ -3,6 +3,7 @@ import StatsCard from './StatsCard.js';
 import { getMonthlySummary } from '../statsService.js';
 import { addValue } from '../utils/formatCurrency.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
+import CURRENCIES from '../../../shared/config/monedas.js';
 
 // Module-level refs so only one listener per event is active at a time.
 // Each call to StatsIndicators() replaces the previous listeners with ones
@@ -11,7 +12,48 @@ let _monthHandler = null;
 let _dataChangedHandler = null;
 const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted'];
 
-export default function StatsIndicators({ mes } = {}) {
+function asGlobalItems(byCurrency = {}) {
+  return CURRENCIES.map((currency) => ({
+    currency,
+    value: new Intl.NumberFormat('es-AR').format(Number(byCurrency[currency] || 0))
+  }));
+}
+
+function createGlobalSummary(summary) {
+  const global = summary?.globalPending || {};
+  const hasAnyUnpaid = Boolean(global.hasAnyUnpaid);
+
+  const section = document.createElement('section');
+  section.className = 'mt-4';
+  section.innerHTML = `
+    <div class="d-flex flex-column gap-1 mb-2">
+      <h5 class="mb-0">Situación total</h5>
+      <small class="text-muted">Incluye todos los meses cargados.</small>
+      ${hasAnyUnpaid ? '' : '<small class="text-muted">Sin montos pendientes por pagar.</small>'}
+    </div>
+  `;
+
+  const row = document.createElement('div');
+  row.className = 'row row-cols-1 row-cols-md-3 g-3';
+
+  const globalCards = [
+    { title: 'Vencido', icon: 'bi-exclamation-triangle', color: 'danger', items: asGlobalItems(global.vencidoByCurrency) },
+    { title: 'Pendiente futuro', icon: 'bi-calendar-check', color: 'warning', items: asGlobalItems(global.futuroByCurrency) },
+    { title: 'Total por pagar', icon: 'bi-wallet2', color: 'primary', items: asGlobalItems(global.totalByCurrency) }
+  ];
+
+  for (const cardProps of globalCards) {
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.appendChild(StatsCard(cardProps));
+    row.appendChild(col);
+  }
+
+  section.appendChild(row);
+  return section;
+}
+
+export default function StatsIndicators({ mes, getSummary = getMonthlySummary, showGlobalSummary = false } = {}) {
   const container = document.createElement('div');
   container.className = 'mb-4';
   container.setAttribute('data-tour-step', 'indicadores');
@@ -25,7 +67,7 @@ export default function StatsIndicators({ mes } = {}) {
     container.appendChild(loading);
 
     try {
-      const summary = await getMonthlySummary(periodo);
+      const summary = await getSummary(periodo);
       container.innerHTML = '';
 
       const row = document.createElement('div');
@@ -46,6 +88,9 @@ export default function StatsIndicators({ mes } = {}) {
       }
 
       container.appendChild(row);
+      if (showGlobalSummary) {
+        container.appendChild(createGlobalSummary(summary));
+      }
     } catch (err) {
       container.innerHTML = '';
       const errEl = document.createElement('div');
