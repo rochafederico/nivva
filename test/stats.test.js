@@ -264,7 +264,10 @@ async function testStatsIndicatorsGlobalSummaryEmptyState() {
     await new Promise(resolve => setTimeout(resolve, 30));
 
     assert(indicators.textContent.includes('Sin montos pendientes por pagar.'), 'Debe mostrar estado vacío cuando no hay pendientes');
-    assert(indicators.textContent.includes('0'), 'Debe mostrar totales en cero de forma clara');
+    const zeroValues = [...indicators.querySelectorAll('section h6')]
+        .map((el) => el.childNodes[0]?.textContent?.trim());
+    assert(zeroValues.length === 3, 'Debe renderizar 3 valores globales en estado vacío');
+    assert(zeroValues.every((value) => value === '0'), 'Vencido, pendiente futuro y total por pagar deben mostrarse en 0');
 }
 
 export const tests = [

@@ -11,11 +11,12 @@ import CURRENCIES from '../../../shared/config/monedas.js';
 let _monthHandler = null;
 let _dataChangedHandler = null;
 const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted'];
+const NUMBER_FORMATTER = new Intl.NumberFormat('es-AR');
 
 function asGlobalItems(byCurrency = {}) {
   return CURRENCIES.map((currency) => ({
     currency,
-    value: new Intl.NumberFormat('es-AR').format(Number(byCurrency[currency] || 0))
+    value: NUMBER_FORMATTER.format(Number(byCurrency[currency] || 0))
   }));
 }
 
@@ -67,7 +68,7 @@ export default function StatsIndicators({ mes, getSummary = getMonthlySummary, s
     container.appendChild(loading);
 
     try {
-      const summary = await getSummary(periodo);
+      const summary = await getSummary(periodo, { includeGlobalPending: showGlobalSummary });
       container.innerHTML = '';
 
       const row = document.createElement('div');

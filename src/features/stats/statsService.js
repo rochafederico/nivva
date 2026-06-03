@@ -1,6 +1,8 @@
-// src/utils/stats.js
+// src/features/stats/statsService.js
 // Utilities to compute monthly financial summaries using existing repositories
 function getLocalTodayYmd() {
+  // En Nivva, vencimiento se persiste como fecha local YYYY-MM-DD.
+  // Por consistencia, las comparaciones de vencimiento deben usar calendario local.
   const now = new Date();
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, '0');
@@ -8,6 +10,10 @@ function getLocalTodayYmd() {
   return `${y}-${m}-${d}`;
 }
 
+/**
+ * Resume montos pendientes globales (todos los meses).
+ * `today` es inyectable para tests determinísticos.
+ */
 export function summarizeGlobalPending(montos = [], today = getLocalTodayYmd()) {
   const vencidoByCurrency = {};
   const futuroByCurrency = {};
@@ -40,7 +46,7 @@ export function summarizeGlobalPending(montos = [], today = getLocalTodayYmd()) 
   };
 }
 
-export async function getMonthlySummary(mes) {
+export async function getMonthlySummary(mes, { includeGlobalPending = false } = {}) {
   // mes expected as 'YYYY-MM' string. If not provided, use current month
   const periodo = mes || new Date().toISOString().slice(0, 7);
   const { sumIngresosByMonth } = await import('../ingresos/ingresoRepository.js');
@@ -48,8 +54,11 @@ export async function getMonthlySummary(mes) {
 
   const ingresos = await sumIngresosByMonth({ mes: periodo });
   const montos = await countMontosByMes({ mes: periodo });
-  const montosGlobales = await listMontos();
-  const globalPending = summarizeGlobalPending(montosGlobales);
+  let globalPending = null;
+  if (includeGlobalPending) {
+    const montosGlobales = await listMontos();
+    globalPending = summarizeGlobalPending(montosGlobales);
+  }
 
   // Totales por moneda (desglose)
   const monedas = new Set([
