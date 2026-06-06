@@ -12,6 +12,7 @@ import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
 import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
+import { promptCuotaMigrationIfNeeded } from './features/migrations/components/CuotaMigrationModal.js';
 
 function shouldRegisterServiceWorker() {
     const { protocol, hostname } = window.location;
@@ -69,6 +70,9 @@ document.body.appendChild(FeedbackFabComponent());
 // Initialize the IndexedDB and only after DB is ready render the initial route
 initDB().then(async (db) => {
     window.db = db;
+
+    // Bloquear el uso de la app hasta migrar datos locales del formato anterior.
+    await promptCuotaMigrationIfNeeded(db);
 
     // Inicialización de rutas después que DB esté lista
     renderRoute(window.location.pathname);

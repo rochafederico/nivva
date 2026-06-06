@@ -135,6 +135,51 @@ async function testImportarDatosCompletos() {
     await cleanupAll();
 }
 
+
+// ===================================================================
+// UC1b: Importar backups anteriores con montos/monto
+// Flujo: usuario importa una copia vieja. La app debe aceptar la estructura
+// anterior, persistir en cuotas y no propagar campos legacy.
+// ===================================================================
+async function testImportarBackupLegacyMontos() {
+    console.log('  UC1b: Importar backup anterior con montos/monto');
+    await cleanupAll();
+
+    const modal = document.createElement('import-data-modal');
+    document.body.appendChild(modal);
+    modal.importData = {
+        deudas: [{
+            acreedor: 'Banco Legacy',
+            tipoDeuda: 'Prestamo',
+            notas: '',
+            montos: [
+                { monto: 33000, moneda: 'ARS', vencimiento: '2026-04-10', periodo: '2026-04', pagado: false }
+            ]
+        }],
+        ingresos: [
+            { descripcion: 'Ingreso legacy', monto: 250000, moneda: 'ARS', fecha: '2026-04-01' }
+        ],
+        inversiones: []
+    };
+
+    await modal.importDataToDb();
+    await new Promise(r => setTimeout(r, 100));
+
+    const deudas = await listDeudas();
+    assert(deudas.length === 1, 'Legacy import: 1 deuda en DB');
+    assert(deudas[0].cuotas.length === 1, 'Legacy import: 1 cuota en la deuda');
+    assert(deudas[0].cuotas[0].cuota === 33000, 'Legacy import: valor migrado a cuota');
+    assert(!Object.prototype.hasOwnProperty.call(deudas[0].cuotas[0], 'monto'), 'Legacy import: no persiste el campo anterior en cuotas');
+
+    const ingresos = await getAllIngresos();
+    const ingreso = ingresos.find(i => i.descripcion === 'Ingreso legacy');
+    assert(ingreso?.cuota === 250000, 'Legacy import: ingreso migrado a cuota');
+    assert(!Object.prototype.hasOwnProperty.call(ingreso, 'monto'), 'Legacy import: no persiste el campo anterior en ingresos');
+
+    document.body.removeChild(modal);
+    await cleanupAll();
+}
+
 // ===================================================================
 // UC2: Importar backup sin inversiones (retrocompatibilidad)
 // Flujo: usuario importa un backup viejo que solo tiene deudas e
@@ -520,6 +565,7 @@ async function testDataImportedRefreshesStatsIndicators() {
 
 export const tests = [
     testImportarDatosCompletos,
+    testImportarBackupLegacyMontos,
     testImportarSinInversiones,
     testExportarDatosCompletos,
     testRoundTripExportImport,

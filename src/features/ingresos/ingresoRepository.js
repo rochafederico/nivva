@@ -2,6 +2,7 @@
 import { getDB } from '../../shared/database/initDB.js';
 import { INGRESOS_STORE } from '../../shared/database/schema.js';
 import { IngresoEntity } from './IngresoEntity.js';
+import { getCuotaValue, normalizeIngresoRecord } from '../../shared/database/cuotaCompatibility.js';
 
 function _getIngresosStore(mode = 'readonly') {
     const db = getDB();
@@ -27,11 +28,14 @@ export function addIngreso(ingresoModel) {
 
 export function listIngresos({ mes } = {}) {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
-        const resolveRows = (rows) => resolve(mes ? rows.filter(row => row.periodo === mes) : rows);
+        const resolveRows = (rows) => {
+            const normalized = (rows || []).map(normalizeIngresoRecord);
+            resolve(mes ? normalized.filter(row => row.periodo === mes) : normalized);
+        };
         try {
             const index = store.index('by_periodo');
             const req = mes ? index.getAll(mes) : index.getAll();
-            req.onsuccess = () => resolve(req.result);
+            req.onsuccess = () => resolve((req.result || []).map(normalizeIngresoRecord));
             req.onerror = (e) => reject(new Error('Error listing ingresos: ' + e.target.errorCode));
         } catch (err) {
             // Fallback: no índice
@@ -45,7 +49,7 @@ export function listIngresos({ mes } = {}) {
 export function getAll() {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
         const req = store.getAll();
-        req.onsuccess = () => resolve(req.result);
+        req.onsuccess = () => resolve((req.result || []).map(normalizeIngresoRecord));
         req.onerror = (e) => reject(new Error('Error getting all ingresos: ' + e.target.errorCode));
     });
 }
@@ -71,7 +75,7 @@ export function sumIngresosByMonth({ mes } = {}) {
             const rows = mes ? (request.result || []).filter(row => row.periodo === mes) : (request.result || []);
             const totals = {};
             rows.forEach(r => {
-                totals[r.moneda] = (totals[r.moneda] || 0) + (Number(r.cuota) || 0);
+                totals[r.moneda] = (totals[r.moneda] || 0) + (Number(getCuotaValue(r)) || 0);
             });
             resolve(totals);
         };

@@ -1,5 +1,6 @@
 // src/models/DeudaModel.js
 import { CuotaModel } from '../cuotas/CuotaModel.js';
+import { getLegacyOrCurrentCuotas } from '../../shared/database/cuotaCompatibility.js';
 
 export class DeudaModel {
     /**
@@ -10,12 +11,12 @@ export class DeudaModel {
      * @param {string} [params.notas]
      * @param {Array<Object>|CuotaModel[]} [params.cuotas]
      */
-    constructor({ id, acreedor, tipoDeuda, notas = '', cuotas = [] }) {
+    constructor({ id, acreedor, tipoDeuda, notas = '', cuotas = [], montos = undefined }) {
         this.id = id;
         this.acreedor = acreedor;
         this.tipoDeuda = tipoDeuda;
         this.notas = notas;
         // Asegura que todos las cuotas sean instancias de CuotaModel
-        this.cuotas = cuotas.map(m => m instanceof CuotaModel ? m : new CuotaModel(m));
+        this.cuotas = getLegacyOrCurrentCuotas({ cuotas, montos }).map(m => m instanceof CuotaModel ? m : new CuotaModel(m));
     }
 }

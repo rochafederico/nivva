@@ -9,6 +9,7 @@ import { tests as cuotasTests } from './cuotas.test.js';
 import { tests as ingresosTests } from './ingresos.test.js';
 import { tests as inversionesTests } from './inversiones.test.js';
 import { tests as importExportTests } from './import-export.test.js';
+import { tests as cuotaCompatibilityTests } from './cuota-compatibility.test.js';
 import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
 import { tests as notificationsTests } from './notifications.test.js';
@@ -24,6 +25,9 @@ async function run() {
     try {
         await initDB();
         console.log('DB initialized (happy-dom + fake-indexeddb)\n');
+
+        console.log('--- Compatibilidad cuotas ---');
+        for (const test of cuotaCompatibilityTests) { await test(); }
 
         console.log('--- Deudas ---');
         for (const test of deudasTests) { await test(); }

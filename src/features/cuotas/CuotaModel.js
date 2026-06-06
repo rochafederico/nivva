@@ -1,4 +1,6 @@
 // CuotaModel.js
+import { getCuotaValue } from '../../shared/database/cuotaCompatibility.js';
+
 export class CuotaModel {
     /**
      * @param {Object} params
@@ -9,9 +11,9 @@ export class CuotaModel {
      * @param {string} [params.periodo]
      * @param {number} [params.deudaId]
      */
-    constructor({ id, cuota, moneda, vencimiento, periodo, deudaId, pagado = false }) {
+    constructor({ id, cuota, monto, moneda, vencimiento, periodo, deudaId, pagado = false }) {
         this.id = id;
-        this.cuota = Number(cuota);
+        this.cuota = Number(getCuotaValue({ cuota, monto }));
         this.moneda = moneda || 'ARS';
         this.vencimiento = vencimiento;
         this.periodo = periodo || (vencimiento ? vencimiento.slice(0, 7) : '');

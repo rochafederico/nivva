@@ -4,6 +4,7 @@ import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppSpinner.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { CuotaModel } from '../../cuotas/CuotaModel.js';
+import { getLegacyOrCurrentCuotas, getCuotaValue, normalizeIngresoRecord } from '../../../shared/database/cuotaCompatibility.js';
 import {
     trackEvent,
     trackFlowStart,
@@ -134,7 +135,7 @@ export class ImportDataModal extends HTMLElement {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
         const inversiones = data.inversiones || (data.data && data.data.inversiones) || [];
-        const totalCuotas = deudas.reduce((sum, d) => sum + (d.cuotas?.length || 0), 0);
+        const totalCuotas = deudas.reduce((sum, d) => sum + getLegacyOrCurrentCuotas(d).length, 0);
 
         const renderCompactList = (items, renderItem) => {
             if (!items.length) return '<span class="text-muted small">Ninguno</span>';
@@ -198,8 +199,8 @@ export class ImportDataModal extends HTMLElement {
             for (const deudaData of deudas) {
                 try {
                     // Crear instancia de DeudaModel sin ID para que se genere uno nuevo
-                    const cuotas = (deudaData.cuotas || []).map(m => new CuotaModel({
-                        cuota: m.cuota,
+                    const cuotas = getLegacyOrCurrentCuotas(deudaData).map(m => new CuotaModel({
+                        cuota: getCuotaValue(m),
                         moneda: m.moneda || 'ARS',
                         vencimiento: m.vencimiento,
                         periodo: m.periodo,
@@ -228,7 +229,7 @@ export class ImportDataModal extends HTMLElement {
                 this.#showLoading('Importando ingresos...');
                 for (const ingreso of ingresos) {
                     try {
-                        await addIngreso(ingreso);
+                        await addIngreso(normalizeIngresoRecord(ingreso));
                         ingresosImported++;
                     } catch (error) {
                         console.error('Error al importar ingreso:', ingreso, error);
@@ -347,6 +348,7 @@ export class ImportDataModal extends HTMLElement {
                             <li>Agregá datos sin borrar los existentes.</li>
                             <li>Fusión automática: mismo Acreedor + Tipo de Deuda → las cuotas se agrupan.</li>
                             <li>Duplicados ignorados si coinciden cuota, moneda y periodo.</li>
+                            <li>Compatible con backups anteriores que todavía usen el campo legacy.</li>
                         </ul>
                     </div>
                     

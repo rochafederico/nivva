@@ -8,6 +8,7 @@ import { DeudaEntity } from './DeudaEntity.js';
 import { CuotaEntity } from '../cuotas/CuotaEntity.js';
 import { mergeDeudaUseCase } from './use-cases/mergeDeudaUseCase.js';
 import { syncCuotasUseCase } from './use-cases/syncCuotasUseCase.js';
+import { getCuotaValue, normalizeCuotaRecord } from '../../shared/database/cuotaCompatibility.js';
 
 function getIDBErrorDetail(event) {
     return event?.target?.error?.message || event?.target?.errorCode || 'unknown';
@@ -54,7 +55,7 @@ export function addDeuda(deudaModel) {
                 deudaModel.cuotas.forEach(cuota => {
                     const cuotaEntity = new CuotaEntity({
                         deudaId,
-                        cuota: cuota.cuota,
+                        cuota: getCuotaValue(cuota),
                         moneda: cuota.moneda,
                         vencimiento: cuota.vencimiento,
                         periodo: cuota.periodo,
@@ -179,7 +180,7 @@ export function getDeuda(id) {
             const index = cuotasStore.index('by_deudaId');
             const cuotasRequest = index.getAll(id);
             cuotasRequest.onsuccess = () => {
-                deuda.cuotas = cuotasRequest.result;
+                deuda.cuotas = (cuotasRequest.result || []).map(normalizeCuotaRecord);
                 resolve(deuda);
             };
                 cuotasRequest.onerror = (event) => {
@@ -205,7 +206,8 @@ export function listDeudas() {
             cuotasRequest.onsuccess = () => {
                 const cuotas = cuotasRequest.result;
                 const cuotasPorDeuda = {};
-                cuotas.forEach(m => {
+                cuotas.forEach(rawCuota => {
+                    const m = normalizeCuotaRecord(rawCuota);
                     if (!cuotasPorDeuda[m.deudaId]) cuotasPorDeuda[m.deudaId] = [];
                     cuotasPorDeuda[m.deudaId].push(m);
                 });

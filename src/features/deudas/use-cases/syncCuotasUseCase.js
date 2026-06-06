@@ -1,4 +1,5 @@
 import { CuotaEntity } from '../../cuotas/CuotaEntity.js';
+import { getCuotaValue } from '../../../shared/database/cuotaCompatibility.js';
 
 /**
  * Sincroniza cuotas usando un objectStore que pertenece a una transacción
@@ -47,7 +48,7 @@ export function syncCuotasUseCase({ cuotasStore, deudaId, cuotas }) {
             nuevosCuotas.forEach(cuota => {
                 const cuotaEntity = new CuotaEntity({
                     deudaId,
-                    cuota: cuota.cuota,
+                    cuota: getCuotaValue(cuota),
                     moneda: cuota.moneda,
                     vencimiento: cuota.vencimiento,
                     periodo: cuota.periodo,

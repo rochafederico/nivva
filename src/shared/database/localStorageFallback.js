@@ -229,7 +229,10 @@ class FakeTransaction {
 export class FakeIDB {
     constructor() {
         this._stores = {};
-        ['deudas', 'cuotas', 'ingresos', 'inversiones'].forEach(n => {
+        this.objectStoreNames = {
+            contains: (name) => Object.prototype.hasOwnProperty.call(this._stores, name)
+        };
+        ['deudas', 'cuotas', 'montos', 'ingresos', 'inversiones'].forEach(n => {
             this._stores[n] = new FakeObjectStore(n);
         });
     }

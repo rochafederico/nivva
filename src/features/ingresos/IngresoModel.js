@@ -1,4 +1,6 @@
 // src/models/IngresoModel.js
+import { getCuotaValue } from '../../shared/database/cuotaCompatibility.js';
+
 export class IngresoModel {
     /**
      * @param {Object} params
@@ -9,11 +11,11 @@ export class IngresoModel {
      * @param {string} params.moneda
      * @param {string} [params.periodo] // yyyy-mm
      */
-    constructor({ id, fecha, descripcion, cuota, moneda = 'ARS', periodo } = {}) {
+    constructor({ id, fecha, descripcion, cuota, monto, moneda = 'ARS', periodo } = {}) {
         this.id = id;
         this.fecha = fecha;
         this.descripcion = descripcion || '';
-        this.cuota = Number(cuota) || 0;
+        this.cuota = Number(getCuotaValue({ cuota, monto })) || 0;
         this.moneda = moneda || 'ARS';
         this.periodo = periodo || (fecha ? fecha.slice(0, 7) : '');
     }

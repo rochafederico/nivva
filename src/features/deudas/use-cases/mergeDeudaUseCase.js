@@ -1,12 +1,13 @@
 import { DEUDAS_STORE, CUOTAS_STORE } from '../../../shared/database/schema.js';
+import { getCuotaValue, normalizeCuotaRecord } from '../../../shared/database/cuotaCompatibility.js';
 
 function normalizeText(value) {
     return (value || '').toString().trim().toLowerCase();
 }
 
 function cuotaEqual(a, b) {
-    const ma = Number(a.cuota);
-    const mb = Number(b.cuota);
+    const ma = Number(getCuotaValue(a));
+    const mb = Number(getCuotaValue(b));
     if (ma !== mb) return false;
     if ((a.moneda || 'ARS') !== (b.moneda || 'ARS')) return false;
 
@@ -19,7 +20,7 @@ function cuotaEqual(a, b) {
 
 function toMergeCuota(cuota) {
     return {
-        cuota: cuota.cuota,
+        cuota: getCuotaValue(cuota),
         moneda: cuota.moneda,
         vencimiento: cuota.vencimiento,
         periodo: cuota.periodo,
@@ -51,7 +52,7 @@ export function mergeDeudaUseCase({ db, deudaModel, addDeuda, updateDeuda }) {
             const index = cuotasStore.index('by_deudaId');
             const getCuotasReq = index.getAll(existing.id);
             getCuotasReq.onsuccess = () => {
-                const cuotasActuales = getCuotasReq.result || [];
+                const cuotasActuales = (getCuotasReq.result || []).map(normalizeCuotaRecord);
                 const incoming = deudaModel.cuotas || [];
                 const nuevosCuotas = incoming.filter(inc => !cuotasActuales.some(actual => cuotaEqual(actual, inc)));
                 const unionCuotas = cuotasActuales.concat(nuevosCuotas.map(toMergeCuota));

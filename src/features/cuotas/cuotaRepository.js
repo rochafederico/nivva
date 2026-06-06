@@ -4,6 +4,7 @@ import { getDB } from '../../shared/database/initDB.js';
 import { CUOTAS_STORE } from '../../shared/database/schema.js';
 import { CuotaEntity } from './CuotaEntity.js';
 import { trackEvent, trackFlowError } from '../../shared/observability/index.js';
+import { getCuotaValue, normalizeCuotaRecord } from '../../shared/database/cuotaCompatibility.js';
 
 function _getCuotasStore(mode = 'readonly') {
     const db = getDB();
@@ -47,7 +48,7 @@ export function deleteCuota(id) {
 export function getCuota(id) {
     return _withCuotasStore('readonly', (cuotasStore, resolve, reject) => {
         const request = cuotasStore.get(id);
-        request.onsuccess = () => resolve(request.result);
+        request.onsuccess = () => resolve(request.result ? normalizeCuotaRecord(request.result) : undefined);
         request.onerror = (event) => reject(new Error('Error getting cuota: ' + event.target.errorCode));
     });
 }
@@ -57,7 +58,7 @@ export function listCuotas({ mes } = {}) {
         const index = cuotasStore.index('by_periodo');
         const request = mes ? index.getAll(mes):index.getAll();
         request.onsuccess = () => {
-            resolve(request.result);
+            resolve((request.result || []).map(normalizeCuotaRecord));
         };
         request.onerror = (event) => reject(new Error('Error listing cuotas: ' + event.target.errorCode));
     });
@@ -82,10 +83,10 @@ export function setPagado(id, pagado) {
                         cuotaId: id,
                         deudaId: cuota.deudaId,
                         moneda: cuota.moneda,
-                        amount: cuota.cuota
+                        amount: getCuotaValue(cuota)
                     });
                 }
-                resolve(cuota);
+                resolve(normalizeCuotaRecord(cuota));
             };
             putRequest.onerror = (event) => {
                 trackFlowError('payment', { cuotaId: id, reason: 'update_failed' });
@@ -110,9 +111,9 @@ export function countCuotasByMes({ mes } = {}) {
             const totalesPagados = {};
             cuotas.forEach(row => {
                 if (row.pagado) {
-                    totalesPagados[row.moneda] = (totalesPagados[row.moneda] || 0) + (Number(row.cuota) || 0);
+                    totalesPagados[row.moneda] = (totalesPagados[row.moneda] || 0) + (Number(getCuotaValue(row)) || 0);
                 } else {
-                    totalesPendientes[row.moneda] = (totalesPendientes[row.moneda] || 0) + (Number(row.cuota) || 0);
+                    totalesPendientes[row.moneda] = (totalesPendientes[row.moneda] || 0) + (Number(getCuotaValue(row)) || 0);
                 }
             });
             resolve({ totalesPendientes, totalesPagados });
