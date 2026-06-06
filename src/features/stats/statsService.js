@@ -45,3 +45,54 @@ export async function getMonthlySummary(mes) {
     }
   };
 }
+
+function addAmount(target, currency, amount) {
+  target[currency] = (target[currency] || 0) + (Number(amount) || 0);
+}
+
+function isOverduePayment(payment, todayISO) {
+  const dueDate = typeof payment.vencimiento === 'string' ? payment.vencimiento.slice(0, 10) : '';
+  return Boolean(dueDate && dueDate < todayISO);
+}
+
+export function summarizeGlobalPayments(montos = [], todayISO = new Date().toISOString().slice(0, 10)) {
+  const totalDue = {};
+  const overdue = {};
+  const upcoming = {};
+  const counts = {
+    totalDue: 0,
+    overdue: 0,
+    upcoming: 0
+  };
+
+  (montos || []).forEach((payment) => {
+    if (!payment || payment.pagado) return;
+
+    counts.totalDue += 1;
+    addAmount(totalDue, payment.moneda, payment.monto);
+
+    if (isOverduePayment(payment, todayISO)) {
+      counts.overdue += 1;
+      addAmount(overdue, payment.moneda, payment.monto);
+      return;
+    }
+
+    counts.upcoming += 1;
+    addAmount(upcoming, payment.moneda, payment.monto);
+  });
+
+  return {
+    byCurrency: {
+      totalDue,
+      overdue,
+      upcoming
+    },
+    counts
+  };
+}
+
+export async function getGlobalPaymentSummary() {
+  const { listMontos } = await import('../montos/montoRepository.js');
+  const montos = await listMontos();
+  return summarizeGlobalPayments(montos);
+}

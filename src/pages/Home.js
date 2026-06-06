@@ -9,7 +9,7 @@ export default function Home() {
 
   import('../features/stats/components/StatsIndicators.js')
     .then(({ default: StatsIndicators }) => {
-      statsSlot.appendChild(StatsIndicators());
+      statsSlot.appendChild(StatsIndicators({ showGlobalSummary: true }));
     })
     .catch(() => {
       statsSlot.innerHTML = '<p class="text-muted small">No se pudieron cargar los indicadores.</p>';

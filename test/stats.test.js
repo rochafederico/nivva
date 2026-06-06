@@ -4,6 +4,7 @@ import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
 import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
 import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
+import { summarizeGlobalPayments } from '../src/features/stats/statsService.js';
 
 // ===================================================================
 // UC1: StatsCard renders with correct Bootstrap classes
@@ -177,6 +178,58 @@ async function testStatsIndicatorsCardOrder() {
     );
 }
 
+
+// ===================================================================
+// UC13: summarizeGlobalPayments separates overdue, upcoming, and total
+// ===================================================================
+async function testSummarizeGlobalPaymentsBucketsAndCounts() {
+    console.log('  UC13: summarizeGlobalPayments separa vencidos, próximos y total');
+
+    const summary = summarizeGlobalPayments([
+        { monto: 1000, moneda: 'ARS', vencimiento: '2026-01-10', pagado: false },
+        { monto: 2000, moneda: 'ARS', vencimiento: '2026-07-10', pagado: false },
+        { monto: 50, moneda: 'USD', vencimiento: '2026-08-01', pagado: false },
+        { monto: 9999, moneda: 'ARS', vencimiento: '2026-01-01', pagado: true }
+    ], '2026-06-06');
+
+    assert(summary.byCurrency.overdue.ARS === 1000, 'vencido debe sumar solo pagos impagos anteriores a hoy');
+    assert(summary.byCurrency.upcoming.ARS === 2000, 'próximos debe sumar pagos impagos no vencidos en ARS');
+    assert(summary.byCurrency.upcoming.USD === 50, 'próximos debe sumar pagos impagos no vencidos en USD');
+    assert(summary.byCurrency.totalDue.ARS === 3000, 'total por pagar debe consolidar vencidos y próximos');
+    assert(summary.counts.overdue === 1, 'debe contar 1 vencido');
+    assert(summary.counts.upcoming === 2, 'debe contar 2 próximos');
+    assert(summary.counts.totalDue === 3, 'debe contar 3 pagos pendientes');
+}
+
+// ===================================================================
+// UC14: StatsIndicators global summary is opt-in and visually separated
+// ===================================================================
+async function testStatsIndicatorsGlobalSummaryOptIn() {
+    console.log('  UC14: StatsIndicators muestra resumen global solo si showGlobalSummary=true');
+
+    const withoutGlobal = StatsIndicators({ mes: '2030-01' });
+    await new Promise(resolve => setTimeout(resolve, 50));
+    assert(!withoutGlobal.textContent.includes('Situación total'), 'sin showGlobalSummary no debe mostrar situación total');
+
+    const withGlobal = StatsIndicators({ mes: '2030-01', showGlobalSummary: true });
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    assert(withGlobal.textContent.includes('Situación total'), 'con showGlobalSummary debe mostrar situación total');
+    assert(withGlobal.textContent.includes('Resumen global de todos los períodos'), 'copy debe aclarar que incluye todos los períodos');
+    assert(withGlobal.textContent.includes('Vencido'), 'resumen global debe priorizar vencido');
+    assert(withGlobal.textContent.includes('Próximos a pagar'), 'resumen global debe priorizar próximos a pagar');
+    assert(withGlobal.textContent.includes('Total por pagar'), 'resumen global debe mantener total por pagar');
+
+    const globalSection = withGlobal.querySelector('section[aria-labelledby="global-summary-title"]');
+    assert(globalSection !== null, 'resumen global debe renderizarse como sección separada');
+    assert(globalSection.classList.contains('bg-body-tertiary'), 'resumen global debe tener contenedor visual separado y liviano');
+
+    const totalCard = [...globalSection.querySelectorAll('.card')].find(card => card.textContent.includes('Total por pagar'));
+    assert(totalCard !== undefined, 'debe existir la tarjeta Total por pagar');
+    assert(totalCard.classList.contains('border-secondary-subtle'), 'Total por pagar debe usar estilo neutro');
+    assert(!totalCard.classList.contains('border-success'), 'Total por pagar no debe usar color positivo');
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
     testStatsCardItemClasses,
@@ -190,4 +243,6 @@ export const tests = [
     testCompactFormatSmall,
     testCompactFormatNull,
     testStatsIndicatorsCardOrder,
+    testSummarizeGlobalPaymentsBucketsAndCounts,
+    testStatsIndicatorsGlobalSummaryOptIn,
 ];
