@@ -41,7 +41,7 @@ Todo mensaje visible al usuario debe tener como mínimo:
 | `✅ Ingreso guardado.` | `✅ El ingreso fue registrado de manera correcta.` |
 | `✅ Datos exportados. El archivo se descargó.` | `✅ Exportación exitosa. El archivo se descargó.` (ok, pero leve redundancia) |
 | `✅ Importación exitosa: 5 egresos, 2 ingresos.` | `✅ Se importaron todos tus datos correctamente.` |
-| `✅ Monto marcado como pagado.` | `✅ OK` |
+| `✅ Cuota marcado como pagado.` | `✅ OK` |
 
 ---
 
@@ -86,7 +86,7 @@ Todo mensaje visible al usuario debe tener como mínimo:
 | ✅ Do | ❌ Don't |
 |---|---|
 | `Vas a eliminar todos tus egresos, ingresos e inversiones. Esta acción no se puede deshacer. ¿Continuás?` | `¿Estás seguro de que deseas eliminar todos los datos?` |
-| `Vas a eliminar este egreso y todos sus montos. No se puede recuperar.` | `¿Seguro que querés borrar esto?` |
+| `Vas a eliminar este egreso y todos sus cuotas. No se puede recuperar.` | `¿Seguro que querés borrar esto?` |
 
 ---
 
@@ -155,8 +155,8 @@ Todo mensaje visible al usuario debe tener como mínimo:
 | ✅ Do | ❌ Don't |
 |---|---|
 | `El campo Acreedor es obligatorio.` | `Este campo es requerido.` |
-| `Debe agregar al menos un monto antes de guardar.` | `Error en montos.` |
-| `Ingresá un monto mayor a 0.` | `Monto inválido.` |
+| `Debe agregar al menos una cuota antes de guardar.` | `Error en cuotas.` |
+| `Ingresá una cuota mayor a 0.` | `Cuota inválida.` |
 | `Seleccioná una moneda.` | `Campo requerido.` |
 
 ---

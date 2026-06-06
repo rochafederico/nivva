@@ -14,7 +14,7 @@ export default function createIngresoList(mes = new Date().toISOString().slice(0
         table.columns = [
             { key: 'fecha', label: 'Fecha', format: v => new Date(v).toLocaleDateString() },
             { key: 'descripcion', label: 'Descripción' },
-            { key: 'monto', label: 'Monto', align: 'right', render: (v, row) => {
+            { key: 'cuota', label: 'Cuota', align: 'right', render: (v, row) => {
                 return formatMoneda(row.moneda, v);
             } },
             { key: 'moneda', label: 'Moneda' }

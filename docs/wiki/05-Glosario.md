@@ -10,19 +10,19 @@
 | Término aprobado | Sinónimos prohibidos | Definición operativa | Ejemplo de uso en UI |
 |---|---|---|---|
 | **Egreso** | Deuda, gasto fijo, compromiso, obligación | Pago periódico o único que la persona debe realizar (alquiler, tarjeta, préstamo, servicio) | "Agregá un egreso" / "Egresos del mes" |
-| **Monto** | Cuota, importe, valor, plata, precio | Cifra numérica de un pago dentro de un egreso, asociada a moneda, vencimiento y período | "Monto: $15.000 ARS" / "Agregar monto" |
+| **Cuota** | Cuota, importe, valor, plata, precio | Cifra numérica de un pago dentro de un egreso, asociada a moneda, vencimiento y período | "Cuota: $15.000 ARS" / "Agregar cuota" |
 | **Acreedor** | A quién le debo, prestamista, empresa | Entidad o persona a la que se le debe el pago del egreso | "Acreedor: Banco Galicia" |
 | **Tipo de deuda** | Categoría, tipo, clase | Clasificación libre del egreso (ej: tarjeta, alquiler, préstamo, servicio) | "Tipo de deuda: Tarjeta de crédito" |
 | **Ingreso** | Sueldo, entrada, plata que entra | Dinero recibido en un período (sueldo, honorarios, renta, etc.) | "Agregar ingreso" / "Ingresos del mes" |
 | **Inversión** | Activo, ahorro invertido, capital | Dinero colocado en un instrumento financiero con historial de valores | "Agregar inversión" / "Seguimiento de inversiones" |
-| **Moneda** | Divisa, currency, tipo de cambio | Unidad monetaria del monto (ARS, USD, etc.) | "Moneda: ARS" |
-| **Vencimiento** | Fecha límite, due date, fecha de pago | Fecha en la que el monto debe pagarse | "Vencimiento: 10/05/2026" |
-| **Período** | Mes, periodo, ciclo | Mes al que corresponde el monto (formato YYYY-MM) | "Período: 2026-04" |
+| **Moneda** | Divisa, currency, tipo de cambio | Unidad monetaria dla cuota (ARS, USD, etc.) | "Moneda: ARS" |
+| **Vencimiento** | Fecha límite, due date, fecha de pago | Fecha en la que la cuota debe pagarse | "Vencimiento: 10/05/2026" |
+| **Período** | Mes, periodo, ciclo | Mes al que corresponde la cuota (formato YYYY-MM) | "Período: 2026-04" |
 | **Copia de seguridad** | backup, respaldo, archivo de exportación | Archivo .json que contiene todos los datos de la app para restaurar | "Hacé una copia de seguridad desde Ajustes." |
 | **Ajustes** | Configuración, settings, opciones | Menú con acciones administrativas (exportar, importar, eliminar datos) | "Desde Ajustes podés exportar tus datos." |
 | **Balance** | Saldo, diferencia, resultado | Diferencia entre ingresos y egresos del mes | "Balance: +$5.000 ARS" |
-| **Pendientes** | Por pagar, a cobrar, impagos | Montos no marcados como pagados en el período | "Pendientes: $30.000 ARS" |
-| **Valor inicial** | Precio de compra, costo, valor de entrada | Monto con el que se registra una inversión al darla de alta | "Valor inicial: USD 100" |
+| **Pendientes** | Por pagar, a cobrar, impagos | Cuotas no marcados como pagados en el período | "Pendientes: $30.000 ARS" |
+| **Valor inicial** | Precio de compra, costo, valor de entrada | Cuota con el que se registra una inversión al darla de alta | "Valor inicial: USD 100" |
 | **Fecha de compra** | Fecha inicial, fecha de entrada | Fecha en la que se registra o adquirió la inversión | "Fecha de compra: 01/01/2026" |
 
 ---
@@ -63,15 +63,15 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 - En contextos educativos o de onboarding, podemos usar "compromiso financiero" como alternativa más neutral.
 - El repo se llama internamente "deudas-app" — esto es un nombre técnico, no de UI.
 
-### Monto vs. Cuota
-- **"Monto"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
-- **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de monto en todos los contextos.
+### Cuota vs. Cuota
+- **"Cuota"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
+- **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de cuota en todos los contextos.
 
 ### Plata / Dinero
 
 - Las palabras **"plata"** y **"dinero"** están prohibidas en toda la UI y el contenido de marca.
 - Nivva **no gestiona dinero** — gestiona **números que el usuario ingresa**. La app solo registra y visualiza; no interpreta si son fondos, deudas o activos reales.
-- En la UI, una cifra numérica es siempre un **"monto"** (nunca "plata" ni "dinero").
+- En la UI, una cifra numérica es siempre un **"cuota"** (nunca "plata" ni "dinero").
 - En copy de redes, onboarding y documentación de cara al usuario: usar **"números"**, **"registros"** o **"compromisos"** en lugar de cualquier equivalente monetario coloquial.
 - Nota: en este glosario "plata" y "dinero" aparecen únicamente en la columna **"Sinónimos prohibidos"** — su presencia ahí es intencional y documenta exactamente qué términos hay que evitar.
 
@@ -85,7 +85,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ## ✅ Checklist QA — 05-Glosario
 
 - [x] Cada término tiene: término aprobado, sinónimos prohibidos, definición, ejemplo de uso
-- [x] Cubre: Egreso, Monto, Acreedor, Tipo de deuda, Ingreso, Inversión, Moneda, Vencimiento, Período
+- [x] Cubre: Egreso, Cuota, Acreedor, Tipo de deuda, Ingreso, Inversión, Moneda, Vencimiento, Período
 - [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes
 - [x] Sección de términos técnicos internos que no deben exponerse al usuario
 - [x] Regla de anglicismos con decisión por término

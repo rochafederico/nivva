@@ -40,9 +40,9 @@ export class DebtDetailModal extends HTMLElement {
 
     _calcTotalesPendientes() {
         const totales = {};
-        (this.deuda?.montos || []).forEach(m => {
+        (this.deuda?.cuotas || []).forEach(m => {
             if (!m.pagado) {
-                totales[m.moneda] = (totales[m.moneda] || 0) + (Number(m.monto) || 0);
+                totales[m.moneda] = (totales[m.moneda] || 0) + (Number(m.cuota) || 0);
             }
         });
         return totales;
@@ -50,7 +50,7 @@ export class DebtDetailModal extends HTMLElement {
 
     _nextVencimiento() {
         const today = new Date().toISOString().slice(0, 10);
-        const pendientes = (this.deuda?.montos || [])
+        const pendientes = (this.deuda?.cuotas || [])
             .filter(m => !m.pagado && m.vencimiento >= today)
             .sort((a, b) => a.vencimiento.localeCompare(b.vencimiento));
         return pendientes[0]?.vencimiento || '—';
@@ -60,13 +60,13 @@ export class DebtDetailModal extends HTMLElement {
         this.ui.clearBody();
         if (!this.deuda) return;
 
-        const montos = this.deuda.montos || [];
+        const cuotas = this.deuda.cuotas || [];
         const totales = this._calcTotalesPendientes();
         const nextVenc = this._nextVencimiento();
 
         // Total amount — visually prominent at top
         const totalesStr = Object.entries(totales)
-            .map(([moneda, monto]) => formatMoneda(monto, moneda))
+            .map(([moneda, cuota]) => formatMoneda(cuota, moneda))
             .join(' / ') || '—';
 
         const headerSection = el('div', {
@@ -91,7 +91,7 @@ export class DebtDetailModal extends HTMLElement {
             ]
         });
 
-        const monedas = [...new Set(montos.map(m => m.moneda))].join(', ') || '—';
+        const monedas = [...new Set(cuotas.map(m => m.moneda))].join(', ') || '—';
 
         const infoSection = el('div', {
             className: 'mb-4',
@@ -104,8 +104,8 @@ export class DebtDetailModal extends HTMLElement {
             ]
         });
 
-        // Montos section — priority visual section
-        const montosSection = this._renderMontosSection(montos);
+        // Cuotas section — priority visual section
+        const cuotasSection = this._renderCuotasSection(cuotas);
 
         const closeButton = el('button', {
             className: 'btn btn-secondary',
@@ -130,7 +130,7 @@ export class DebtDetailModal extends HTMLElement {
             children: [
                 headerSection,
                 infoSection,
-                montosSection,
+                cuotasSection,
                 el('div', {
                     className: 'd-flex justify-content-end gap-2 mt-3',
                     children: actions
@@ -140,22 +140,22 @@ export class DebtDetailModal extends HTMLElement {
         this.ui.appendChild(content);
     }
 
-    _renderMontosSection(montos) {
+    _renderCuotasSection(cuotas) {
         const thead = el('thead', {
             children: [el('tr', {
                 children: [
-                    el('th', { text: 'Monto' }),
+                    el('th', { text: 'Cuota' }),
                     el('th', { text: 'Moneda' }),
                     el('th', { text: 'Vencimiento' })
                 ]
             })]
         });
 
-        const tbody = el('tbody', { attrs: { id: 'detail-montos-tbody' } });
-        montos
+        const tbody = el('tbody', { attrs: { id: 'detail-cuotas-tbody' } });
+        cuotas
             .slice()
             .sort((a, b) => (a.vencimiento || '').localeCompare(b.vencimiento || ''))
-            .forEach(monto => tbody.appendChild(this._renderMontoRow(monto)));
+            .forEach(cuota => tbody.appendChild(this._renderCuotaRow(cuota)));
 
         const table = el('table', {
             className: 'table table-sm w-100',
@@ -164,7 +164,7 @@ export class DebtDetailModal extends HTMLElement {
 
         return el('div', {
             children: [
-                el('strong', { className: 'mb-2 d-block', text: 'Montos' }),
+                el('strong', { className: 'mb-2 d-block', text: 'Cuotas' }),
                 el('div', {
                     className: 'overflow-auto',
                     style: 'max-height: 260px;',
@@ -174,12 +174,12 @@ export class DebtDetailModal extends HTMLElement {
         });
     }
 
-    _renderMontoRow(monto) {
+    _renderCuotaRow(cuota) {
         return el('tr', {
             children: [
-                el('td', { text: formatMoneda(monto.monto, monto.moneda) }),
-                el('td', { text: monto.moneda }),
-                el('td', { text: monto.vencimiento || '—' })
+                el('td', { text: formatMoneda(cuota.cuota, cuota.moneda) }),
+                el('td', { text: cuota.moneda }),
+                el('td', { text: cuota.vencimiento || '—' })
             ]
         });
     }

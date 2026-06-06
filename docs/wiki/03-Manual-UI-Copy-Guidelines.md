@@ -45,7 +45,7 @@
 | `Valor Inicial` | ❌ → `Valor inicial` | Mayúscula extra en "Inicial" |
 | `Fecha Compra` | ❌ → `Fecha de compra` | Falta "de" + mayúscula extra |
 | `Notas` | ✅ | |
-| `Monto` | ✅ | |
+| `Cuota` | ✅ | |
 | `Moneda` | ✅ | |
 | `Vencimiento` | ✅ | |
 
@@ -65,9 +65,9 @@
 **Ejemplos:**
 ```
 ✅ "El campo Acreedor es obligatorio."
-✅ "Ingresá un monto mayor a 0."
+✅ "Ingresá una cuota mayor a 0."
 ✅ "Seleccioná una moneda."
-✅ "Debe agregar al menos un monto antes de guardar."
+✅ "Debe agregar al menos una cuota antes de guardar."
 ```
 
 ---

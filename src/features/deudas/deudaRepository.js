@@ -1,13 +1,13 @@
 // src/repository/deudaRepository.js
-// Centralized repository for Deuda and Monto CRUD/query operations
+// Centralized repository for Deuda and Cuota CRUD/query operations
 // Limpieza final: este archivo solo debe manejar operaciones de Deuda.
-// No debe haber lógica de Monto separada aquí, solo la relación para agregar/actualizar/borrar montos asociados a una deuda.
+// No debe haber lógica de Cuota separada aquí, solo la relación para agregar/actualizar/borrar cuotas asociadas a una deuda.
 import { getDB } from '../../shared/database/initDB.js';
-import { DEUDAS_STORE, MONTOS_STORE } from '../../shared/database/schema.js';
+import { DEUDAS_STORE, CUOTAS_STORE } from '../../shared/database/schema.js';
 import { DeudaEntity } from './DeudaEntity.js';
-import { MontoEntity } from '../montos/MontoEntity.js';
+import { CuotaEntity } from '../cuotas/CuotaEntity.js';
 import { mergeDeudaUseCase } from './use-cases/mergeDeudaUseCase.js';
-import { syncMontosUseCase } from './use-cases/syncMontosUseCase.js';
+import { syncCuotasUseCase } from './use-cases/syncCuotasUseCase.js';
 
 function getIDBErrorDetail(event) {
     return event?.target?.error?.message || event?.target?.errorCode || 'unknown';
@@ -16,9 +16,9 @@ function getIDBErrorDetail(event) {
 export function addDeuda(deudaModel) {
     const db = getDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readwrite');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
         let deudaId = null;
         let settled = false;
 
@@ -50,17 +50,17 @@ export function addDeuda(deudaModel) {
         const deudaRequest = deudasStore.add(deudaEntity);
         deudaRequest.onsuccess = () => {
             deudaId = deudaRequest.result;
-            if (deudaModel.montos && deudaModel.montos.length > 0) {
-                deudaModel.montos.forEach(monto => {
-                    const montoEntity = new MontoEntity({
+            if (deudaModel.cuotas && deudaModel.cuotas.length > 0) {
+                deudaModel.cuotas.forEach(cuota => {
+                    const cuotaEntity = new CuotaEntity({
                         deudaId,
-                        monto: monto.monto,
-                        moneda: monto.moneda,
-                        vencimiento: monto.vencimiento,
-                        periodo: monto.periodo,
-                        pagado: !!monto.pagado
+                        cuota: cuota.cuota,
+                        moneda: cuota.moneda,
+                        vencimiento: cuota.vencimiento,
+                        periodo: cuota.periodo,
+                        pagado: !!cuota.pagado
                     });
-                    montosStore.add(montoEntity);
+                    cuotasStore.add(cuotaEntity);
                 });
             }
         };
@@ -72,7 +72,7 @@ export function addDeuda(deudaModel) {
 
 /**
  * Agrega una deuda o, si existe una deuda con el mismo acreedor+tipoDeuda,
- * fusiona los montos evitando duplicados.
+ * fusiona las cuotas evitando duplicados.
  * Retorna el id de la deuda (nuevo o existente).
  */
 export function addOrMergeDeuda(deudaModel) {
@@ -92,9 +92,9 @@ export function updateDeuda(deudaModel) {
     }
     const db = getDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readwrite');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
         const deudaEntity = new DeudaEntity({
             id: deudaModel.id,
             acreedor: deudaModel.acreedor,
@@ -103,10 +103,10 @@ export function updateDeuda(deudaModel) {
         });
         const deudaRequest = deudasStore.put(deudaEntity);
         deudaRequest.onsuccess = () => {
-            syncMontosUseCase({
-                montosStore,
+            syncCuotasUseCase({
+                cuotasStore,
                 deudaId: deudaModel.id,
-                montos: deudaModel.montos || []
+                cuotas: deudaModel.cuotas || []
             }).then(resolve).catch(reject);
         };
         deudaRequest.onerror = (event) => {
@@ -118,10 +118,10 @@ export function updateDeuda(deudaModel) {
 export function deleteDeuda(id) {
     const db = getDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readwrite');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
-        let deletedMontosCount = 0;
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
+        let deletedCuotasCount = 0;
         let settled = false;
 
         const rejectOnce = (error) => {
@@ -133,7 +133,7 @@ export function deleteDeuda(id) {
         transaction.oncomplete = () => {
             if (settled) return;
             settled = true;
-            resolve(deletedMontosCount);
+            resolve(deletedCuotasCount);
         };
 
         transaction.onerror = (event) => {
@@ -146,15 +146,15 @@ export function deleteDeuda(id) {
 
         const deudaRequest = deudasStore.delete(id);
         deudaRequest.onsuccess = () => {
-            const index = montosStore.index('by_deudaId');
-            const getMontos = index.getAllKeys(id);
-            getMontos.onsuccess = () => {
-                const keys = getMontos.result;
-                deletedMontosCount = keys.length;
-                keys.forEach(key => montosStore.delete(key));
+            const index = cuotasStore.index('by_deudaId');
+            const getCuotas = index.getAllKeys(id);
+            getCuotas.onsuccess = () => {
+                const keys = getCuotas.result;
+                deletedCuotasCount = keys.length;
+                keys.forEach(key => cuotasStore.delete(key));
             };
-            getMontos.onerror = (event) => {
-                rejectOnce(new Error('Error deleting montos: ' + getIDBErrorDetail(event)));
+            getCuotas.onerror = (event) => {
+                rejectOnce(new Error('Error deleting cuotas: ' + getIDBErrorDetail(event)));
             };
         };
         deudaRequest.onerror = (event) => {
@@ -166,9 +166,9 @@ export function deleteDeuda(id) {
 export function getDeuda(id) {
     const db = getDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readonly');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readonly');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
         const deudaRequest = deudasStore.get(id);
         deudaRequest.onsuccess = () => {
             const deuda = deudaRequest.result;
@@ -176,14 +176,14 @@ export function getDeuda(id) {
                 resolve(null);
                 return;
             }
-            const index = montosStore.index('by_deudaId');
-            const montosRequest = index.getAll(id);
-            montosRequest.onsuccess = () => {
-                deuda.montos = montosRequest.result;
+            const index = cuotasStore.index('by_deudaId');
+            const cuotasRequest = index.getAll(id);
+            cuotasRequest.onsuccess = () => {
+                deuda.cuotas = cuotasRequest.result;
                 resolve(deuda);
             };
-                montosRequest.onerror = (event) => {
-                    reject(new Error('Error getting montos: ' + event.target.errorCode));
+                cuotasRequest.onerror = (event) => {
+                    reject(new Error('Error getting cuotas: ' + event.target.errorCode));
                 };
         };
         deudaRequest.onerror = (event) => {
@@ -195,27 +195,27 @@ export function getDeuda(id) {
 export function listDeudas() {
     const db = getDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readonly');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readonly');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
         const deudasRequest = deudasStore.getAll();
         deudasRequest.onsuccess = () => {
             const deudas = deudasRequest.result;
-            const montosRequest = montosStore.getAll();
-            montosRequest.onsuccess = () => {
-                const montos = montosRequest.result;
-                const montosPorDeuda = {};
-                montos.forEach(m => {
-                    if (!montosPorDeuda[m.deudaId]) montosPorDeuda[m.deudaId] = [];
-                    montosPorDeuda[m.deudaId].push(m);
+            const cuotasRequest = cuotasStore.getAll();
+            cuotasRequest.onsuccess = () => {
+                const cuotas = cuotasRequest.result;
+                const cuotasPorDeuda = {};
+                cuotas.forEach(m => {
+                    if (!cuotasPorDeuda[m.deudaId]) cuotasPorDeuda[m.deudaId] = [];
+                    cuotasPorDeuda[m.deudaId].push(m);
                 });
                 deudas.forEach(d => {
-                    d.montos = montosPorDeuda[d.id] || [];
+                    d.cuotas = cuotasPorDeuda[d.id] || [];
                 });
                 resolve(deudas);
             };
-                montosRequest.onerror = (event) => {
-                    reject(new Error('Error getting montos: ' + event.target.errorCode));
+                cuotasRequest.onerror = (event) => {
+                    reject(new Error('Error getting cuotas: ' + event.target.errorCode));
                 };
         };
         deudasRequest.onerror = (event) => {
@@ -232,9 +232,9 @@ export function deleteDeudas() {
         }
 
         try {
-            const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+            const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readwrite');
             const deudasStore = transaction.objectStore(DEUDAS_STORE);
-            const montosStore = transaction.objectStore(MONTOS_STORE);
+            const cuotasStore = transaction.objectStore(CUOTAS_STORE);
             let settled = false;
             let failedStoreName = '';
             let failedDetail = '';
@@ -268,15 +268,15 @@ export function deleteDeudas() {
                 resolve();
             };
 
-            const clearMontosRequest = montosStore.clear();
-            clearMontosRequest.onsuccess = () => {
+            const clearCuotasRequest = cuotasStore.clear();
+            clearCuotasRequest.onsuccess = () => {
                 const clearDeudasRequest = deudasStore.clear();
                 clearDeudasRequest.onerror = (event) => {
                     markRequestFailure(DEUDAS_STORE, event);
                 };
             };
-            clearMontosRequest.onerror = (event) => {
-                markRequestFailure(MONTOS_STORE, event);
+            clearCuotasRequest.onerror = (event) => {
+                markRequestFailure(CUOTAS_STORE, event);
             };
         } catch (err) {
             reject(new Error('deleteDeudas: ' + err.message));

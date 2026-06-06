@@ -4,16 +4,16 @@ export async function getMonthlySummary(mes) {
   // mes expected as 'YYYY-MM' string. If not provided, use current month
   const periodo = mes || new Date().toISOString().slice(0, 7);
   const { sumIngresosByMonth } = await import('../ingresos/ingresoRepository.js');
-  const { countMontosByMes } = await import('../montos/montoRepository.js');
+  const { countCuotasByMes } = await import('../cuotas/cuotaRepository.js');
 
   const ingresos = await sumIngresosByMonth({ mes: periodo });
-  const montos = await countMontosByMes({ mes: periodo });
+  const cuotas = await countCuotasByMes({ mes: periodo });
 
   // Totales por moneda (desglose)
   const monedas = new Set([
     ...Object.keys(ingresos || {}),
-    ...Object.keys(montos.totalesPagados || {}),
-    ...Object.keys(montos.totalesPendientes || {})
+    ...Object.keys(cuotas.totalesPagados || {}),
+    ...Object.keys(cuotas.totalesPendientes || {})
   ]);
 
   const ingresosByCurrency = {};
@@ -23,8 +23,8 @@ export async function getMonthlySummary(mes) {
   const pendientesByCurrency = {};
   monedas.forEach(m => {
     const ing = Number(ingresos[m] || 0);
-    const pag = Number((montos.totalesPagados && montos.totalesPagados[m]) || 0);
-    const pen = Number((montos.totalesPendientes && montos.totalesPendientes[m]) || 0);
+    const pag = Number((cuotas.totalesPagados && cuotas.totalesPagados[m]) || 0);
+    const pen = Number((cuotas.totalesPendientes && cuotas.totalesPendientes[m]) || 0);
     const eg = pag + pen;
     ingresosByCurrency[m] = ing;
     egresosByCurrency[m] = eg;
@@ -35,7 +35,7 @@ export async function getMonthlySummary(mes) {
 
   return {
     periodo,
-    raw: { ingresos, totalesPagados: montos.totalesPagados, totalesPendientes: montos.totalesPendientes },
+    raw: { ingresos, totalesPagados: cuotas.totalesPagados, totalesPendientes: cuotas.totalesPendientes },
     byCurrency: {
       ingresos: ingresosByCurrency,
       egresos: egresosByCurrency,

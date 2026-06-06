@@ -61,68 +61,68 @@ export class DebtList extends HTMLElement {
     }
 
     async loadTotals() {
-        // Consulta los montos originales desde el repository y calcula los totales
-        const { countMontosByMes } = await import('../../montos/montoRepository.js');
-        const { totalesPendientes, totalesPagados } = await countMontosByMes({ mes: this.mes });
+        // Consulta las cuotas originales desde el repository y calcula los totales
+        const { countCuotasByMes } = await import('../../cuotas/cuotaRepository.js');
+        const { totalesPendientes, totalesPagados } = await countCuotasByMes({ mes: this.mes });
         this.totalesPendientes = totalesPendientes;
         this.totalesPagados = totalesPagados;
     }
 
     async listByMes(mes) {
-        // Usa montoRepository para consultar montos por periodo 'YYYY-MM' y agrupar por deuda
-        const { listMontos } = await import('../../montos/montoRepository.js');
+        // Usa cuotaRepository para consultar cuotas por periodo 'YYYY-MM' y agrupar por deuda
+        const { listCuotas } = await import('../../cuotas/cuotaRepository.js');
         const { getDeuda } = await import('../deudaRepository.js');
-        const montos = await listMontos({ mes }); // mes es 'YYYY-MM'
-        const deudaIds = [...new Set(montos.map(m => m.deudaId))];
+        const cuotas = await listCuotas({ mes }); // mes es 'YYYY-MM'
+        const deudaIds = [...new Set(cuotas.map(m => m.deudaId))];
         const deudas = [];
         for (const id of deudaIds) {
             const deuda = await getDeuda(id);
             if (!deuda) continue;
-            deuda.montos = montos.filter(m => m.deudaId === id);
+            deuda.cuotas = cuotas.filter(m => m.deudaId === id);
             deudas.push(deuda);
         }
         return deudas;
     }
 
     renderTable() {
-        // Unificar todos los montos en un solo array con referencia a la deuda
-        let allMontos = this.debts.reduce((arr, deuda) => {
-            deuda.montos.forEach(monto => {
-                arr.push({ ...monto, acreedor: deuda.acreedor, tipoDeuda: deuda.tipoDeuda });
+        // Unificar todos las cuotas en un solo array con referencia a la deuda
+        let allCuotas = this.debts.reduce((arr, deuda) => {
+            deuda.cuotas.forEach(cuota => {
+                arr.push({ ...cuota, acreedor: deuda.acreedor, tipoDeuda: deuda.tipoDeuda });
             });
             return arr;
         }, []);
 
         // Agrupamiento dinámico
         if (this.groupBy !== 'none') {
-            allMontos = this.groupMontos(allMontos, this.groupBy);
+            allCuotas = this.groupCuotas(allCuotas, this.groupBy);
         }
 
         // Ordenar por fecha de vencimiento ascendente
-        allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
+        allCuotas.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
 
         // Mapear datos de la tabla enriqueciendo con callbacks
-        const tableData = allMontos.map(row => {
+        const tableData = allCuotas.map(row => {
             const entry = {
                 ...row,
                 _fmtMoneda: this.fmtMoneda.bind(this),
-                _onDetail: async (monto, opener) => {
+                _onDetail: async (cuota, opener) => {
                     const detailModal = document.querySelector('app-shell #debtDetailModal')
                         || document.getElementById('debtDetailModal');
                     if (!detailModal) return;
                     const { getDeuda } = await import('../deudaRepository.js');
-                    const deudaActualizada = await getDeuda(monto.deudaId);
+                    const deudaActualizada = await getDeuda(cuota.deudaId);
                     detailModal.openDetail(deudaActualizada);
                     detailModal.attachOpener(opener || null);
                 },
-                _onEdit: async (monto) => {
+                _onEdit: async (cuota) => {
                     const { getDeuda } = await import('../deudaRepository.js');
-                    const deuda = await getDeuda(monto.deudaId);
+                    const deuda = await getDeuda(cuota.deudaId);
                     window.dispatchEvent(new CustomEvent('deuda:edit', { detail: deuda }));
                 },
                 _reload: this.loadDebts.bind(this)
             };
-            entry._onRowClick = (monto, opener) => entry._onDetail(monto, opener || null);
+            entry._onRowClick = (cuota, opener) => entry._onDetail(cuota, opener || null);
             return entry;
         });
 
@@ -198,11 +198,11 @@ export class DebtList extends HTMLElement {
         editModal.attachOpener();
     }
 
-    deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
-        const montoFmt = this.fmtMoneda(moneda, monto);
-        if (!confirm(`¿Seguro que quieres borrar los ${montoFmt} que le debes a "${acreedor}"?\nVencimiento: ${vencimiento} | Periodo: ${periodo}`)) return;
-        import('../../montos/montoRepository.js').then(({ deleteMonto }) => {
-            deleteMonto(id).then(() => {
+    deleteDebt(id, acreedor, cuota, vencimiento, periodo, moneda) {
+        const cuotaFmt = this.fmtMoneda(moneda, cuota);
+        if (!confirm(`¿Seguro que quieres borrar los ${cuotaFmt} que le debes a "${acreedor}"?\nVencimiento: ${vencimiento} | Periodo: ${periodo}`)) return;
+        import('../../cuotas/cuotaRepository.js').then(({ deleteCuota }) => {
+            deleteCuota(id).then(() => {
                 this.loadDebts(); // Actualiza la tabla tras borrar
             });
         });
@@ -236,26 +236,26 @@ export class DebtList extends HTMLElement {
         this._externalTotals = el;
     }
 
-    groupMontos(montos, groupBy) {
+    groupCuotas(cuotas, groupBy) {
         // Devuelve un array agrupado según el criterio, siempre separando por moneda salvo si el filtro es 'moneda'
         const grouped = {};
-        montos.forEach(monto => {
+        cuotas.forEach(cuota => {
             let key = '';
             switch (groupBy) {
-                case 'acreedor': key = `${monto.acreedor}__${monto.moneda}`; break;
-                case 'tipo': key = `${monto.tipoDeuda}__${monto.moneda}`; break;
-                case 'vencimiento': key = `${monto.vencimiento}__${monto.moneda}`; break;
-                case 'moneda': key = monto.moneda; break;
-                default: key = `Otros__${monto.moneda}`;
+                case 'acreedor': key = `${cuota.acreedor}__${cuota.moneda}`; break;
+                case 'tipo': key = `${cuota.tipoDeuda}__${cuota.moneda}`; break;
+                case 'vencimiento': key = `${cuota.vencimiento}__${cuota.moneda}`; break;
+                case 'moneda': key = cuota.moneda; break;
+                default: key = `Otros__${cuota.moneda}`;
             }
             // Separar por estado pagado
-            key += `__${monto.pagado ? 'pagado' : 'pendiente'}`;
+            key += `__${cuota.pagado ? 'pagado' : 'pendiente'}`;
             if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(monto);
+            grouped[key].push(cuota);
         });
         // Devuelve un array donde cada elemento es un resumen del grupo
         return Object.entries(grouped).map(([group, items]) => {
-            const total = items.reduce((sum, m) => sum + (Number(m.monto) || 0), 0);
+            const total = items.reduce((sum, m) => sum + (Number(m.cuota) || 0), 0);
             const acreedores = [...new Set(items.map(m => m.acreedor))].join(', ');
             const tipos = [...new Set(items.map(m => m.tipoDeuda))].join(', ');
             const vencimientos = [...new Set(items.map(m => m.vencimiento))].join(', ');
@@ -269,7 +269,7 @@ export class DebtList extends HTMLElement {
             }
             return {
                 ...items[0],
-                monto: total,
+                cuota: total,
                 groupLabel,
                 items: items,
                 acreedor: (groupBy !== 'acreedor') ? acreedores : groupLabel,

@@ -1,5 +1,5 @@
 // src/database/initDB.js
-import { DEUDAS_STORE, MONTOS_STORE, INGRESOS_STORE, INVERSIONES_STORE, DB_NAME, VERSION } from './schema.js';
+import { DEUDAS_STORE, CUOTAS_STORE, INGRESOS_STORE, INVERSIONES_STORE, DB_NAME, VERSION } from './schema.js';
 import { FakeIDB } from './localStorageFallback.js';
 
 let db;
@@ -26,10 +26,10 @@ export function initDB() {
             if (!db.objectStoreNames.contains(DEUDAS_STORE)) {
                 db.createObjectStore(DEUDAS_STORE, { keyPath: 'id', autoIncrement: true });
             }
-            if (!db.objectStoreNames.contains(MONTOS_STORE)) {
-                const montosStore = db.createObjectStore(MONTOS_STORE, { keyPath: 'id', autoIncrement: true });
-                montosStore.createIndex('by_deudaId', 'deudaId');
-                montosStore.createIndex('by_periodo', 'periodo');
+            if (!db.objectStoreNames.contains(CUOTAS_STORE)) {
+                const cuotasStore = db.createObjectStore(CUOTAS_STORE, { keyPath: 'id', autoIncrement: true });
+                cuotasStore.createIndex('by_deudaId', 'deudaId');
+                cuotasStore.createIndex('by_periodo', 'periodo');
             }
             // Crear store para ingresos
             let ingresosStore;

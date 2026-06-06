@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | 1 | Caos / confusión | Persona frente a Excel, notas en papel, mirando el celular sin entender | *"¿Cuánto vas a pagar este mes?"* | 2–3 seg |
 | 2 | Aparece Nivva | Animación de entrada: ícono/logo Nivva sobre fondo crema | *(sin texto — solo logo)* | 1–2 seg |
-| 3 | Resumen del mes | Captura mobile limpia de Nivva: vista de deudas pendientes con monto total visible | *"Nivva te lo muestra."* | 3–4 seg |
+| 3 | Resumen del mes | Captura mobile limpia de Nivva: vista de deudas pendientes con cuota total visible | *"Nivva te lo muestra."* | 3–4 seg |
 | 4 | Cierre con CTA | Logo Nivva centrado + tagline + CTA | *"Probala gratis — link en bio"* | 2 seg |
 
 ---
@@ -44,7 +44,7 @@
 
 ### Datos ficticios de ejemplo
 
-| Acreedor | Monto | Vencimiento | Estado |
+| Acreedor | Cuota | Vencimiento | Estado |
 |---|---|---|---|
 | Banco Nación | $ 18.500 | 10/05 | Pendiente |
 | Expensas | $ 42.000 | 05/05 | Pendiente |
@@ -64,9 +64,9 @@ Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **A
       "acreedor": "Banco Nación",
       "tipoDeuda": "Préstamo",
       "notas": "Datos ficticios — demo reel 04/05",
-      "montos": [
+      "cuotas": [
         {
-          "monto": 18500,
+          "cuota": 18500,
           "moneda": "ARS",
           "vencimiento": "2026-05-10",
           "periodo": "2026-05",
@@ -78,9 +78,9 @@ Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **A
       "acreedor": "Expensas",
       "tipoDeuda": "Servicio",
       "notas": "Datos ficticios — demo reel 04/05",
-      "montos": [
+      "cuotas": [
         {
-          "monto": 42000,
+          "cuota": 42000,
           "moneda": "ARS",
           "vencimiento": "2026-05-05",
           "periodo": "2026-05",
@@ -92,9 +92,9 @@ Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **A
       "acreedor": "Tarjeta Visa",
       "tipoDeuda": "Tarjeta de crédito",
       "notas": "Datos ficticios — demo reel 04/05",
-      "montos": [
+      "cuotas": [
         {
-          "monto": 67200,
+          "cuota": 67200,
           "moneda": "ARS",
           "vencimiento": "2026-05-15",
           "periodo": "2026-05",
@@ -106,9 +106,9 @@ Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **A
       "acreedor": "Netflix",
       "tipoDeuda": "Servicio",
       "notas": "Datos ficticios — demo reel 04/05",
-      "montos": [
+      "cuotas": [
         {
-          "monto": 3200,
+          "cuota": 3200,
           "moneda": "ARS",
           "vencimiento": "2026-05-08",
           "periodo": "2026-05",

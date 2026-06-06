@@ -71,7 +71,7 @@ export function sumIngresosByMonth({ mes } = {}) {
             const rows = mes ? (request.result || []).filter(row => row.periodo === mes) : (request.result || []);
             const totals = {};
             rows.forEach(r => {
-                totals[r.moneda] = (totals[r.moneda] || 0) + (Number(r.monto) || 0);
+                totals[r.moneda] = (totals[r.moneda] || 0) + (Number(r.cuota) || 0);
             });
             resolve(totals);
         };

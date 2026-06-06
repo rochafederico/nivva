@@ -17,10 +17,10 @@ export function summarizeDebtListTotals(debts = [], today = getLocalTodayYmd()) 
     let pagadosCount = 0;
 
     (debts || []).forEach(deuda => {
-        (deuda.montos || []).forEach(monto => {
-            const vencimiento = typeof monto.vencimiento === 'string' ? monto.vencimiento.trim() : '';
-            if (!monto.pagado && isValidYmd(vencimiento) && vencimiento < today) vencidas++;
-            if (monto.pagado) pagadosCount++;
+        (deuda.cuotas || []).forEach(cuota => {
+            const vencimiento = typeof cuota.vencimiento === 'string' ? cuota.vencimiento.trim() : '';
+            if (!cuota.pagado && isValidYmd(vencimiento) && vencimiento < today) vencidas++;
+            if (cuota.pagado) pagadosCount++;
         });
     });
 
@@ -39,8 +39,8 @@ export class DebtListTotals extends HTMLElement {
 
     /**
      * Actualiza los totales y re-renderiza el componente.
-     * @param {Object} pendiente     - Mapa moneda → monto pendiente (ej. { ARS: 15000, USD: 100 })
-     * @param {Object} pagado        - Mapa moneda → monto pagado   (ej. { ARS: 5000 })
+     * @param {Object} pendiente     - Mapa moneda → cuota pendiente (ej. { ARS: 15000, USD: 100 })
+     * @param {Object} pagado        - Mapa moneda → cuota pagada   (ej. { ARS: 5000 })
      * @param {Object} summary       - { debts } para calcular indicadores
      */
     update(pendiente, pagado, summary = {}) {
@@ -126,7 +126,7 @@ export class DebtListTotals extends HTMLElement {
     /**
      * Crea una tarjeta KPI para un estado, mostrando todas las monedas agrupadas.
      * @param {string} label        - "Pendiente" | "Pagado"
-     * @param {Object} amountsMap   - Mapa moneda → monto
+     * @param {Object} amountsMap   - Mapa moneda → cuota
      * @param {string} colorKey     - "warning" | "success"
      * @param {string} iconClass    - Clase Bootstrap Icon
      * @param {number} vencidas     - Cuotas vencidas (solo Pendiente)
@@ -142,7 +142,7 @@ export class DebtListTotals extends HTMLElement {
         const body = document.createElement('div');
         body.className = 'd-flex justify-content-between align-items-center p-3';
 
-        // Bloque de texto izquierdo: etiqueta + monto(s) + indicadores
+        // Bloque de texto izquierdo: etiqueta + cuota(s) + indicadores
         const textBlock = document.createElement('div');
         textBlock.className = 'flex-grow-1 me-3';
 

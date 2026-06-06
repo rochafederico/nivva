@@ -30,7 +30,7 @@ async function cleanup() {
 
 // ===================================================================
 // UC1: Agregar ingreso desde IngresoForm y verificar en DB
-// Flujo: usuario abre IngresoForm, ingresa fecha/descripcion/monto/moneda,
+// Flujo: usuario abre IngresoForm, ingresa fecha/descripcion/cuota/moneda,
 // hace submit. El ingreso se guarda via repository y aparece en la DB.
 // ===================================================================
 async function testAgregarIngresoDesdeForm() {
@@ -54,7 +54,7 @@ async function testAgregarIngresoDesdeForm() {
         detail: {
             fecha: '2026-03-15',
             descripcion: 'Sueldo marzo',
-            monto: 500000,
+            cuota: 500000,
             moneda: 'ARS'
         },
         bubbles: true,
@@ -66,7 +66,7 @@ async function testAgregarIngresoDesdeForm() {
     await new Promise(r => setTimeout(r, 50));
 
     assert(savedEvent !== null, 'IngresoForm debe emitir ingreso:saved');
-    assert(savedEvent.detail.ingreso.monto === 500000, 'Detalle del evento: monto = 500000');
+    assert(savedEvent.detail.ingreso.cuota === 500000, 'Detalle del evento: cuota = 500000');
     assert(savedEvent.detail.ingreso.moneda === 'ARS', 'Detalle del evento: moneda = ARS');
     assert(savedEvent.detail.ingreso.descripcion === 'Sueldo marzo', 'Detalle del evento: descripcion correcta');
     assert(savedEvent.detail.ingreso.periodo === '2026-03', 'Detalle del evento: periodo = 2026-03');
@@ -74,7 +74,7 @@ async function testAgregarIngresoDesdeForm() {
     // Verificar que el ingreso esta en la DB
     const ingresos = await listIngresos({ mes: '2026-03' });
     assert(ingresos.length === 1, 'Debe haber 1 ingreso en marzo');
-    assert(ingresos[0].monto === 500000, 'Monto guardado: 500000');
+    assert(ingresos[0].cuota === 500000, 'Cuota guardado: 500000');
     assert(ingresos[0].moneda === 'ARS', 'Moneda guardada: ARS');
     assert(ingresos[0].descripcion === 'Sueldo marzo', 'Descripcion guardada correcta');
     assert(ingresos[0].periodo === '2026-03', 'Periodo guardado: 2026-03');
@@ -112,7 +112,7 @@ async function testCancelarIngresoForm() {
 }
 
 async function testIngresoFormLayoutMobileFirst() {
-    console.log('  UC2b: IngresoForm ordena Descripción, Monto+Moneda y Fecha para mobile');
+    console.log('  UC2b: IngresoForm ordena Descripción, Cuota+Moneda y Fecha para mobile');
 
     const ingresoForm = document.createElement('ingreso-form');
     document.body.appendChild(ingresoForm);
@@ -121,17 +121,17 @@ async function testIngresoFormLayoutMobileFirst() {
     const formEl = appForm.querySelector('form');
     const descripcionField = appForm.querySelector('[data-field-name="descripcion"]');
     const fechaField = appForm.querySelector('[data-field-name="fecha"]');
-    const montoRow = appForm.querySelector('.ingreso-monto-row');
-    const montoField = appForm.querySelector('[data-field-name="monto"]');
+    const cuotaRow = appForm.querySelector('.ingreso-cuota-row');
+    const cuotaField = appForm.querySelector('[data-field-name="cuota"]');
     const monedaField = appForm.querySelector('[data-field-name="moneda"]');
 
     assert(formEl.children[0] === descripcionField, 'Descripción debe ser el primer campo visible');
-    assert(montoRow !== null, 'Monto y Moneda deben renderizarse en una misma fila Bootstrap');
-    assert(formEl.children[1] === montoRow, 'La fila Monto+Moneda debe ir después de Descripción');
-    assert(formEl.children[2] === fechaField, 'Fecha debe ir después del grupo Monto+Moneda');
-    assert(montoField.classList.contains('col-8'), 'Monto debe priorizar mayor ancho');
+    assert(cuotaRow !== null, 'Cuota y Moneda deben renderizarse en una misma fila Bootstrap');
+    assert(formEl.children[1] === cuotaRow, 'La fila Cuota+Moneda debe ir después de Descripción');
+    assert(formEl.children[2] === fechaField, 'Fecha debe ir después del grupo Cuota+Moneda');
+    assert(cuotaField.classList.contains('col-8'), 'Cuota debe priorizar mayor ancho');
     assert(monedaField.classList.contains('col-4'), 'Moneda debe ocupar menor ancho');
-    assert(montoField.classList.contains('align-self-start'), 'Monto debe alinearse arriba dentro de la fila');
+    assert(cuotaField.classList.contains('align-self-start'), 'Cuota debe alinearse arriba dentro de la fila');
     assert(monedaField.classList.contains('align-self-start'), 'Moneda debe alinearse arriba dentro de la fila');
 
     document.body.removeChild(ingresoForm);
@@ -191,13 +191,13 @@ async function testMultiplesIngresosFiltradoPorMes() {
 
     // Agregar ingresos via repository (como lo haria IngresoForm._onSubmit)
     const marzo1 = new IngresoModel({
-        fecha: '2026-03-01', descripcion: 'Sueldo', monto: 400000, moneda: 'ARS'
+        fecha: '2026-03-01', descripcion: 'Sueldo', cuota: 400000, moneda: 'ARS'
     });
     const marzo2 = new IngresoModel({
-        fecha: '2026-03-15', descripcion: 'Freelance', monto: 200, moneda: 'USD'
+        fecha: '2026-03-15', descripcion: 'Freelance', cuota: 200, moneda: 'USD'
     });
     const abril1 = new IngresoModel({
-        fecha: '2026-04-01', descripcion: 'Sueldo abril', monto: 420000, moneda: 'ARS'
+        fecha: '2026-04-01', descripcion: 'Sueldo abril', cuota: 420000, moneda: 'ARS'
     });
 
     await addIngreso(marzo1);
@@ -237,13 +237,13 @@ async function testTotalesIngresosPorMoneda() {
 
     // Agregar ingresos mixtos en septiembre
     await addIngreso(new IngresoModel({
-        fecha: '2026-09-01', descripcion: 'Sueldo', monto: 500000, moneda: 'ARS'
+        fecha: '2026-09-01', descripcion: 'Sueldo', cuota: 500000, moneda: 'ARS'
     }));
     await addIngreso(new IngresoModel({
-        fecha: '2026-09-10', descripcion: 'Bonus', monto: 100000, moneda: 'ARS'
+        fecha: '2026-09-10', descripcion: 'Bonus', cuota: 100000, moneda: 'ARS'
     }));
     await addIngreso(new IngresoModel({
-        fecha: '2026-09-15', descripcion: 'Freelance USD', monto: 500, moneda: 'USD'
+        fecha: '2026-09-15', descripcion: 'Freelance USD', cuota: 500, moneda: 'USD'
     }));
 
     // Totales de septiembre
@@ -278,7 +278,7 @@ async function testFlujoCompletoIngresosUI() {
         detail: {
             fecha: '2026-06-01',
             descripcion: 'Sueldo junio',
-            monto: 450000,
+            cuota: 450000,
             moneda: 'ARS'
         },
         bubbles: true, composed: true
@@ -288,14 +288,14 @@ async function testFlujoCompletoIngresosUI() {
     // Verificar primer ingreso
     let ingresos = await listIngresos({ mes: '2026-06' });
     assert(ingresos.length === 1, 'Despues de 1er submit: 1 ingreso');
-    assert(ingresos[0].monto === 450000, '1er ingreso: 450000');
+    assert(ingresos[0].cuota === 450000, '1er ingreso: 450000');
 
     // Segundo ingreso via UI (diferente moneda)
     appForm.dispatchEvent(new CustomEvent('form:submit', {
         detail: {
             fecha: '2026-06-15',
             descripcion: 'Freelance',
-            monto: 300,
+            cuota: 300,
             moneda: 'USD'
         },
         bubbles: true, composed: true
@@ -316,7 +316,7 @@ async function testFlujoCompletoIngresosUI() {
         detail: {
             fecha: '2026-07-01',
             descripcion: 'Sueldo julio',
-            monto: 460000,
+            cuota: 460000,
             moneda: 'ARS'
         },
         bubbles: true, composed: true
@@ -330,7 +330,7 @@ async function testFlujoCompletoIngresosUI() {
     // Julio tiene el nuevo ingreso
     const ingresosJulio = await listIngresos({ mes: '2026-07' });
     assert(ingresosJulio.length === 1, 'Julio: 1 ingreso');
-    assert(ingresosJulio[0].monto === 460000, 'Julio: 460000');
+    assert(ingresosJulio[0].cuota === 460000, 'Julio: 460000');
 
     // Total general
     const todos = await getAll();
@@ -352,15 +352,15 @@ async function testIngresoModelCalculaPeriodo() {
     const modelo = new IngresoModel({
         fecha: '2026-11-25',
         descripcion: 'Test',
-        monto: 1000,
+        cuota: 1000,
         moneda: 'ARS'
     });
     assert(modelo.periodo === '2026-11', 'Periodo calculado: 2026-11');
-    assert(modelo.monto === 1000, 'Monto numerico: 1000');
+    assert(modelo.cuota === 1000, 'Cuota numerico: 1000');
     assert(modelo.moneda === 'ARS', 'Moneda por defecto: ARS');
 
     // Sin fecha
-    const sinFecha = new IngresoModel({ descripcion: 'Sin fecha', monto: 500 });
+    const sinFecha = new IngresoModel({ descripcion: 'Sin fecha', cuota: 500 });
     assert(sinFecha.periodo === '', 'Sin fecha: periodo vacio');
     assert(sinFecha.moneda === 'ARS', 'Moneda default: ARS');
 
@@ -391,7 +391,7 @@ async function testIngresoModalPersisteIngresoCreado() {
         detail: {
             fecha: '2026-05-01',
             descripcion: 'Salario',
-            monto: 1000,
+            cuota: 1000,
             moneda: 'ARS'
         },
         bubbles: true,
@@ -428,7 +428,7 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
             detail: {
                 fecha: '2026-05-15',
                 descripcion: 'Salario',
-                monto: 1000,
+                cuota: 1000,
                 moneda: 'ARS'
             },
             bubbles: true,
@@ -438,7 +438,7 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
 
         const tableText = page.querySelector('app-table')?.textContent || '';
         assert(tableText.includes('Salario'), 'La tabla de Ingresos debe mostrar el ingreso creado');
-        assert(tableText.includes('$ 1.000,00'), 'La tabla de Ingresos debe mostrar el monto creado');
+        assert(tableText.includes('$ 1.000,00'), 'La tabla de Ingresos debe mostrar la cuota creada');
     } finally {
         if (page && page.parentNode) {
             document.body.removeChild(page);

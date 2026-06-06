@@ -6,7 +6,7 @@ export const tests = [
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'cuota', type: 'number', label: 'Cuota', required: true, min: 0.01 },
             { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' }
         ];
         document.body.appendChild(appForm);
@@ -16,12 +16,12 @@ export const tests = [
         assert(labels[0].querySelector('.text-danger') !== null, 'Debe mostrar asterisco en campo requerido');
 
         const select = appForm.querySelector('select[name="moneda"]');
-        const montoInput = appForm.querySelector('input[name="monto"]');
+        const cuotaInput = appForm.querySelector('input[name="cuota"]');
         assert(select !== null, 'Debe renderizar el select requerido');
         assert(select.options[0].value === '', 'El select requerido debe tener opción placeholder vacía');
         assert(select.options[0].textContent === 'Seleccioná una moneda…', 'El placeholder del select debe coincidir');
-        assert(montoInput.getAttribute('min') === '0.01', 'El input numérico debe exponer min nativo');
-        assert(montoInput.required === true, 'El input numérico debe usar required nativo');
+        assert(cuotaInput.getAttribute('min') === '0.01', 'El input numérico debe exponer min nativo');
+        assert(cuotaInput.required === true, 'El input numérico debe usar required nativo');
 
         document.body.removeChild(appForm);
     },
@@ -31,25 +31,25 @@ export const tests = [
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'cuota', type: 'number', label: 'Cuota', required: true, min: 0.01 },
             { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' }
         ];
         document.body.appendChild(appForm);
 
         const form = appForm.querySelector('form');
-        const montoInput = appForm.querySelector('input[name="monto"]');
+        const cuotaInput = appForm.querySelector('input[name="cuota"]');
         const acreedorInput = appForm.querySelector('input[name="acreedor"]');
         const monedaSelect = appForm.querySelector('select[name="moneda"]');
         let submitEvent = null;
         appForm.addEventListener('form:submit', e => { submitEvent = e; });
-        montoInput.value = '0';
+        cuotaInput.value = '0';
 
         appForm.triggerSubmit();
 
         assert(submitEvent === null, 'No debe emitir form:submit si el formulario es inválido');
         assert(form.classList.contains('was-validated'), 'El formulario debe usar la clase de Bootstrap tras un intento inválido');
         assert(acreedorInput.validity.valueMissing === true, 'Acreedor debe quedar inválido por required nativo');
-        assert(montoInput.validity.rangeUnderflow === true, 'Monto debe quedar inválido por min nativo');
+        assert(cuotaInput.validity.rangeUnderflow === true, 'Cuota debe quedar inválido por min nativo');
         assert(monedaSelect.validity.valueMissing === true, 'Moneda debe quedar inválida por required nativo');
         assert(!acreedorInput.classList.contains('is-invalid'), 'No debe inyectar clases is-invalid manuales');
 
@@ -130,24 +130,24 @@ export const tests = [
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'cuota', type: 'number', label: 'Cuota', required: true, min: 0.01 },
             { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'fecha', type: 'date', label: 'Fecha', required: true }
         ];
         document.body.appendChild(appForm);
 
         const acreedorWrapper = appForm.querySelector('[data-field-name="acreedor"]');
-        const montoWrapper = appForm.querySelector('[data-field-name="monto"]');
+        const cuotaWrapper = appForm.querySelector('[data-field-name="cuota"]');
         const monedaWrapper = appForm.querySelector('[data-field-name="moneda"]');
         const fechaWrapper = appForm.querySelector('[data-field-name="fecha"]');
 
         assert(acreedorWrapper.querySelector('.invalid-feedback') !== null, 'Acreedor debe tener elemento invalid-feedback');
-        assert(montoWrapper.querySelector('.invalid-feedback') !== null, 'Monto debe tener elemento invalid-feedback');
+        assert(cuotaWrapper.querySelector('.invalid-feedback') !== null, 'Cuota debe tener elemento invalid-feedback');
         assert(monedaWrapper.querySelector('.invalid-feedback') !== null, 'Moneda debe tener elemento invalid-feedback');
         assert(fechaWrapper.querySelector('.invalid-feedback') !== null, 'Fecha debe tener elemento invalid-feedback');
 
         assert(acreedorWrapper.querySelector('.invalid-feedback').textContent === 'Este campo es obligatorio.', 'Mensaje de texto requerido correcto');
-        assert(montoWrapper.querySelector('.invalid-feedback').textContent.includes('número'), 'Mensaje numérico menciona número');
+        assert(cuotaWrapper.querySelector('.invalid-feedback').textContent.includes('número'), 'Mensaje numérico menciona número');
         assert(monedaWrapper.querySelector('.invalid-feedback').textContent.includes('opción'), 'Mensaje de select menciona opción');
         assert(fechaWrapper.querySelector('.invalid-feedback').textContent.includes('fecha'), 'Mensaje de fecha menciona fecha');
 

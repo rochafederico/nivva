@@ -75,7 +75,7 @@ flowchart TD
 | Pantalla/Flow | Componente | Tipo | Texto actual | Observación |
 |---|---|---|---|---|
 | Egresos | DebtList | Empty state | `No hay datos.` | ⚠️ Muy genérico — falta contexto y próximo paso |
-| Egresos | DebtList | Table header | `Monto` | ✅ |
+| Egresos | DebtList | Table header | `Cuota` | ✅ |
 | Egresos | DebtList | Table header | `Moneda` | ✅ |
 | Egresos | DebtList | Table header | `Vencimiento` | ✅ |
 | Egresos | DebtList | Table header | `Acciones` | ✅ |
@@ -89,15 +89,15 @@ flowchart TD
 | Formulario | DebtForm | Label | `Acreedor` | ✅ |
 | Formulario | DebtForm | Label | `Tipo de Deuda` | ⚠️ Inconsistente: mayúscula en "Deuda" vs detalle que usa "Tipo de deuda" |
 | Formulario | DebtForm | Label | `Notas` | ✅ |
-| Formulario | DebtForm | Section | `Montos` | ✅ |
-| Formulario | DebtForm | Button | `Agregar monto` | ✅ |
-| Formulario | DebtForm | Button title | `Guardar` (monto) | ✅ |
-| Formulario | DebtForm | Button title | `Cancelar` (monto) | ✅ |
-| Formulario | DebtForm | Button title | `Editar` (monto) | ✅ |
-| Formulario | DebtForm | Button title | `Eliminar` (monto) | ✅ |
-| Formulario | DebtForm | Button title | `Duplicar` (monto) | ✅ |
+| Formulario | DebtForm | Section | `Cuotas` | ✅ |
+| Formulario | DebtForm | Button | `Agregar cuota` | ✅ |
+| Formulario | DebtForm | Button title | `Guardar` (cuota) | ✅ |
+| Formulario | DebtForm | Button title | `Cancelar` (cuota) | ✅ |
+| Formulario | DebtForm | Button title | `Editar` (cuota) | ✅ |
+| Formulario | DebtForm | Button title | `Eliminar` (cuota) | ✅ |
+| Formulario | DebtForm | Button title | `Duplicar` (cuota) | ✅ |
 | Formulario | DebtForm | Checkbox title | `Marcar como pagado` | ✅ |
-| Formulario | DebtForm | Error message | `Debe agregar al menos un monto antes de guardar.` | ✅ Claro, pero falta próximo paso explícito |
+| Formulario | DebtForm | Error message | `Debe agregar al menos una cuota antes de guardar.` | ✅ Claro, pero falta próximo paso explícito |
 | Modal footer | DebtModal | Button | `Cancelar` | ✅ |
 | Modal footer | DebtModal | Button | `Guardar` | ✅ |
 
@@ -112,7 +112,7 @@ flowchart TD
 | Detalle | DebtDetailModal | Label row | `Moneda` | ✅ |
 | Detalle | DebtDetailModal | Label row | `Próximo vencimiento` | ✅ |
 | Detalle | DebtDetailModal | Label row | `Notas` | ✅ |
-| Detalle | DebtDetailModal | Section header | `Montos` | ✅ |
+| Detalle | DebtDetailModal | Section header | `Cuotas` | ✅ |
 | Detalle | DebtDetailModal | Button | `Editar` | ✅ |
 | Detalle | DebtDetailModal | Button | `Cerrar` | ✅ |
 
@@ -123,7 +123,7 @@ flowchart TD
 | Modal | IngresoModal | Title | `Agregar ingreso` | ✅ |
 | Formulario | IngresoForm | Label | `Fecha` | ✅ |
 | Formulario | IngresoForm | Label | `Descripción` | ✅ |
-| Formulario | IngresoForm | Label | `Monto` | ✅ |
+| Formulario | IngresoForm | Label | `Cuota` | ✅ |
 | Formulario | IngresoForm | Label | `Moneda` | ✅ |
 | Formulario | IngresoForm | Submit | `Agregar ingreso` | ✅ |
 | Formulario | IngresoForm | Cancel | `Cancelar` | ✅ |
@@ -153,8 +153,8 @@ flowchart TD
 | Importar | ImportDataModal | Button | `Seleccionar archivo` | ⚠️ Infinitivo genérico — ok como fallback |
 | Importar | ImportDataModal | Warning | `⚠️ Importante:` | ✅ |
 | Importar | ImportDataModal | Info | `Añade datos sin borrar los existentes.` | ❌ "Añade" es tuteo — debe ser "Añade" → "Agrega" (vos) o reescribir |
-| Importar | ImportDataModal | Info | `Fusión automática: mismo Acreedor + Tipo de Deuda → los montos se agrupan.` | ⚠️ Técnico, pero aceptable en contexto de importación |
-| Importar | ImportDataModal | Info | `Duplicados ignorados si coinciden monto, moneda y periodo.` | ⚠️ Técnico — ok en este contexto |
+| Importar | ImportDataModal | Info | `Fusión automática: mismo Acreedor + Tipo de Deuda → las cuotas se agrupan.` | ⚠️ Técnico, pero aceptable en contexto de importación |
+| Importar | ImportDataModal | Info | `Duplicados ignorados si coinciden cuota, moneda y periodo.` | ⚠️ Técnico — ok en este contexto |
 | Importar | ImportDataModal | Button | `📥 Importar datos` | ✅ |
 | Importar | ImportDataModal | Button | `Cancelar` | ✅ |
 | Importar | ImportDataModal | Error | `❌ Archivo JSON no válido. Asegúrate de que sea un backup de DeudasApp.` | ❌ "Asegúrate" es tuteo — debe ser "Asegurate" |
@@ -191,7 +191,7 @@ flowchart TD
 | Modal | FeedbackModal | Label | `Comentario` | ✅ |
 | Modal | FeedbackModal | Placeholder | `Describí tu sugerencia, problema o confusión…` | ✅ (vos) |
 | Modal | FeedbackModal | Tip | `💡 Si tenés imagen o video, adjuntalo luego en la plataforma.` | ✅ (vos) |
-| Modal | FeedbackModal | Warning | `⚠️ Evitá incluir datos sensibles como montos u otros datos personales.` | ✅ (vos) |
+| Modal | FeedbackModal | Warning | `⚠️ Evitá incluir datos sensibles como cuotas u otros datos personales.` | ✅ (vos) |
 | Modal | FeedbackModal | Button | `Enviar` | ✅ |
 
 ### StatsIndicators

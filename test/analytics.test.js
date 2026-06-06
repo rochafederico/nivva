@@ -6,7 +6,7 @@ import {
     trackFlowError,
     trackFlowAbandoned
 } from '../src/shared/observability/index.js';
-import { setPagado, listMontos } from '../src/features/montos/montoRepository.js';
+import { setPagado, listCuotas } from '../src/features/cuotas/cuotaRepository.js';
 import { addDeuda, deleteDeudas } from '../src/features/deudas/deudaRepository.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/import-export/components/ImportDataModal.js';
@@ -77,7 +77,7 @@ async function testDebtFormAndMonthNavigationUseClarityOnly() {
         detail: { acreedor: 'Banco Test', tipoDeuda: 'Tarjeta', notas: '' }
     });
 
-    form.montos = [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-06-10', pagado: false }];
+    form.cuotas = [{ cuota: 1000, moneda: 'ARS', vencimiento: '2026-06-10', pagado: false }];
     await form.handleSubmit({
         preventDefault: () => {},
         detail: { acreedor: 'Banco Test', tipoDeuda: 'Tarjeta', notas: '' }
@@ -111,7 +111,7 @@ async function testImportFlowAndPaymentErrorsSendClarityEvents() {
         paymentFailed = true;
     }
 
-    assert(paymentFailed, 'Payment update with missing monto should fail');
+    assert(paymentFailed, 'Payment update with missing cuota should fail');
 
     const names = readClarityEvents().map(([, eventName]) => eventName);
     assert(names.includes('desktop_import_data_started'), 'Import flow should send started event');
@@ -128,16 +128,16 @@ async function testImportSuccessAndPaymentRegistrationSendClarityEvents() {
         acreedor: 'Banco Test',
         tipoDeuda: 'Prestamo',
         notas: '',
-        montos: [{ monto: 2000, moneda: 'ARS', vencimiento: '2026-06-20', pagado: false }]
+        cuotas: [{ cuota: 2000, moneda: 'ARS', vencimiento: '2026-06-20', pagado: false }]
     });
-    const [monto] = await listMontos();
+    const [cuota] = await listCuotas();
 
-    await setPagado(monto.id, true);
+    await setPagado(cuota.id, true);
 
     const modal = document.createElement('import-data-modal');
     document.body.appendChild(modal);
     modal.importData = {
-        deudas: [{ acreedor: 'Otra deuda', tipoDeuda: 'Servicio', notas: '', montos: [] }],
+        deudas: [{ acreedor: 'Otra deuda', tipoDeuda: 'Servicio', notas: '', cuotas: [] }],
         ingresos: [],
         inversiones: []
     };
@@ -145,7 +145,7 @@ async function testImportSuccessAndPaymentRegistrationSendClarityEvents() {
 
     const names = readClarityEvents().map(([, eventName]) => eventName);
     assert(deudaId > 0, 'Debt setup should create a debt');
-    assert(monto.id > 0, 'Debt setup should create a monto');
+    assert(cuota.id > 0, 'Debt setup should create a cuota');
     assert(names.includes('desktop_payment_registered'), 'Successful payment should send payment_registered');
     assert(names.includes('desktop_import_data_used'), 'Successful import should send import_data_used');
 }

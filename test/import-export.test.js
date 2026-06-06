@@ -9,7 +9,7 @@ import '../src/features/deudas/components/DebtList.js';
 import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
 import { getSelectedMonth } from '../src/shared/MonthFilter.js';
 import { DeudaModel } from '../src/features/deudas/DeudaModel.js';
-import { MontoModel } from '../src/features/montos/MontoModel.js';
+import { CuotaModel } from '../src/features/cuotas/CuotaModel.js';
 import { addIngreso, getAll as getAllIngresos } from '../src/features/ingresos/ingresoRepository.js';
 import { addInversion, listInversiones } from '../src/features/inversiones/inversionRepository.js';
 
@@ -69,15 +69,15 @@ async function testImportarDatosCompletos() {
                 acreedor: 'Banco Test',
                 tipoDeuda: 'Prestamo',
                 notas: 'Prestamo personal',
-                montos: [
-                    { monto: 15000, moneda: 'ARS', vencimiento: '2026-03-15', periodo: '2026-03', pagado: false },
-                    { monto: 25000, moneda: 'ARS', vencimiento: '2026-04-15', periodo: '2026-04', pagado: true }
+                cuotas: [
+                    { cuota: 15000, moneda: 'ARS', vencimiento: '2026-03-15', periodo: '2026-03', pagado: false },
+                    { cuota: 25000, moneda: 'ARS', vencimiento: '2026-04-15', periodo: '2026-04', pagado: true }
                 ]
             }
         ],
         ingresos: [
-            { descripcion: 'Sueldo', monto: 500000, moneda: 'ARS', fecha: '2026-03-01' },
-            { descripcion: 'Freelance', monto: 1000, moneda: 'USD', fecha: '2026-03-15' }
+            { descripcion: 'Sueldo', cuota: 500000, moneda: 'ARS', fecha: '2026-03-01' },
+            { descripcion: 'Freelance', cuota: 1000, moneda: 'USD', fecha: '2026-03-15' }
         ],
         inversiones: [
             {
@@ -108,14 +108,14 @@ async function testImportarDatosCompletos() {
     const deudas = await listDeudas();
     assert(deudas.length === 1, 'Import: 1 deuda en DB');
     assert(deudas[0].acreedor === 'Banco Test', 'Import: acreedor correcto');
-    assert(deudas[0].montos.length === 2, 'Import: 2 montos en la deuda');
+    assert(deudas[0].cuotas.length === 2, 'Import: 2 cuotas en la deuda');
 
     // Verificar ingresos en DB
     const ingresos = await getAllIngresos();
     assert(ingresos.length === 2, 'Import: 2 ingresos en DB');
     const sueldo = ingresos.find(i => i.descripcion === 'Sueldo');
     assert(sueldo !== undefined, 'Import: ingreso Sueldo existe');
-    assert(sueldo.monto === 500000, 'Import: monto Sueldo = 500000');
+    assert(sueldo.cuota === 500000, 'Import: cuota Sueldo = 500000');
 
     // Verificar inversiones en DB
     const inversiones = await listInversiones();
@@ -155,13 +155,13 @@ async function testImportarSinInversiones() {
                 acreedor: 'Tarjeta Visa',
                 tipoDeuda: 'Tarjeta',
                 notas: '',
-                montos: [
-                    { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-10', periodo: '2026-03', pagado: false }
+                cuotas: [
+                    { cuota: 5000, moneda: 'ARS', vencimiento: '2026-03-10', periodo: '2026-03', pagado: false }
                 ]
             }
         ],
         ingresos: [
-            { descripcion: 'Sueldo Marzo', monto: 300000, moneda: 'ARS', fecha: '2026-03-01' }
+            { descripcion: 'Sueldo Marzo', cuota: 300000, moneda: 'ARS', fecha: '2026-03-01' }
         ]
         // Sin clave "inversiones" — retrocompatibilidad
     };
@@ -200,13 +200,13 @@ async function testExportarDatosCompletos() {
         acreedor: 'Banco Export',
         tipoDeuda: 'Hipotecario',
         notas: 'Test export',
-        montos: [
-            new MontoModel({ monto: 100000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false })
+        cuotas: [
+            new CuotaModel({ cuota: 100000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false })
         ]
     });
     await addOrMergeDeuda(deudaModel);
 
-    await addIngreso({ descripcion: 'Bonus', monto: 200000, moneda: 'ARS', fecha: '2026-06-01' });
+    await addIngreso({ descripcion: 'Bonus', cuota: 200000, moneda: 'ARS', fecha: '2026-06-01' });
 
     await addInversion({
         nombre: 'FCI Beta',
@@ -239,8 +239,8 @@ async function testExportarDatosCompletos() {
         acreedor: d.acreedor,
         tipoDeuda: d.tipoDeuda,
         notas: d.notas,
-        montos: (d.montos || []).map(m => ({
-            monto: m.monto,
+        cuotas: (d.cuotas || []).map(m => ({
+            cuota: m.cuota,
             moneda: m.moneda,
             vencimiento: m.vencimiento,
             periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : ''),
@@ -268,9 +268,9 @@ async function testExportarDatosCompletos() {
     assert(Array.isArray(parsed.deudas), 'Export JSON tiene deudas[]');
     assert(parsed.deudas.length === 1, 'Export JSON: 1 deuda');
     assert(parsed.deudas[0].acreedor === 'Banco Export', 'Export JSON: acreedor correcto');
-    assert(parsed.deudas[0].montos.length === 1, 'Export JSON: 1 monto');
-    assert(parsed.deudas[0].montos[0].monto === 100000, 'Export JSON: monto = 100000');
-    assert(parsed.deudas[0].montos[0].periodo === '2026-06', 'Export JSON: periodo derivado');
+    assert(parsed.deudas[0].cuotas.length === 1, 'Export JSON: 1 cuota');
+    assert(parsed.deudas[0].cuotas[0].cuota === 100000, 'Export JSON: cuota = 100000');
+    assert(parsed.deudas[0].cuotas[0].periodo === '2026-06', 'Export JSON: periodo derivado');
     assert(!('id' in parsed.deudas[0]), 'Export JSON: deuda no tiene id');
 
     assert(Array.isArray(parsed.ingresos), 'Export JSON tiene ingresos[]');
@@ -301,13 +301,13 @@ async function testRoundTripExportImport() {
         acreedor: 'Round Trip Bank',
         tipoDeuda: 'Personal',
         notas: 'Test round trip',
-        montos: [
-            new MontoModel({ monto: 50000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }),
-            new MontoModel({ monto: 200, moneda: 'USD', vencimiento: '2026-08-01', pagado: true })
+        cuotas: [
+            new CuotaModel({ cuota: 50000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }),
+            new CuotaModel({ cuota: 200, moneda: 'USD', vencimiento: '2026-08-01', pagado: true })
         ]
     });
     await addOrMergeDeuda(deuda);
-    await addIngreso({ descripcion: 'Alquiler', monto: 150000, moneda: 'ARS', fecha: '2026-07-01' });
+    await addIngreso({ descripcion: 'Alquiler', cuota: 150000, moneda: 'ARS', fecha: '2026-07-01' });
     await addInversion({
         nombre: 'ETF QQQ', fechaCompra: '2026-03-01', valorInicial: 30000,
         moneda: 'USD', historialValores: [{ fecha: '2026-03-01', valor: 30000 }, { fecha: '2026-06-01', valor: 35000 }]
@@ -321,8 +321,8 @@ async function testRoundTripExportImport() {
     const exportJson = {
         deudas: origDeudas.map(d => ({
             acreedor: d.acreedor, tipoDeuda: d.tipoDeuda, notas: d.notas,
-            montos: (d.montos || []).map(m => ({
-                monto: m.monto, moneda: m.moneda, vencimiento: m.vencimiento,
+            cuotas: (d.cuotas || []).map(m => ({
+                cuota: m.cuota, moneda: m.moneda, vencimiento: m.vencimiento,
                 periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : ''), pagado: m.pagado
             }))
         })),
@@ -351,12 +351,12 @@ async function testRoundTripExportImport() {
     const restoredDeudas = await listDeudas();
     assert(restoredDeudas.length === 1, 'RT: 1 deuda restaurada');
     assert(restoredDeudas[0].acreedor === 'Round Trip Bank', 'RT: acreedor correcto');
-    assert(restoredDeudas[0].montos.length === 2, 'RT: 2 montos restaurados');
+    assert(restoredDeudas[0].cuotas.length === 2, 'RT: 2 cuotas restaurados');
 
     const restoredIngresos = await getAllIngresos();
     assert(restoredIngresos.length === 1, 'RT: 1 ingreso restaurado');
     assert(restoredIngresos[0].descripcion === 'Alquiler', 'RT: descripcion ingreso correcta');
-    assert(restoredIngresos[0].monto === 150000, 'RT: monto ingreso = 150000');
+    assert(restoredIngresos[0].cuota === 150000, 'RT: cuota ingreso = 150000');
 
     const restoredInversiones = await listInversiones();
     assert(restoredInversiones.length === 1, 'RT: 1 inversion restaurada');
@@ -372,7 +372,7 @@ async function testRoundTripExportImport() {
 
 // ===================================================================
 // UC5: Importar con merge de deudas (no duplicar)
-// Flujo: importar la misma deuda 2 veces — la segunda vez los montos
+// Flujo: importar la misma deuda 2 veces — la segunda vez las cuotas
 // deben mergearse sin duplicar la deuda.
 // ===================================================================
 async function testImportarConMergeDuplicados() {
@@ -384,8 +384,8 @@ async function testImportarConMergeDuplicados() {
             acreedor: 'Banco Merge',
             tipoDeuda: 'Prestamo',
             notas: '',
-            montos: [
-                { monto: 10000, moneda: 'ARS', vencimiento: '2026-05-01', periodo: '2026-05', pagado: false }
+            cuotas: [
+                { cuota: 10000, moneda: 'ARS', vencimiento: '2026-05-01', periodo: '2026-05', pagado: false }
             ]
         }],
         ingresos: [],
@@ -401,7 +401,7 @@ async function testImportarConMergeDuplicados() {
 
     let deudas = await listDeudas();
     assert(deudas.length === 1, 'Merge 1ra import: 1 deuda');
-    assert(deudas[0].montos.length === 1, 'Merge 1ra import: 1 monto');
+    assert(deudas[0].cuotas.length === 1, 'Merge 1ra import: 1 cuota');
 
     // Segunda importación (mismos datos)
     const modal2 = document.createElement('import-data-modal');
@@ -412,8 +412,8 @@ async function testImportarConMergeDuplicados() {
 
     deudas = await listDeudas();
     assert(deudas.length === 1, 'Merge 2da import: sigue 1 deuda (no duplico)');
-    // Los montos duplicados deben ser detectados (mismo monto + moneda + periodo)
-    assert(deudas[0].montos.length === 1, 'Merge 2da import: sigue 1 monto (no duplico)');
+    // Las cuotas duplicados deben ser detectados (mismo cuota + moneda + periodo)
+    assert(deudas[0].cuotas.length === 1, 'Merge 2da import: sigue 1 cuota (no duplico)');
 
     document.body.removeChild(modal1);
     document.body.removeChild(modal2);
@@ -449,7 +449,7 @@ async function testDataImportedRefreshesDebtList() {
             acreedor: 'Acreedor Refresh',
             tipoDeuda: 'Prestamo',
             notas: '',
-            montos: [{ monto: 5000, moneda: 'ARS', vencimiento, periodo: currentMes, pagado: false }]
+            cuotas: [{ cuota: 5000, moneda: 'ARS', vencimiento, periodo: currentMes, pagado: false }]
         }],
         ingresos: [],
         inversiones: []

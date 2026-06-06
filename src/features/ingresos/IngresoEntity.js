@@ -4,14 +4,14 @@ export class IngresoEntity {
      * @param {Object} params
      * @param {string} params.fecha
      * @param {string} params.descripcion
-     * @param {number} params.monto
+     * @param {number} params.cuota
      * @param {string} params.moneda
      * @param {string} [params.periodo]
      */
-    constructor({ fecha, descripcion, monto, moneda, periodo } = {}) {
+    constructor({ fecha, descripcion, cuota, moneda, periodo } = {}) {
         this.fecha = fecha;
         this.descripcion = descripcion || '';
-        this.monto = monto;
+        this.cuota = cuota;
         this.moneda = moneda || 'ARS';
         this.periodo = periodo || (fecha ? fecha.slice(0, 7) : '');
     }

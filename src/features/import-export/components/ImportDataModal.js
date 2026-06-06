@@ -3,7 +3,7 @@ import '../../../shared/components/UiModal.js';
 import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppSpinner.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
-import { MontoModel } from '../../montos/MontoModel.js';
+import { CuotaModel } from '../../cuotas/CuotaModel.js';
 import {
     trackEvent,
     trackFlowStart,
@@ -134,7 +134,7 @@ export class ImportDataModal extends HTMLElement {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
         const inversiones = data.inversiones || (data.data && data.data.inversiones) || [];
-        const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
+        const totalCuotas = deudas.reduce((sum, d) => sum + (d.cuotas?.length || 0), 0);
 
         const renderCompactList = (items, renderItem) => {
             if (!items.length) return '<span class="text-muted small">Ninguno</span>';
@@ -152,7 +152,7 @@ export class ImportDataModal extends HTMLElement {
             <div class="border rounded p-3">
                 <h3 class="h6 text-primary mb-2">📋 Vista previa</h3>
                 <div class="d-flex flex-wrap gap-3 bg-body-tertiary rounded p-2 mb-3">
-                    <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalMontos}</strong> montos</span>
+                    <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalCuotas}</strong> cuotas</span>
                     ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
                     ${inversiones.length ? `<span class="small"><strong>${inversiones.length}</strong> inversiones</span>` : ''}
                     ${exportDateStr}
@@ -198,8 +198,8 @@ export class ImportDataModal extends HTMLElement {
             for (const deudaData of deudas) {
                 try {
                     // Crear instancia de DeudaModel sin ID para que se genere uno nuevo
-                    const montos = (deudaData.montos || []).map(m => new MontoModel({
-                        monto: m.monto,
+                    const cuotas = (deudaData.cuotas || []).map(m => new CuotaModel({
+                        cuota: m.cuota,
                         moneda: m.moneda || 'ARS',
                         vencimiento: m.vencimiento,
                         periodo: m.periodo,
@@ -210,7 +210,7 @@ export class ImportDataModal extends HTMLElement {
                         acreedor: deudaData.acreedor,
                         tipoDeuda: deudaData.tipoDeuda,
                         notas: deudaData.notas || '',
-                        montos: montos
+                        cuotas: cuotas
                     });
 
                     await addOrMergeDeuda(deuda);
@@ -345,8 +345,8 @@ export class ImportDataModal extends HTMLElement {
                         <p class="mb-1"><strong>⚠️ Importante:</strong></p>
                         <ul class="mb-0 small ps-3">
                             <li>Agregá datos sin borrar los existentes.</li>
-                            <li>Fusión automática: mismo Acreedor + Tipo de Deuda → los montos se agrupan.</li>
-                            <li>Duplicados ignorados si coinciden monto, moneda y periodo.</li>
+                            <li>Fusión automática: mismo Acreedor + Tipo de Deuda → las cuotas se agrupan.</li>
+                            <li>Duplicados ignorados si coinciden cuota, moneda y periodo.</li>
                         </ul>
                     </div>
                     

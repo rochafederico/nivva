@@ -1,4 +1,4 @@
-// Opciones de agrupamiento para la lista de montos
+// Opciones de agrupamiento para la lista de cuotas
 export const groupOptions = [
   { value: 'none', label: 'Sin agrupar' },
   { value: 'acreedor', label: 'Acreedor' },

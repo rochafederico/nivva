@@ -8,7 +8,7 @@ function getTodayYmd() {
     return new Date().toISOString().slice(0, 10);
 }
 
-function getMontoEstado(row) {
+function getCuotaEstado(row) {
     if (row?.pagado) {
         return { label: 'Pagado', className: 'text-bg-success' };
     }
@@ -56,16 +56,16 @@ export const debtTableColumns = [
     { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'd-none d-md-table-cell' } },
     { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'd-none d-md-table-cell' } },
     {
-        key: 'monedaymonto',
-        label: 'Monto',
+        key: 'monedaycuota',
+        label: 'Cuota',
         render: row => {
             const wrapper = document.createElement('div');
             wrapper.className = 'd-flex flex-column align-items-start';
 
-            const montoSpan = document.createElement('span');
-            montoSpan.className = 'text-nowrap';
-            montoSpan.textContent = formatMoneda(row.monto, row.moneda);
-            wrapper.appendChild(montoSpan);
+            const cuotaSpan = document.createElement('span');
+            cuotaSpan.className = 'text-nowrap';
+            cuotaSpan.textContent = formatMoneda(row.cuota, row.moneda);
+            wrapper.appendChild(cuotaSpan);
 
             const vencimiento = String(row.vencimiento ?? '').trim();
             if (vencimiento !== '') {
@@ -80,7 +80,7 @@ export const debtTableColumns = [
 
             const renderEstado = () => {
                 estadoContainer.replaceChildren();
-                const estado = getMontoEstado(row);
+                const estado = getCuotaEstado(row);
                 if (!estado) {
                     estadoContainer.classList.add('d-none');
                     return;
@@ -110,7 +110,7 @@ export const debtTableColumns = [
             appCheckbox.checked = !!row.pagado;
             appCheckbox.title = 'Marcar como pagado';
             appCheckbox.addEventListener('checkbox-change', async (e) => {
-                const { setPagado } = await import('../../../features/montos/montoRepository.js');
+                const { setPagado } = await import('../../../features/cuotas/cuotaRepository.js');
                 const nextChecked = !!e.detail.checked;
                 const previousChecked = !!row.pagado;
                 row.pagado = nextChecked;
@@ -155,7 +155,7 @@ export const debtTableColumns = [
 export const ingresosColumns = [
     { key: 'fecha', label: 'Fecha' },
     { key: 'descripcion', label: 'Descripción' },
-    { key: 'monto', label: 'Monto', align: 'right', render: (row) => {
-        return formatMoneda(row.monto, row.moneda);
+    { key: 'cuota', label: 'Cuota', align: 'right', render: (row) => {
+        return formatMoneda(row.cuota, row.moneda);
     } },
 ];

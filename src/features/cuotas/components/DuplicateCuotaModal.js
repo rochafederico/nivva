@@ -1,18 +1,18 @@
-// src/components/DuplicateMontoModal.js
+// src/components/DuplicateCuotaModal.js
 import '../../../shared/components/AppForm.js';
 
-export class DuplicateMontoModal extends HTMLElement {
+export class DuplicateCuotaModal extends HTMLElement {
     constructor() {
         super();
-        this._monto = null;
+        this._cuota = null;
     }
 
-    set monto(data) {
-        this._monto = data || {};
+    set cuota(data) {
+        this._cuota = data || {};
         this.render();
     }
-    get monto() {
-        return this._monto;
+    get cuota() {
+        return this._cuota;
     }
 
     connectedCallback() {
@@ -39,9 +39,9 @@ export class DuplicateMontoModal extends HTMLElement {
         form.fields = [
             { name: 'vencimiento', type: 'date', label: 'Nueva fecha de vencimiento', required: true }
         ];
-        // Precargar la fecha del monto original si existe
-        if (this._monto && this._monto.vencimiento) {
-            form.initialValues = { vencimiento: this._monto.vencimiento };
+        // Precargar la fecha dla cuota original si existe
+        if (this._cuota && this._cuota.vencimiento) {
+            form.initialValues = { vencimiento: this._cuota.vencimiento };
         }
         form.submitText = 'Duplicar';
         form.cancelText = 'Cancelar';
@@ -52,4 +52,4 @@ export class DuplicateMontoModal extends HTMLElement {
         this.appendChild(form);
     }
 }
-customElements.define('duplicate-monto-modal', DuplicateMontoModal);
+customElements.define('duplicate-cuota-modal', DuplicateCuotaModal);

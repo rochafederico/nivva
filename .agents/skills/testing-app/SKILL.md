@@ -48,7 +48,7 @@ Tour targets are inside nested Shadow DOMs (e.g., `app-shell > shadowRoot > head
 ## General App Testing Notes
 
 - The app uses Web Components with Shadow DOM extensively. When inspecting elements, you may need to expand shadow roots in DevTools.
-- IndexedDB stores: `deudas`, `montos`, `ingresos`, `inversiones`
+- IndexedDB stores: `deudas`, `cuotas`, `ingresos`, `inversiones`
 - Port 8080 may be occupied from previous sessions. Kill with `fuser -k 8080/tcp` or use a different port.
 - The app has no backend — all data is local (IndexedDB + localStorage).
 - Netlify preview deploys are available for PRs targeting `main`. PRs targeting other branches (e.g., stacked PRs) may not get preview deploys.

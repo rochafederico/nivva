@@ -1,6 +1,6 @@
 // src/features/deudas/components/DebtRowItem.js
 // Clase JS que construye una fila <tr> de deuda con diseño consistente en todos los breakpoints.
-// 2 celdas: info (avatar + nombre + tipo + fecha) y acciones (monto + badge + toggle + chevron).
+// 2 celdas: info (avatar + nombre + tipo + fecha) y acciones (cuota + badge + toggle + chevron).
 
 import '../../../shared/components/AppCheckbox.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
@@ -107,7 +107,7 @@ export class DebtRowItem {
                 cb.checked = nextChecked;
                 renderEstado();
                 try {
-                    const { setPagado } = await import('../../montos/montoRepository.js');
+                    const { setPagado } = await import('../../cuotas/cuotaRepository.js');
                     await setPagado(row.id, nextChecked);
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
@@ -208,17 +208,17 @@ export class DebtRowItem {
         const actWrap = document.createElement('div');
         actWrap.className = 'd-flex align-items-center';
 
-        // Estado: monto + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
+        // Estado: cuota + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
         const estadoCol = document.createElement('div');
         estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-4';
 
-        // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
+        // Cuota y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
         const amountRow = document.createElement('div');
         amountRow.className = 'd-flex flex-wrap align-items-baseline gap-1 justify-content-end';
 
         const amountEl = document.createElement('span');
         amountEl.className = 'fw-normal lh-sm text-nowrap';
-        amountEl.textContent = formatMoneda(row.monto, row.moneda);
+        amountEl.textContent = formatMoneda(row.cuota, row.moneda);
         amountRow.appendChild(amountEl);
         amountRow.appendChild(badgeSpan);
         estadoCol.appendChild(amountRow);

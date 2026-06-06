@@ -1,10 +1,10 @@
-# Social Media — Reel IA: nueva vista de montos adeudados
+# Social Media — Reel IA: nueva vista de cuotas adeudados
 
-> Guía operativa y registro del reel de Instagram creado para promocionar la nueva vista de montos adeudados de Nivva.
+> Guía operativa y registro del reel de Instagram creado para promocionar la nueva vista de cuotas adeudados de Nivva.
 
 ## Objetivo
 
-Promocionar la nueva vista de montos adeudados de Nivva mostrando, de forma clara y simple, que ahora es más fácil ver:
+Promocionar la nueva vista de cuotas adeudados de Nivva mostrando, de forma clara y simple, que ahora es más fácil ver:
 
 - qué queda pendiente;
 - qué ya está pagado;
@@ -52,7 +52,7 @@ Motivo: al no sumar overlays, el reel se ve más limpio, más realista y menos p
 ```text
 Ordenar tus cuentas no debería depender de mil papeles, cuentas sueltas o una planilla difícil de seguir.
 
-En Nivva estoy mejorando la vista de montos adeudados para que sea más simple ver qué queda pendiente, qué ya pagaste y cuánto corresponde al mes.
+En Nivva estoy mejorando la vista de cuotas adeudados para que sea más simple ver qué queda pendiente, qué ya pagaste y cuánto corresponde al mes.
 
 La idea es clara: menos vueltas, más visibilidad.
 

@@ -40,7 +40,7 @@ export class IngresoForm extends HTMLElement {
         const ingreso = {
             fecha,
             descripcion: values.descripcion,
-            monto: Number(values.monto) || 0,
+            cuota: Number(values.cuota) || 0,
             moneda: values.moneda || 'ARS',
             periodo
         };
@@ -64,10 +64,10 @@ export class IngresoForm extends HTMLElement {
     }
 
     render() {
-        // Campos: descripcion, monto, moneda, fecha
+        // Campos: descripcion, cuota, moneda, fecha
         const fields = [
             { name: 'descripcion', label: 'Descripción', type: 'text', required: true },
-            { name: 'monto', label: 'Monto', type: 'number', required: true, min: 0.01 },
+            { name: 'cuota', label: 'Cuota', type: 'number', required: true, min: 0.01 },
             { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },
         ];
@@ -84,17 +84,17 @@ export class IngresoForm extends HTMLElement {
     _applyMobileFirstLayout(appForm) {
         const formEl = appForm.querySelector('form');
         const descripcionField = appForm.querySelector('[data-field-name="descripcion"]');
-        const montoField = appForm.querySelector('[data-field-name="monto"]');
+        const cuotaField = appForm.querySelector('[data-field-name="cuota"]');
         const monedaField = appForm.querySelector('[data-field-name="moneda"]');
         const fechaField = appForm.querySelector('[data-field-name="fecha"]');
         const submitControls = formEl?.lastElementChild;
-        if (!formEl || !descripcionField || !montoField || !monedaField || !fechaField || !submitControls) return;
+        if (!formEl || !descripcionField || !cuotaField || !monedaField || !fechaField || !submitControls) return;
 
         const amountRow = document.createElement('div');
-        amountRow.className = 'row g-2 align-items-start ingreso-monto-row';
-        montoField.className = 'mb-0 col-8 align-self-start';
+        amountRow.className = 'row g-2 align-items-start ingreso-cuota-row';
+        cuotaField.className = 'mb-0 col-8 align-self-start';
         monedaField.className = 'mb-0 col-4 align-self-start';
-        amountRow.appendChild(montoField);
+        amountRow.appendChild(cuotaField);
         amountRow.appendChild(monedaField);
 
         formEl.replaceChildren(

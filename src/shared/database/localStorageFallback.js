@@ -229,7 +229,7 @@ class FakeTransaction {
 export class FakeIDB {
     constructor() {
         this._stores = {};
-        ['deudas', 'montos', 'ingresos', 'inversiones'].forEach(n => {
+        ['deudas', 'cuotas', 'ingresos', 'inversiones'].forEach(n => {
             this._stores[n] = new FakeObjectStore(n);
         });
     }

@@ -46,7 +46,7 @@ export class AppShell extends HTMLElement {
         groupFilter.setAttribute('type', 'select');
         groupFilter.setAttribute('id', 'group-filter');
         groupFilter.setAttribute('name', 'group-filter');
-        groupFilter.setAttribute('title', 'Agrupar montos');
+        groupFilter.setAttribute('title', 'Agrupar cuotas');
         groupFilter.innerHTML = optionsHtml;
         groupFilter.addEventListener('change', (e) => {
             this.groupBy = e.target.value;

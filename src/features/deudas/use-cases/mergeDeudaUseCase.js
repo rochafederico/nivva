@@ -1,12 +1,12 @@
-import { DEUDAS_STORE, MONTOS_STORE } from '../../../shared/database/schema.js';
+import { DEUDAS_STORE, CUOTAS_STORE } from '../../../shared/database/schema.js';
 
 function normalizeText(value) {
     return (value || '').toString().trim().toLowerCase();
 }
 
-function montoEqual(a, b) {
-    const ma = Number(a.monto);
-    const mb = Number(b.monto);
+function cuotaEqual(a, b) {
+    const ma = Number(a.cuota);
+    const mb = Number(b.cuota);
     if (ma !== mb) return false;
     if ((a.moneda || 'ARS') !== (b.moneda || 'ARS')) return false;
 
@@ -17,13 +17,13 @@ function montoEqual(a, b) {
     return !!(a.vencimiento && b.vencimiento && a.vencimiento === b.vencimiento);
 }
 
-function toMergeMonto(monto) {
+function toMergeCuota(cuota) {
     return {
-        monto: monto.monto,
-        moneda: monto.moneda,
-        vencimiento: monto.vencimiento,
-        periodo: monto.periodo,
-        pagado: !!monto.pagado
+        cuota: cuota.cuota,
+        moneda: cuota.moneda,
+        vencimiento: cuota.vencimiento,
+        periodo: cuota.periodo,
+        pagado: !!cuota.pagado
     };
 }
 
@@ -32,9 +32,9 @@ export function mergeDeudaUseCase({ db, deudaModel, addDeuda, updateDeuda }) {
     // La lectura de coincidencias y la escritura final ocurren en transacciones separadas.
     // En el uso actual de la app, las operaciones se ejecutan desde un único cliente local.
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readonly');
+        const transaction = db.transaction([DEUDAS_STORE, CUOTAS_STORE], 'readonly');
         const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const cuotasStore = transaction.objectStore(CUOTAS_STORE);
         const getAllReq = deudasStore.getAll();
 
         getAllReq.onsuccess = () => {
@@ -48,24 +48,24 @@ export function mergeDeudaUseCase({ db, deudaModel, addDeuda, updateDeuda }) {
                 return;
             }
 
-            const index = montosStore.index('by_deudaId');
-            const getMontosReq = index.getAll(existing.id);
-            getMontosReq.onsuccess = () => {
-                const montosActuales = getMontosReq.result || [];
-                const incoming = deudaModel.montos || [];
-                const nuevosMontos = incoming.filter(inc => !montosActuales.some(actual => montoEqual(actual, inc)));
-                const unionMontos = montosActuales.concat(nuevosMontos.map(toMergeMonto));
+            const index = cuotasStore.index('by_deudaId');
+            const getCuotasReq = index.getAll(existing.id);
+            getCuotasReq.onsuccess = () => {
+                const cuotasActuales = getCuotasReq.result || [];
+                const incoming = deudaModel.cuotas || [];
+                const nuevosCuotas = incoming.filter(inc => !cuotasActuales.some(actual => cuotaEqual(actual, inc)));
+                const unionCuotas = cuotasActuales.concat(nuevosCuotas.map(toMergeCuota));
 
                 updateDeuda({
                     id: existing.id,
                     acreedor: deudaModel.acreedor,
                     tipoDeuda: deudaModel.tipoDeuda,
                     notas: deudaModel.notas,
-                    montos: unionMontos
+                    cuotas: unionCuotas
                 }).then(() => resolve(existing.id)).catch(reject);
             };
-            getMontosReq.onerror = (event) => {
-                reject(new Error('Error getting montos for merge: ' + event.target.errorCode));
+            getCuotasReq.onerror = (event) => {
+                reject(new Error('Error getting cuotas for merge: ' + event.target.errorCode));
             };
         };
 

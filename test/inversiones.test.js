@@ -317,7 +317,7 @@ async function testFlujoCompletoInversion() {
 // ===================================================================
 // UC6: InversionEntity preserva id cuando se proporciona
 // Flujo: verificar que la entidad maneja correctamente el id
-// (a diferencia de MontoEntity que no lo hace).
+// (a diferencia de CuotaEntity que no lo hace).
 // ===================================================================
 async function testInversionEntityConId() {
     console.log('  UC6: InversionEntity preserva id y datos');

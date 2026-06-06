@@ -66,7 +66,7 @@ export class HeaderBar extends HTMLElement {
         this.innerHTML = `
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center p-2 gap-2">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <app-input type="select" id="group-filter" name="group-filter" title="Agrupar montos">
+                <app-input type="select" id="group-filter" name="group-filter" title="Agrupar cuotas">
                 ${optionsHtml}
                 </app-input>
             </div>

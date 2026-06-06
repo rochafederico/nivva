@@ -76,11 +76,11 @@ export class DebtEntityShell extends HTMLElement {
         return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n);
     }
 
-    computePendiente(montos) {
+    computePendiente(cuotas) {
         const totals = {};
-        (montos || []).forEach(m => {
+        (cuotas || []).forEach(m => {
             if (!m.pagado) {
-                totals[m.moneda] = (totals[m.moneda] || 0) + Number(m.monto);
+                totals[m.moneda] = (totals[m.moneda] || 0) + Number(m.cuota);
             }
         });
         return totals;
@@ -96,10 +96,10 @@ export class DebtEntityShell extends HTMLElement {
         }
 
         const rows = this.entities.map(deuda => {
-            const pendiente = this.computePendiente(deuda.montos);
-            const montos = deuda.montos || [];
-            const total = montos.length;
-            const pagadasCount = montos.filter(m => m.pagado).length;
+            const pendiente = this.computePendiente(deuda.cuotas);
+            const cuotas = deuda.cuotas || [];
+            const total = cuotas.length;
+            const pagadasCount = cuotas.filter(m => m.pagado).length;
             const cuotasStr = total > 0 ? `${pagadasCount}/${total}` : '0/0';
             const pendienteStr = Object.keys(pendiente).length
                 ? Object.entries(pendiente).map(([moneda, tot]) => this.fmtMoneda(moneda, tot)).join(' | ')
@@ -176,7 +176,7 @@ export class DebtEntityShell extends HTMLElement {
             btn.addEventListener('click', () => {
                 const id = Number(btn.dataset.deleteId);
                 const acreedor = btn.dataset.acreedor;
-                if (!confirm(`¿Eliminar la deuda con "${acreedor}" y todos sus montos?`)) return;
+                if (!confirm(`¿Eliminar la deuda con "${acreedor}" y todos sus cuotas?`)) return;
                 import('../use-cases/deleteDeudaWithTrackingUseCase.js').then(({ deleteDeudaWithTrackingUseCase }) => {
                     deleteDeudaWithTrackingUseCase(id).then(() => {
                         window.dispatchEvent(new CustomEvent('deuda:deleted'));
@@ -189,7 +189,7 @@ export class DebtEntityShell extends HTMLElement {
     _renderTotalesBar() {
         const totals = {};
         this.entities.forEach(deuda => {
-            const pendientePorMoneda = this.computePendiente(deuda.montos || []);
+            const pendientePorMoneda = this.computePendiente(deuda.cuotas || []);
             Object.entries(pendientePorMoneda).forEach(([moneda, total]) => {
                 totals[moneda] = (totals[moneda] || 0) + Number(total);
             });

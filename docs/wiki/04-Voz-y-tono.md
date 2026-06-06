@@ -183,7 +183,7 @@ Evitamos anglicismos en textos visibles al usuario. Solo se permiten cuando son 
 | Frase a evitar | Motivo | Alternativa |
 |---|---|---|
 | "backup" (solo) | Anglicismo expuesto al usuario | "copia de seguridad" |
-| "plata" | Coloquialismo de dinero — Nivva gestiona números, no dinero | "monto", "registros", "números" |
+| "plata" | Coloquialismo de dinero — Nivva gestiona números, no dinero | "cuota", "registros", "números" |
 | "dinero" | Implica que la app maneja fondos reales — va en contra del propósito de registro | "números", "compromisos", "registros" |
 | "Asegúrate" | Tuteo | "Asegurate" |
 | "Selecciona" | Tuteo | "Seleccioná" |

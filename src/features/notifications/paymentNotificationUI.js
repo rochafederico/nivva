@@ -52,14 +52,14 @@ export function formatRelativeDate(dateStr, now = new Date()) {
 
 /**
  * Renders a single payment row with an info button.
- * @param {{acreedor: string, monto: number, moneda: string, deudaId?: number}} p
+ * @param {{acreedor: string, cuota: number, moneda: string, deudaId?: number}} p
  * @returns {string} HTML list item
  */
 function renderPaymentItem(p) {
     const acreedor = escapeHtml(p.acreedor);
     const moneda = escapeHtml(p.moneda);
-    const formattedMonto = `${moneda} ${p.monto.toLocaleString('es-AR')}`;
-    return `<li class="mb-1">${acreedor} — <strong>${formattedMonto}</strong></li>`;
+    const formattedCuota = `${moneda} ${p.cuota.toLocaleString('es-AR')}`;
+    return `<li class="mb-1">${acreedor} — <strong>${formattedCuota}</strong></li>`;
 }
 
 /**
@@ -128,9 +128,9 @@ function renderTotalsSection(overduePayments) {
     const totals = {};
     const numberFormatter = new Intl.NumberFormat('es-AR');
     for (const p of overduePayments) {
-        const numericMonto = Number(p.monto);
-        const safeMonto = Number.isFinite(numericMonto) ? numericMonto : 0;
-        totals[p.moneda] = (totals[p.moneda] || 0) + safeMonto;
+        const numericCuota = Number(p.cuota);
+        const safeCuota = Number.isFinite(numericCuota) ? numericCuota : 0;
+        totals[p.moneda] = (totals[p.moneda] || 0) + safeCuota;
     }
     const count = overduePayments.length;
     const badges = Object.entries(totals)
@@ -150,7 +150,7 @@ function renderTotalsSection(overduePayments) {
  * Builds the inner HTML for the structured upcoming-payments alert panel.
  * Groups payments into: Vencidos del mes / Hoy / Mañana / Próximos días.
  * Appends a totals-by-currency summary for overdue payments and a link to view debts.
- * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string, deudaId?: number}>} payments
+ * @param {Array<{acreedor: string, cuota: number, moneda: string, vencimiento: string, deudaId?: number}>} payments
  * @param {Date} [now=new Date()]
  * @returns {string} HTML string for the alert body
  */
@@ -210,12 +210,12 @@ export function showInAppPanel(payments, now = new Date()) {
 /**
  * Shows an in-app toast alert for a single payment.
  * Used as a fallback when the browser Notifications API is unavailable or denied.
- * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
+ * @param {{acreedor: string, cuota: number, moneda: string, vencimiento: string}} payment
  * @param {Date} [now=new Date()]
  */
 export function showInAppNotification(payment, now = new Date()) {
     if (typeof window === 'undefined') return;
-    const { acreedor, monto, moneda, vencimiento } = payment;
+    const { acreedor, cuota, moneda, vencimiento } = payment;
     const relDate = formatRelativeDate(vencimiento, now);
     const formattedDate = formatDate(vencimiento);
     const safeAcreedor = escapeHtml(acreedor);
@@ -225,7 +225,7 @@ export function showInAppNotification(payment, now = new Date()) {
     const verb = overdue ? 'Venció' : 'Vence';
     const message = [
         `<strong>${title}</strong>`,
-        `💰 <strong>${safeAcreedor} — ${safeMoneda} ${monto.toLocaleString('es-AR')}</strong>`,
+        `💰 <strong>${safeAcreedor} — ${safeMoneda} ${cuota.toLocaleString('es-AR')}</strong>`,
         `📅 ${verb} ${relDate} (${formattedDate}) · <a href="/" class="alert-link">Ver detalle</a>`
     ].join('<br>');
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));

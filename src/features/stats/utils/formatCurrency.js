@@ -23,8 +23,8 @@ function compactFormat(n) {
  */
 export function addValue(obj) {
     return CURRENCIES.map(moneda => {
-        const monto = obj ? obj[moneda] : undefined;
-        const value = (monto == null || monto === 0) ? '-' : compactFormat(monto);
+        const cuota = obj ? obj[moneda] : undefined;
+        const value = (cuota == null || cuota === 0) ? '-' : compactFormat(cuota);
         return { currency: moneda, value };
     });
 }

@@ -2,7 +2,7 @@
 // E2E tests for deudas feature: UI component (DebtForm) → Model → Repository → IndexedDB
 import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
-import { listMontos } from '../src/features/montos/montoRepository.js';
+import { listCuotas } from '../src/features/cuotas/cuotaRepository.js';
 import { getDB } from '../src/shared/database/initDB.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
 import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
@@ -10,8 +10,8 @@ import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtL
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
-import '../src/features/montos/components/DuplicateMontoModal.js';
-import { MONTO_FORM_GENERAL_ERROR_MESSAGE } from '../src/features/montos/components/MontoForm.js';
+import '../src/features/cuotas/components/DuplicateCuotaModal.js';
+import { CUOTA_FORM_GENERAL_ERROR_MESSAGE } from '../src/features/cuotas/components/CuotaForm.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/deudas/components/DebtModal.js';
 import '../src/features/deudas/components/DebtEntityShell.js';
@@ -21,24 +21,24 @@ async function cleanup() {
 }
 
 // ===================================================================
-// UC1: Crear deuda desde DebtForm con montos en distintos meses
+// UC1: Crear deuda desde DebtForm con cuotas en distintos meses
 // Flujo: usuario llena el formulario (acreedor, tipo, notas), agrega
-// 3 montos en meses distintos (ARS y USD), y hace submit.
-// Luego navega por mes y ve los montos correctos en cada uno.
+// 3 cuotas en meses distintos (ARS y USD), y hace submit.
+// Luego navega por mes y ve las cuotas correctos en cada uno.
 // ===================================================================
 async function testCrearDeudaDesdeFormulario() {
-    console.log('  UC1: Crear deuda desde DebtForm con montos por mes');
+    console.log('  UC1: Crear deuda desde DebtForm con cuotas por mes');
     await cleanup();
 
     // Crear el componente DebtForm y montarlo en el DOM
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    // Simular que el usuario agrega montos al formulario
-    form.montos = [
-        { monto: 15000, moneda: 'ARS', vencimiento: '2026-03-15', pagado: false },
-        { monto: 25000, moneda: 'ARS', vencimiento: '2026-04-15', pagado: false },
-        { monto: 100, moneda: 'USD', vencimiento: '2026-05-15', pagado: false }
+    // Simular que el usuario agrega cuotas al formulario
+    form.cuotas = [
+        { cuota: 15000, moneda: 'ARS', vencimiento: '2026-03-15', pagado: false },
+        { cuota: 25000, moneda: 'ARS', vencimiento: '2026-04-15', pagado: false },
+        { cuota: 100, moneda: 'USD', vencimiento: '2026-05-15', pagado: false }
     ];
 
     // Simular submit del formulario (como lo dispara AppForm → DebtForm.handleSubmit)
@@ -56,13 +56,13 @@ async function testCrearDeudaDesdeFormulario() {
     const deudas = await listDeudas();
     assert(deudas.length === 1, 'Debe existir 1 deuda en la DB');
     assert(deudas[0].acreedor === 'Banco Galicia', 'Acreedor debe ser Banco Galicia');
-    assert(deudas[0].montos.length === 3, 'Deuda debe tener 3 montos');
+    assert(deudas[0].cuotas.length === 3, 'Deuda debe tener 3 cuotas');
 
-    // Verificar que los montos tienen los datos correctos
-    const montos = deudas[0].montos;
-    assert(montos.some(m => m.monto === 15000 && m.moneda === 'ARS'), 'Monto ARS 15000 presente');
-    assert(montos.some(m => m.monto === 25000 && m.moneda === 'ARS'), 'Monto ARS 25000 presente');
-    assert(montos.some(m => m.monto === 100 && m.moneda === 'USD'), 'Monto USD 100 presente');
+    // Verificar que las cuotas tienen los datos correctos
+    const cuotas = deudas[0].cuotas;
+    assert(cuotas.some(m => m.cuota === 15000 && m.moneda === 'ARS'), 'Cuota ARS 15000 presente');
+    assert(cuotas.some(m => m.cuota === 25000 && m.moneda === 'ARS'), 'Cuota ARS 25000 presente');
+    assert(cuotas.some(m => m.cuota === 100 && m.moneda === 'USD'), 'Cuota USD 100 presente');
 
     // Limpiar DOM
     document.body.removeChild(form);
@@ -70,9 +70,9 @@ async function testCrearDeudaDesdeFormulario() {
 }
 
 // ===================================================================
-// UC2: Editar deuda desde DebtForm (cambiar datos + montos)
+// UC2: Editar deuda desde DebtForm (cambiar datos + cuotas)
 // Flujo: usuario abre una deuda existente en el formulario (load),
-// cambia el acreedor, elimina un monto, agrega uno nuevo, y guarda.
+// cambia el acreedor, elimina una cuota, agrega uno nuevo, y guarda.
 // ===================================================================
 async function testEditarDeudaDesdeFormulario() {
     console.log('  UC2: Editar deuda desde DebtForm');
@@ -82,9 +82,9 @@ async function testEditarDeudaDesdeFormulario() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [
-        { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false },
-        { monto: 8000, moneda: 'ARS', vencimiento: '2026-04-10', pagado: false }
+    form.cuotas = [
+        { cuota: 5000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false },
+        { cuota: 8000, moneda: 'ARS', vencimiento: '2026-04-10', pagado: false }
     ];
     await form.handleSubmit({
         preventDefault: () => {},
@@ -94,18 +94,18 @@ async function testEditarDeudaDesdeFormulario() {
     // Obtener la deuda creada
     const deudas = await listDeudas();
     const deuda = deudas[0];
-    assert(deuda.montos.length === 2, 'Deuda original tiene 2 montos');
+    assert(deuda.cuotas.length === 2, 'Deuda original tiene 2 cuotas');
 
     // Simular edición: usuario abre la deuda con form.load()
     form.load(deuda);
     assert(form.editing === true, 'Formulario en modo edición');
     assert(form.deudaId === deuda.id, 'ID de deuda cargado');
 
-    // Usuario modifica los montos: mantiene el primero, elimina el segundo, agrega nuevo
-    const keepMontoId = deuda.montos[0].id;
-    form.montos = [
-        { id: keepMontoId, monto: 5000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false },
-        { monto: 12000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false }
+    // Usuario modifica las cuotas: mantiene el primero, elimina el segundo, agrega nuevo
+    const keepCuotaId = deuda.cuotas[0].id;
+    form.cuotas = [
+        { id: keepCuotaId, cuota: 5000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false },
+        { cuota: 12000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false }
     ];
 
     // Submit en modo edición
@@ -122,12 +122,12 @@ async function testEditarDeudaDesdeFormulario() {
     const edited = await getDeuda(deuda.id);
     assert(edited.acreedor === 'Visa Gold', 'Acreedor actualizado a Visa Gold');
     assert(edited.notas === 'Upgrade', 'Notas actualizadas');
-    assert(edited.montos.length === 2, 'Debe tener 2 montos (1 mantenido + 1 nuevo)');
+    assert(edited.cuotas.length === 2, 'Debe tener 2 cuotas (1 mantenido + 1 nuevo)');
 
-    // Verificar que los montos reflejan la edicion
-    const montosEditados = edited.montos;
-    assert(montosEditados.some(m => m.monto === 5000), 'Monto mantenido: 5000');
-    assert(montosEditados.some(m => m.monto === 12000), 'Nuevo monto: 12000');
+    // Verificar que las cuotas reflejan la edicion
+    const cuotasEditados = edited.cuotas;
+    assert(cuotasEditados.some(m => m.cuota === 5000), 'Cuota mantenido: 5000');
+    assert(cuotasEditados.some(m => m.cuota === 12000), 'Nuevo cuota: 12000');
 
     document.body.removeChild(form);
     await cleanup();
@@ -136,19 +136,19 @@ async function testEditarDeudaDesdeFormulario() {
 // ===================================================================
 // UC3: Importar datos con merge (evitar duplicados)
 // Flujo: usuario tiene una deuda existente, importa JSON que tiene
-// la misma deuda con montos repetidos y nuevos. No debe duplicar.
+// la misma deuda con cuotas repetidos y nuevos. No debe duplicar.
 // ===================================================================
 async function testImportarConMerge() {
-    console.log('  UC3: Importar datos con merge (sin duplicar montos)');
+    console.log('  UC3: Importar datos con merge (sin duplicar cuotas)');
     await cleanup();
 
     // Deuda existente creada desde DebtForm
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [
-        { monto: 50000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
-        { monto: 50000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
+    form.cuotas = [
+        { cuota: 50000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
+        { cuota: 50000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
     ];
     await form.handleSubmit({
         preventDefault: () => {},
@@ -160,22 +160,22 @@ async function testImportarConMerge() {
         acreedor: 'Banco Nacion',
         tipoDeuda: 'Hipotecario',
         notas: '',
-        montos: [
-            { monto: 50000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }, // duplicado
-            { monto: 50000, moneda: 'ARS', vencimiento: '2026-05-01', pagado: false }  // nuevo
+        cuotas: [
+            { cuota: 50000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }, // duplicado
+            { cuota: 50000, moneda: 'ARS', vencimiento: '2026-05-01', pagado: false }  // nuevo
         ]
     });
 
     const deudas = await listDeudas();
     assert(deudas.length === 1, 'Merge: debe seguir siendo 1 deuda');
-    assert(deudas[0].montos.length === 3, 'Merge: 2 originales + 1 nuevo = 3 montos');
+    assert(deudas[0].cuotas.length === 3, 'Merge: 2 originales + 1 nuevo = 3 cuotas');
 
     // Importar deuda con acreedor diferente: debe crear nueva
     await addOrMergeDeuda({
         acreedor: 'Banco Provincia',
         tipoDeuda: 'Personal',
         notas: '',
-        montos: [{ monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }]
+        cuotas: [{ cuota: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }]
     });
     const deudasFinal = await listDeudas();
     assert(deudasFinal.length === 2, 'Import nuevo acreedor: 2 deudas');
@@ -186,7 +186,7 @@ async function testImportarConMerge() {
 
 // ===================================================================
 // UC4: Eliminar deuda individual y eliminar todo
-// Flujo: usuario tiene varias deudas, elimina una y sus montos
+// Flujo: usuario tiene varias deudas, elimina una y sus cuotas
 // desaparecen. Luego elimina todo.
 // ===================================================================
 async function testEliminarDeudas() {
@@ -197,7 +197,7 @@ async function testEliminarDeudas() {
     document.body.appendChild(form);
 
     // Crear deuda A
-    form.montos = [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-03-01' }];
+    form.cuotas = [{ cuota: 1000, moneda: 'ARS', vencimiento: '2026-03-01' }];
     await form.handleSubmit({
         preventDefault: () => {},
         detail: { acreedor: 'Deuda A', tipoDeuda: 'Servicio', notas: '' }
@@ -205,9 +205,9 @@ async function testEliminarDeudas() {
     form.reset();
 
     // Crear deuda B
-    form.montos = [
-        { monto: 2000, moneda: 'ARS', vencimiento: '2026-03-01' },
-        { monto: 3000, moneda: 'ARS', vencimiento: '2026-04-01' }
+    form.cuotas = [
+        { cuota: 2000, moneda: 'ARS', vencimiento: '2026-03-01' },
+        { cuota: 3000, moneda: 'ARS', vencimiento: '2026-04-01' }
     ];
     await form.handleSubmit({
         preventDefault: () => {},
@@ -215,9 +215,9 @@ async function testEliminarDeudas() {
     });
 
     let deudas = await listDeudas();
-    let montos = await listMontos();
+    let cuotas = await listCuotas();
     assert(deudas.length === 2, 'Inicio: 2 deudas');
-    assert(montos.length === 3, 'Inicio: 3 montos totales');
+    assert(cuotas.length === 3, 'Inicio: 3 cuotas totales');
 
     // Eliminar deuda A (importando deleteDeuda como haría el componente)
     const { deleteDeuda } = await import('../src/features/deudas/deudaRepository.js');
@@ -225,17 +225,17 @@ async function testEliminarDeudas() {
     await deleteDeuda(deudaA.id);
 
     deudas = await listDeudas();
-    montos = await listMontos();
+    cuotas = await listCuotas();
     assert(deudas.length === 1, 'Despues de borrar A: 1 deuda');
     assert(deudas[0].acreedor === 'Deuda B', 'La deuda restante es B');
-    assert(montos.length === 2, 'Despues de borrar A: 2 montos');
+    assert(cuotas.length === 2, 'Despues de borrar A: 2 cuotas');
 
     // Eliminar todo
     await deleteDeudas();
     deudas = await listDeudas();
-    montos = await listMontos();
+    cuotas = await listCuotas();
     assert(deudas.length === 0, 'Despues de eliminar todo: 0 deudas');
-    assert(montos.length === 0, 'Despues de eliminar todo: 0 montos');
+    assert(cuotas.length === 0, 'Despues de eliminar todo: 0 cuotas');
 
     document.body.removeChild(form);
 }
@@ -248,7 +248,7 @@ async function testDeleteDeudasWaitsForTransactionComplete() {
         acreedor: 'Consistencia',
         tipoDeuda: 'IndexedDB',
         notas: '',
-        montos: [{ monto: 1, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }]
+        cuotas: [{ cuota: 1, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }]
     });
 
     const db = getDB();
@@ -258,7 +258,7 @@ async function testDeleteDeudasWaitsForTransactionComplete() {
     db.transaction = (storeNames, mode, ...args) => {
         const transaction = originalTransaction(storeNames, mode, ...args);
         const names = Array.isArray(storeNames) ? storeNames : [storeNames];
-        if (mode === 'readwrite' && names.includes('deudas') && names.includes('montos')) {
+        if (mode === 'readwrite' && names.includes('deudas') && names.includes('cuotas')) {
             transaction.addEventListener('complete', () => {
                 clearTransactionCompleted = true;
             }, { once: true });
@@ -276,19 +276,19 @@ async function testDeleteDeudasWaitsForTransactionComplete() {
 }
 
 // ===================================================================
-// UC5: Multiples deudas con montos en el mismo mes
-// Flujo: usuario crea 2 deudas distintas con montos en el mismo mes.
-// Al consultar el mes, ve todos los montos y totales correctos.
+// UC5: Multiples deudas con cuotas en el mismo mes
+// Flujo: usuario crea 2 deudas distintas con cuotas en el mismo mes.
+// Al consultar el mes, ve todos las cuotas y totales correctos.
 // ===================================================================
 async function testMultiplesDeudasMismoMes() {
-    console.log('  UC5: Multiples deudas con montos en el mismo mes');
+    console.log('  UC5: Multiples deudas con cuotas en el mismo mes');
     await cleanup();
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
     // Deuda 1
-    form.montos = [{ monto: 8000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false }];
+    form.cuotas = [{ cuota: 8000, moneda: 'ARS', vencimiento: '2026-03-10', pagado: false }];
     await form.handleSubmit({
         preventDefault: () => {},
         detail: { acreedor: 'Edenor', tipoDeuda: 'Servicio', notas: '' }
@@ -296,42 +296,42 @@ async function testMultiplesDeudasMismoMes() {
     form.reset();
 
     // Deuda 2
-    form.montos = [
-        { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-15', pagado: false },
-        { monto: 20, moneda: 'USD', vencimiento: '2026-03-15', pagado: true }
+    form.cuotas = [
+        { cuota: 5000, moneda: 'ARS', vencimiento: '2026-03-15', pagado: false },
+        { cuota: 20, moneda: 'USD', vencimiento: '2026-03-15', pagado: true }
     ];
     await form.handleSubmit({
         preventDefault: () => {},
         detail: { acreedor: 'Personal', tipoDeuda: 'Servicio', notas: '' }
     });
 
-    // Cada deuda tiene sus propios montos
+    // Cada deuda tiene sus propios cuotas
     const deudas = await listDeudas();
     assert(deudas.length === 2, '2 deudas');
     const edenor = deudas.find(d => d.acreedor === 'Edenor');
     const personal = deudas.find(d => d.acreedor === 'Personal');
-    assert(edenor.montos.length === 1, 'Edenor: 1 monto');
-    assert(personal.montos.length === 2, 'Personal: 2 montos');
+    assert(edenor.cuotas.length === 1, 'Edenor: 1 cuota');
+    assert(personal.cuotas.length === 2, 'Personal: 2 cuotas');
 
     document.body.removeChild(form);
     await cleanup();
 }
 
 // ===================================================================
-// UC6: DebtDetailModal muestra el detalle de una deuda con sus montos
-// Flujo: se crea una deuda con montos, se abre el modal de detalle,
+// UC6: DebtDetailModal muestra el detalle de una deuda con sus cuotas
+// Flujo: se crea una deuda con cuotas, se abre el modal de detalle,
 // y se verifica que renderiza la info correcta.
 // ===================================================================
 async function testDebtDetailModal() {
     console.log('  UC6: DebtDetailModal renderiza detalle de deuda');
     await cleanup();
 
-    // Crear una deuda con dos montos
+    // Crear una deuda con dos cuotas
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [
-        { monto: 12000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
-        { monto: 50, moneda: 'USD', vencimiento: '2026-06-15', pagado: false }
+    form.cuotas = [
+        { cuota: 12000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
+        { cuota: 50, moneda: 'USD', vencimiento: '2026-06-15', pagado: false }
     ];
     await form.handleSubmit({
         preventDefault: () => {},
@@ -343,7 +343,7 @@ async function testDebtDetailModal() {
     const deudas = await listDeudas();
     assert(deudas.length === 1, 'UC6: debe existir 1 deuda');
     const deuda = deudas[0];
-    assert(deuda.montos.length === 2, 'UC6: la deuda tiene 2 montos');
+    assert(deuda.cuotas.length === 2, 'UC6: la deuda tiene 2 cuotas');
 
     // Montar el componente DebtDetailModal
     const modal = document.createElement('debt-detail-modal');
@@ -362,13 +362,13 @@ async function testDebtDetailModal() {
         const totalEl = document.body.querySelector('.fs-2');
         assert(totalEl !== null, 'UC6: debe mostrar el total pendiente prominente');
 
-        // Verificar que la tabla de montos tiene las filas correctas
-        const tbody = document.body.querySelector('#detail-montos-tbody');
-        assert(tbody !== null, 'UC6: debe existir tbody de montos');
-        assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de montos');
+        // Verificar que la tabla de cuotas tiene las filas correctas
+        const tbody = document.body.querySelector('#detail-cuotas-tbody');
+        assert(tbody !== null, 'UC6: debe existir tbody de cuotas');
+        assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de cuotas');
 
-        // Verificar que la tabla de montos NO tiene botones de acción (vista de solo lectura)
-        const actionBtns = document.body.querySelectorAll('#detail-montos-tbody app-button');
+        // Verificar que la tabla de cuotas NO tiene botones de acción (vista de solo lectura)
+        const actionBtns = document.body.querySelectorAll('#detail-cuotas-tbody app-button');
         assert(actionBtns && actionBtns.length === 0, 'UC6: la vista detalle no debe mostrar botones de acción');
     } finally {
         if (detachedModalEl && detachedModalEl.parentNode) {
@@ -423,30 +423,30 @@ async function testAcreedorColumnMobileRender() {
     const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
     assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
 
-    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
-    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
-    assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
-    assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
+    // Columna monedaycuota debe mostrar badge de vencimiento en mobile
+    const cuotaCol = debtTableColumns.find(col => col.key === 'monedaycuota');
+    assert(cuotaCol !== undefined, 'Debe existir columna monedaycuota');
+    assert(typeof cuotaCol.render === 'function', 'Columna monedaycuota debe tener render function');
 
-    const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
-    const montoNode = montoCol.render(rowConVenc);
-    assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
+    const rowConVenc = { cuota: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
+    const cuotaNode = cuotaCol.render(rowConVenc);
+    assert(cuotaNode instanceof Node, 'monedaycuota render debe devolver un nodo DOM');
 
-    // El span del monto debe tener text-nowrap para evitar corte del símbolo de moneda en mobile
-    const montoSpan = montoNode.querySelector('span.text-nowrap');
-    assert(montoSpan !== null, 'El span del monto debe tener clase text-nowrap');
+    // El span dla cuota debe tener text-nowrap para evitar corte del símbolo de moneda en mobile
+    const cuotaSpan = cuotaNode.querySelector('span.text-nowrap');
+    assert(cuotaSpan !== null, 'El span dla cuota debe tener clase text-nowrap');
 
-    const vencBadge = montoNode.querySelector('span.d-md-none');
-    assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Monto');
+    const vencBadge = cuotaNode.querySelector('span.d-md-none');
+    assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Cuota');
     assert(vencBadge.classList.contains('d-md-none'), 'Elemento de vencimiento debe ser solo visible en mobile (d-md-none)');
     // El span de vencimiento también debe tener text-nowrap para evitar corte de fechas ISO en mobile
     assert(vencBadge.classList.contains('text-nowrap'), 'Elemento de vencimiento debe tener clase text-nowrap');
     assert(vencBadge.textContent === '2026-06-01', 'Elemento debe mostrar la fecha de vencimiento');
 
     // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
-    const rowSinVenc = { monto: 500, moneda: 'ARS', vencimiento: '' };
-    const montoNodeSinVenc = montoCol.render(rowSinVenc);
-    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.d-md-none');
+    const rowSinVenc = { cuota: 500, moneda: 'ARS', vencimiento: '' };
+    const cuotaNodeSinVenc = cuotaCol.render(rowSinVenc);
+    const vencBadgeSinVenc = cuotaNodeSinVenc.querySelector('span.d-md-none');
     assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
 
     const today = new Date();
@@ -456,18 +456,18 @@ async function testAcreedorColumnMobileRender() {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
-    const pagadoNode = montoCol.render({
-        monto: 1000,
+    const pagadoNode = cuotaCol.render({
+        cuota: 1000,
         moneda: 'ARS',
         vencimiento: yyyyMmDd(tomorrow),
         pagado: true
     });
     const pagadoBadge = pagadoNode.querySelector('.badge.text-bg-success');
-    assert(pagadoBadge !== null, 'Debe renderizar badge verde cuando el monto está pagado');
+    assert(pagadoBadge !== null, 'Debe renderizar badge verde cuando la cuota está pagado');
     assert(pagadoBadge.textContent === 'Pagado', 'Badge verde debe mostrar "Pagado"');
 
-    const vencidoNode = montoCol.render({
-        monto: 1000,
+    const vencidoNode = cuotaCol.render({
+        cuota: 1000,
         moneda: 'ARS',
         vencimiento: yyyyMmDd(yesterday),
         pagado: false
@@ -476,8 +476,8 @@ async function testAcreedorColumnMobileRender() {
     assert(vencidoBadge !== null, 'Debe renderizar badge rojo cuando está vencido y pendiente');
     assert(vencidoBadge.textContent === 'Vencido', 'Badge rojo debe mostrar "Vencido"');
 
-    const venceHoyNode = montoCol.render({
-        monto: 1000,
+    const venceHoyNode = cuotaCol.render({
+        cuota: 1000,
         moneda: 'ARS',
         vencimiento: yyyyMmDd(today),
         pagado: false
@@ -486,8 +486,8 @@ async function testAcreedorColumnMobileRender() {
     assert(venceHoyBadge !== null, 'Debe renderizar badge amarillo cuando vence hoy y está pendiente');
     assert(venceHoyBadge.textContent === 'Vence hoy', 'Badge amarillo debe mostrar "Vence hoy"');
 
-    const pendienteNode = montoCol.render({
-        monto: 1000,
+    const pendienteNode = cuotaCol.render({
+        cuota: 1000,
         moneda: 'ARS',
         vencimiento: yyyyMmDd(tomorrow),
         pagado: false
@@ -509,22 +509,22 @@ async function testPagoToggleVisualFeedback() {
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [{ monto: 999, moneda: 'ARS', vencimiento: futureYmd, pagado: false }];
+    form.cuotas = [{ cuota: 999, moneda: 'ARS', vencimiento: futureYmd, pagado: false }];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Toggle Test', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
-    const [monto] = await listMontos({ mes: futureYmd.slice(0, 7) });
-    assert(monto, 'Debe existir un monto para probar el toggle de pagado');
+    const [cuota] = await listCuotas({ mes: futureYmd.slice(0, 7) });
+    assert(cuota, 'Debe existir una cuota para probar el toggle de pagado');
 
-    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
+    const cuotaCol = debtTableColumns.find(col => col.key === 'monedaycuota');
     const accionesCol = debtTableColumns.find(col => col.key === 'acciones');
-    const row = { ...monto };
+    const row = { ...cuota };
     let reloadCalls = 0;
     row._reload = () => { reloadCalls += 1; };
 
-    const montoNode = montoCol.render(row);
+    const cuotaNode = cuotaCol.render(row);
     const accionesNode = accionesCol.render(row);
-    document.body.appendChild(montoNode);
+    document.body.appendChild(cuotaNode);
     document.body.appendChild(accionesNode);
 
     const notifications = [];
@@ -539,33 +539,33 @@ async function testPagoToggleVisualFeedback() {
         input.dispatchEvent(new Event('change', { bubbles: true }));
         await new Promise(resolve => setTimeout(resolve, 50));
 
-        assert(montoNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
+        assert(cuotaNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
         assert(notifications.some(n => n.type === 'success'), 'Al marcar pago debe mostrarse toast verde');
 
         input.checked = false;
         input.dispatchEvent(new Event('change', { bubbles: true }));
         await new Promise(resolve => setTimeout(resolve, 50));
 
-        assert(montoNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
-        const pendingStateBadge = montoNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
+        assert(cuotaNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
+        const pendingStateBadge = cuotaNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
         assert(pendingStateBadge === null, 'Pendiente sin vencer no debe mostrar badge');
         assert(notifications.some(n => n.type === 'warning'), 'Al desmarcar pago debe mostrarse toast amarillo');
         assert(reloadCalls >= 2, 'El toggle pagado debe disparar recarga luego de persistir cambios');
     } finally {
         window.removeEventListener('app:notify', onNotify);
-        if (montoNode.parentNode) document.body.removeChild(montoNode);
+        if (cuotaNode.parentNode) document.body.removeChild(cuotaNode);
         if (accionesNode.parentNode) document.body.removeChild(accionesNode);
         await cleanup();
     }
 }
 
 // ===================================================================
-// UC8: Alta inline — openInlineAdd() muestra sólo el formulario de monto
-// Verifica estados de visibilidad: en creating se ocultan tabla y botón Agregar monto.
-// Al guardar con datos válidos, form.montos crece en 1 y vuelve el modo lista.
+// UC8: Alta inline — openInlineAdd() muestra sólo el formulario de cuota
+// Verifica estados de visibilidad: en creating se ocultan tabla y botón Agregar cuota.
+// Al guardar con datos válidos, form.cuotas crece en 1 y vuelve el modo lista.
 // ===================================================================
 async function testAltaInlineAgregarYGuardar() {
-    console.log('  UC8: Alta inline — agregar monto y guardar');
+    console.log('  UC8: Alta inline — agregar cuota y guardar');
     await cleanup();
 
     const form = document.createElement('debt-form');
@@ -578,22 +578,22 @@ async function testAltaInlineAgregarYGuardar() {
     assert(form._amountMode === 'creating', '_amountMode debe ser "creating"');
     assert(form._inlineEditIdx === 'new', '_inlineEditIdx debe ser "new"');
 
-    const tableWrapper = form.querySelector('#montos-table-wrapper');
-    const addMontoBtnRow = form.querySelector('#add-monto-btn-row');
-    const title = form.querySelector('#monto-form-title');
-    const inlineAddContainer = form.querySelector('#add-monto-form-container');
-    assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de monto');
+    const tableWrapper = form.querySelector('#cuotas-table-wrapper');
+    const addCuotaBtnRow = form.querySelector('#add-cuota-btn-row');
+    const title = form.querySelector('#cuota-form-title');
+    const inlineAddContainer = form.querySelector('#add-cuota-form-container');
+    assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de cuota');
     assert(!inlineAddContainer.classList.contains('d-none'), 'El formulario de alta debe estar visible');
     assert(tableWrapper.classList.contains('d-none'), 'La tabla/lista debe ocultarse al crear');
-    assert(addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto debe ocultarse al crear');
-    assert(title.textContent === 'Nuevo monto', 'El formulario debe titularse "Nuevo monto"');
-    let inlineForm = inlineAddContainer.querySelector('monto-form');
+    assert(addCuotaBtnRow.classList.contains('d-none'), 'El botón Agregar cuota debe ocultarse al crear');
+    assert(title.textContent === 'Nuevo cuota', 'El formulario debe titularse "Nuevo cuota"');
+    let inlineForm = inlineAddContainer.querySelector('cuota-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
-    // Verify inputs exist inside monto-form > app-form
+    // Verify inputs exist inside cuota-form > app-form
     const appFormEl = inlineForm.querySelector('app-form form');
     const fieldsRow = appFormEl.firstElementChild;
-    const generalFeedback = appFormEl.querySelector('[data-monto-general-error="true"]');
+    const generalFeedback = appFormEl.querySelector('[data-cuota-general-error="true"]');
     const actionRow = appFormEl.querySelector('[data-form-actions="true"]');
     const cancelBtn = actionRow.querySelector('#cancelBtn');
     const saveBtn = actionRow.querySelector('button[type="submit"]');
@@ -605,31 +605,31 @@ async function testAltaInlineAgregarYGuardar() {
     assert(actionRow?.classList.contains('mt-3'), 'Las acciones inline deben separarse visualmente de los campos');
     assert(cancelBtn?.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria');
     assert(saveBtn?.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
-    const montoInput = inlineForm.querySelector('input[name="monto"]');
+    const cuotaInput = inlineForm.querySelector('input[name="cuota"]');
     const monedaSelect = inlineForm.querySelector('select[name="moneda"]');
     const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
-    assert(montoInput !== null && monedaSelect !== null && vencInput !== null, 'Inputs del inline presentes');
+    assert(cuotaInput !== null && monedaSelect !== null && vencInput !== null, 'Inputs del inline presentes');
 
-    // Guardar via form:submit directo (mismo patrón que montos.test.js UC1)
+    // Guardar via form:submit directo (mismo patrón que cuotas.test.js UC1)
     inlineForm.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
-        detail: { monto: '7500', moneda: 'ARS', vencimiento: '2026-07-15' },
+        detail: { cuota: '7500', moneda: 'ARS', vencimiento: '2026-07-15' },
         bubbles: true,
         composed: true
     }));
     assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
-    assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
-    assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
-    assert(form.montos[0].moneda === 'ARS', 'Moneda guardada: ARS');
-    assert(form.montos[0].vencimiento === '2026-07-15', 'Vencimiento guardado');
-    assert(form.montos[0].pagado === false, 'pagado = false por defecto');
+    assert(form.cuotas.length === 1, 'cuotas debe tener 1 elemento tras guardar');
+    assert(form.cuotas[0].cuota === 7500, 'Cuota guardado: 7500');
+    assert(form.cuotas[0].moneda === 'ARS', 'Moneda guardada: ARS');
+    assert(form.cuotas[0].vencimiento === '2026-07-15', 'Vencimiento guardado');
+    assert(form.cuotas[0].pagado === false, 'pagado = false por defecto');
 
     // El formulario inline ya no debe estar presente
-    inlineForm = inlineAddContainer.querySelector('monto-form');
+    inlineForm = inlineAddContainer.querySelector('cuota-form');
     assert(inlineForm === null, 'Formulario inline desaparecido tras guardar');
     assert(inlineAddContainer.classList.contains('d-none'), 'El contenedor de alta vuelve a ocultarse tras guardar');
     assert(!tableWrapper.classList.contains('d-none'), 'La tabla/lista vuelve a mostrarse tras guardar');
-    assert(!addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto vuelve a mostrarse tras guardar');
+    assert(!addCuotaBtnRow.classList.contains('d-none'), 'El botón Agregar cuota vuelve a mostrarse tras guardar');
 
     document.body.removeChild(form);
     await cleanup();
@@ -646,42 +646,42 @@ async function testAltaInlineValidacionErrores() {
     document.body.appendChild(form);
 
     form.openInlineAdd();
-    const inlineAddContainer = form.querySelector('#add-monto-form-container');
-    const inlineForm = inlineAddContainer.querySelector('monto-form');
+    const inlineAddContainer = form.querySelector('#add-cuota-form-container');
+    const inlineForm = inlineAddContainer.querySelector('cuota-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
-    const montoInput = inlineForm.querySelector('input[name="monto"]');
+    const cuotaInput = inlineForm.querySelector('input[name="cuota"]');
     const vencInput = inlineForm.querySelector('input[name="vencimiento"]');
     const appForm = inlineForm.querySelector('app-form');
 
     // Intentar guardar con campos vacíos — AppForm fires invalid events, not is-invalid class
     appForm.triggerSubmit();
     assert(form._inlineEditIdx === 'new', 'El inline sigue abierto tras guardar con campos inválidos');
-    assert(form.montos.length === 0, 'No se agregó ningún monto');
-    assert(montoInput.getAttribute('aria-invalid') === 'true', 'Monto debe tener aria-invalid=true');
+    assert(form.cuotas.length === 0, 'No se agregó ningún cuota');
+    assert(cuotaInput.getAttribute('aria-invalid') === 'true', 'Cuota debe tener aria-invalid=true');
     assert(vencInput.getAttribute('aria-invalid') === 'true', 'Vencimiento debe tener aria-invalid=true');
-    const generalFeedback = appForm.querySelector('[data-monto-general-error="true"]');
+    const generalFeedback = appForm.querySelector('[data-cuota-general-error="true"]');
     assert(generalFeedback !== null, 'Debe existir mensaje general de validación');
     assert(generalFeedback.classList.contains('d-block'), 'El mensaje general de validación debe mostrarse');
-    assert(generalFeedback.textContent === MONTO_FORM_GENERAL_ERROR_MESSAGE, 'El mensaje general debe ser corto y claro');
+    assert(generalFeedback.textContent === CUOTA_FORM_GENERAL_ERROR_MESSAGE, 'El mensaje general debe ser corto y claro');
 
     document.body.removeChild(form);
     await cleanup();
 }
 
 // ===================================================================
-// UC9: Cancel alta inline — no modifica form.montos ni deja fila basura
+// UC9: Cancel alta inline — no modifica form.cuotas ni deja fila basura
 // ===================================================================
 async function testCancelarAltaInline() {
-    console.log('  UC9: Cancel alta inline — no modifica montos');
+    console.log('  UC9: Cancel alta inline — no modifica cuotas');
     await cleanup();
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    // Pre-cargar un monto ya confirmado
-    form.montos = [{ monto: 5000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
-    form.renderMontosList();
+    // Pre-cargar una cuota ya confirmado
+    form.cuotas = [{ cuota: 5000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
+    form.renderCuotasList();
 
     form.openInlineAdd();
     assert(form._inlineEditIdx === 'new', 'Inline add abierto');
@@ -690,10 +690,10 @@ async function testCancelarAltaInline() {
     form._cancelInline();
     assert(form._amountMode === 'idle', 'Debe volver a modo idle tras cancelar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
-    assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
-    assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
+    assert(form.cuotas.length === 1, 'cuotas sigue con 1 elemento (sin cambios)');
+    assert(form.cuotas[0].cuota === 5000, 'La cuota original no fue modificado');
 
-    const inlineForm = form.querySelector('#add-monto-form-container monto-form');
+    const inlineForm = form.querySelector('#add-cuota-form-container cuota-form');
     assert(inlineForm === null, 'No hay formulario inline tras cancelar');
 
     document.body.removeChild(form);
@@ -701,7 +701,7 @@ async function testCancelarAltaInline() {
 }
 
 // ===================================================================
-// UC10: Edición inline — openInlineEdit() precarga valores y guardar actualiza montos
+// UC10: Edición inline — openInlineEdit() precarga valores y guardar actualiza cuotas
 // ===================================================================
 async function testEdicionInlineGuardar() {
     console.log('  UC10: Edición inline — editar y guardar');
@@ -710,56 +710,56 @@ async function testEdicionInlineGuardar() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [
-        { monto: 1000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
-        { monto: 2000, moneda: 'USD', vencimiento: '2026-06-10', pagado: false }
+    form.cuotas = [
+        { cuota: 1000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
+        { cuota: 2000, moneda: 'USD', vencimiento: '2026-06-10', pagado: false }
     ];
-    form.renderMontosList();
+    form.renderCuotasList();
 
-    // Editar el primer monto (idx=0 después de ordenar por vencimiento)
-    form.openInlineEdit(form.montos[0], 0);
+    // Editar el primer cuota (idx=0 después de ordenar por vencimiento)
+    form.openInlineEdit(form.cuotas[0], 0);
     assert(form._inlineEditIdx === 0, '_inlineEditIdx = 0');
     assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
-    assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
+    assert(form._inlineEditRef.cuota === 1000, 'Original guardado: 1000');
 
     assert(form._amountMode === 'editing', 'Debe quedar en modo editing');
-    const inlineContainer = form.querySelector('#add-monto-form-container');
-    const inlineRow = inlineContainer.querySelector('monto-form');
+    const inlineContainer = form.querySelector('#add-cuota-form-container');
+    const inlineRow = inlineContainer.querySelector('cuota-form');
     assert(inlineRow !== null, 'Formulario inline presente para edición');
-    assert(form.querySelector('#monto-form-title').textContent === 'Editar monto', 'Debe usar título "Editar monto"');
-    assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La tabla debe ocultarse durante edición');
-    assert(form.querySelector('#add-monto-btn-row').classList.contains('d-none'), 'El botón Agregar monto debe ocultarse durante edición');
+    assert(form.querySelector('#cuota-form-title').textContent === 'Editar cuota', 'Debe usar título "Editar cuota"');
+    assert(form.querySelector('#cuotas-table-wrapper').classList.contains('d-none'), 'La tabla debe ocultarse durante edición');
+    assert(form.querySelector('#add-cuota-btn-row').classList.contains('d-none'), 'El botón Agregar cuota debe ocultarse durante edición');
 
-    const montoInput = inlineRow.querySelector('input[name="monto"]');
-    assert(montoInput.value === '1000', 'Input monto precargado con 1000');
+    const cuotaInput = inlineRow.querySelector('input[name="cuota"]');
+    assert(cuotaInput.value === '1000', 'Input cuota precargado con 1000');
 
     // Modificar el valor
-    montoInput.value = '1500';
+    cuotaInput.value = '1500';
     const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
     vencInput.value = '2026-05-10';
     const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
     monedaSelect.value = 'ARS';
 
     inlineRow.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
-        detail: { monto: '1500', moneda: 'ARS', vencimiento: '2026-05-10' },
+        detail: { cuota: '1500', moneda: 'ARS', vencimiento: '2026-05-10' },
         bubbles: true,
         composed: true
     }));
     assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar edición');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
-    assert(form.montos.length === 2, 'Sigue con 2 montos');
+    assert(form.cuotas.length === 2, 'Sigue con 2 cuotas');
 
-    // Verificar que el monto fue actualizado
-    const montoActualizado = form.montos.find(m => m.vencimiento === '2026-05-10');
-    assert(montoActualizado !== undefined, 'Monto de mayo sigue presente');
-    assert(montoActualizado.monto === 1500, 'Monto actualizado a 1500');
+    // Verificar que la cuota fue actualizado
+    const cuotaActualizado = form.cuotas.find(m => m.vencimiento === '2026-05-10');
+    assert(cuotaActualizado !== undefined, 'Cuota de mayo sigue presente');
+    assert(cuotaActualizado.cuota === 1500, 'Cuota actualizado a 1500');
 
     document.body.removeChild(form);
     await cleanup();
 }
 
 // ===================================================================
-// UC11: Cancelar edición inline — revierte valores, montos sin cambios
+// UC11: Cancelar edición inline — revierte valores, cuotas sin cambios
 // ===================================================================
 async function testCancelarEdicionInline() {
     console.log('  UC11: Cancelar edición inline — revierte sin cambios');
@@ -768,21 +768,21 @@ async function testCancelarEdicionInline() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [{ monto: 9000, moneda: 'ARS', vencimiento: '2026-08-01', pagado: false }];
-    form.renderMontosList();
+    form.cuotas = [{ cuota: 9000, moneda: 'ARS', vencimiento: '2026-08-01', pagado: false }];
+    form.renderCuotasList();
 
-    form.openInlineEdit(form.montos[0], 0);
+    form.openInlineEdit(form.cuotas[0], 0);
 
     // Modificar inputs pero cancelar sin guardar
-    const inlineRow = form.querySelector('#add-monto-form-container monto-form');
-    inlineRow.querySelector('input[name="monto"]').value = '99999';
+    const inlineRow = form.querySelector('#add-cuota-form-container cuota-form');
+    inlineRow.querySelector('input[name="cuota"]').value = '99999';
 
     form._cancelInline();
 
     assert(form._amountMode === 'idle', 'Cancelar edición vuelve a modo lista');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
-    assert(form.montos.length === 1, 'Sigue con 1 monto');
-    assert(form.montos[0].monto === 9000, 'Monto original sin cambios: 9000');
+    assert(form.cuotas.length === 1, 'Sigue con 1 cuota');
+    assert(form.cuotas[0].cuota === 9000, 'Cuota original sin cambios: 9000');
 
     document.body.removeChild(form);
     await cleanup();
@@ -798,22 +798,22 @@ async function testSoloUnInlineAbierto() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [
-        { monto: 100, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false },
-        { monto: 200, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
+    form.cuotas = [
+        { cuota: 100, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false },
+        { cuota: 200, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
     ];
-    form.renderMontosList();
+    form.renderCuotasList();
 
-    // Abrir inline en el primer monto
-    form.openInlineEdit(form.montos[0], 0);
+    // Abrir inline en el primer cuota
+    form.openInlineEdit(form.cuotas[0], 0);
     assert(form._inlineEditIdx === 0, 'Primer inline abierto en idx 0');
 
     // Simular confirm = true (usuario acepta descartar cambios)
     const origConfirm = global.confirm;
     global.confirm = () => true;
     try {
-        // Intentar abrir inline en el segundo monto
-        form.openInlineEdit(form.montos[1], 1);
+        // Intentar abrir inline en el segundo cuota
+        form.openInlineEdit(form.cuotas[1], 1);
         assert(form._inlineEditIdx === 1, 'Con confirm=true, nuevo inline abierto en idx 1');
     } finally {
         global.confirm = origConfirm;
@@ -821,12 +821,12 @@ async function testSoloUnInlineAbierto() {
 
     // Simular confirm = false (usuario rechaza descartar cambios)
     form._cancelInline(); // cerrar el inline actual primero
-    form.openInlineEdit(form.montos[0], 0);
+    form.openInlineEdit(form.cuotas[0], 0);
     assert(form._inlineEditIdx === 0, 'Inline abierto en idx 0');
 
     global.confirm = () => false;
     try {
-        form.openInlineEdit(form.montos[1], 1);
+        form.openInlineEdit(form.cuotas[1], 1);
         assert(form._inlineEditIdx === 0, 'Con confirm=false, inline original sigue en idx 0');
     } finally {
         global.confirm = origConfirm;
@@ -837,30 +837,30 @@ async function testSoloUnInlineAbierto() {
 }
 
 // ===================================================================
-// UC13: Duplicar monto inline — copia datos, pagado=false, sin modal
+// UC13: Duplicar cuota inline — copia datos, pagado=false, sin modal
 // ===================================================================
-async function testDuplicarMontoInline() {
-    console.log('  UC13: Duplicar monto inline — pagado=false, sin abrir modal');
+async function testDuplicarCuotaInline() {
+    console.log('  UC13: Duplicar cuota inline — pagado=false, sin abrir modal');
     await cleanup();
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [{
-        id: 42, monto: 5000, moneda: 'USD', vencimiento: '2026-09-01', pagado: true
+    form.cuotas = [{
+        id: 42, cuota: 5000, moneda: 'USD', vencimiento: '2026-09-01', pagado: true
     }];
-    form.renderMontosList();
+    form.renderCuotasList();
 
-    // No debe haber montoModal ni duplicateMontoModal en el DOM
-    assert(form.querySelector('#montoModal') === null, 'No hay #montoModal');
-    assert(form.querySelector('#duplicateMontoModal') === null, 'No hay #duplicateMontoModal');
+    // No debe haber cuotaModal ni duplicateCuotaModal en el DOM
+    assert(form.querySelector('#cuotaModal') === null, 'No hay #cuotaModal');
+    assert(form.querySelector('#duplicateCuotaModal') === null, 'No hay #duplicateCuotaModal');
 
-    form.duplicateMonto(form.montos[0]);
+    form.duplicateCuota(form.cuotas[0]);
 
-    assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
-    const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
+    assert(form.cuotas.length === 2, 'Debe haber 2 cuotas tras duplicar');
+    const dupl = form.cuotas.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
     assert(dupl !== undefined, 'El duplicado no tiene id');
-    assert(dupl.monto === 5000, 'Monto copiado: 5000');
+    assert(dupl.cuota === 5000, 'Cuota copiado: 5000');
     assert(dupl.moneda === 'USD', 'Moneda copiada: USD');
     assert(dupl.vencimiento === '2026-09-01', 'Vencimiento copiado');
     assert(dupl.pagado === false, 'pagado forzado a false en el duplicado');
@@ -870,22 +870,22 @@ async function testDuplicarMontoInline() {
 }
 
 // ===================================================================
-// UC14: No se usan modales secundarios en el flujo Deuda → Montos
-// Verifica que DebtForm NO tiene montoModal ni duplicateMontoModal.
+// UC14: No se usan modales secundarios en el flujo Deuda → Cuotas
+// Verifica que DebtForm NO tiene cuotaModal ni duplicateCuotaModal.
 // ===================================================================
 async function testNoModalSecundarioEnDebtForm() {
-    console.log('  UC14: DebtForm no abre modales para montos (sin modals apilados)');
+    console.log('  UC14: DebtForm no abre modales para cuotas (sin modals apilados)');
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    assert(form.querySelector('#montoModal') === null, 'No debe existir #montoModal en DebtForm');
-    assert(form.querySelector('#duplicateMontoModal') === null, 'No debe existir #duplicateMontoModal en DebtForm');
+    assert(form.querySelector('#cuotaModal') === null, 'No debe existir #cuotaModal en DebtForm');
+    assert(form.querySelector('#duplicateCuotaModal') === null, 'No debe existir #duplicateCuotaModal en DebtForm');
     assert(typeof form.openInlineAdd === 'function', 'Debe existir método openInlineAdd');
     assert(typeof form.openInlineEdit === 'function', 'Debe existir método openInlineEdit');
-    assert(typeof form.duplicateMonto === 'function', 'Debe existir método duplicateMonto');
-    assert(typeof form.openMontoModal === 'undefined', 'openMontoModal ya no debe existir');
-    assert(typeof form.openDuplicateMontoModal === 'undefined', 'openDuplicateMontoModal ya no debe existir');
+    assert(typeof form.duplicateCuota === 'function', 'Debe existir método duplicateCuota');
+    assert(typeof form.openCuotaModal === 'undefined', 'openCuotaModal ya no debe existir');
+    assert(typeof form.openDuplicateCuotaModal === 'undefined', 'openDuplicateCuotaModal ya no debe existir');
 
     document.body.removeChild(form);
 }
@@ -910,38 +910,38 @@ async function testDebtFormHideButtons() {
 }
 
 async function testDebtFormLayoutMobileFirst() {
-    console.log('  UC15b: DebtForm ordena Acreedor, Tipo, Montos y Notas');
+    console.log('  UC15b: DebtForm ordena Acreedor, Tipo, Cuotas y Notas');
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
     const acreedorField = form.querySelector('[data-field-name="acreedor"]');
     const tipoField = form.querySelector('[data-field-name="tipoDeuda"]');
-    const montosList = form.querySelector('.montos-list');
+    const cuotasList = form.querySelector('.cuotas-list');
     const appForm = form.querySelector('app-form');
     const notasField = appForm.querySelector('[data-field-name="notas"]');
-    const addMontoBtn = montosList.querySelector('#add-monto');
-    const montosLabel = montosList.querySelector('#montos-label');
-    const montosFieldContainer = montosList.querySelector('#montos-field');
-    const montosTableWrapper = montosList.querySelector('#montos-table-wrapper');
-    const montosRequiredMark = montosLabel?.querySelector('.text-danger');
+    const addCuotaBtn = cuotasList.querySelector('#add-cuota');
+    const cuotasLabel = cuotasList.querySelector('#cuotas-label');
+    const cuotasFieldContainer = cuotasList.querySelector('#cuotas-field');
+    const cuotasTableWrapper = cuotasList.querySelector('#cuotas-table-wrapper');
+    const cuotasRequiredMark = cuotasLabel?.querySelector('.text-danger');
     const tipoInput = tipoField.querySelector('input[name="tipoDeuda"]');
 
-    assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de montos');
+    assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de cuotas');
     assert(acreedorField.nextElementSibling === tipoField, 'Tipo de deuda debe ir después de Acreedor');
-    assert(tipoField.nextElementSibling === montosList, 'Montos debe ir después de Tipo de deuda');
-    assert(form.lastElementChild === appForm, 'Notas debe quedar después del bloque de montos');
+    assert(tipoField.nextElementSibling === cuotasList, 'Cuotas debe ir después de Tipo de deuda');
+    assert(form.lastElementChild === appForm, 'Notas debe quedar después del bloque de cuotas');
     assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo');
     assert(!tipoField.classList.contains('card'), 'Tipo de deuda debe mantenerse como campo normal del formulario');
-    assert(montosFieldContainer !== null, 'Montos debe tener un contenedor principal propio');
-    assert(montosTableWrapper !== null, 'Montos debe tener un wrapper específico para la tabla');
-    assert(montosTableWrapper.classList.contains('border'), 'La tabla de Montos debe usar borde Bootstrap como campo compuesto');
-    assert(montosTableWrapper.classList.contains('rounded'), 'La tabla de Montos debe usar el mismo criterio de radio que el formulario');
-    assert(addMontoBtn.parentElement !== null, 'Agregar monto debe tener contenedor dentro del footer del panel');
-    assert(addMontoBtn.parentElement.classList.contains('d-flex'), 'Agregar monto debe quedar alineado dentro del footer del panel');
-    assert(montosLabel?.textContent.includes('Montos'), 'Montos debe tener label visible');
-    assert(montosLabel?.classList.contains('form-label'), 'El label de Montos debe usar el mismo estilo base del formulario');
-    assert(montosRequiredMark?.textContent === '*', 'Montos debe mostrar asterisco de campo obligatorio');
+    assert(cuotasFieldContainer !== null, 'Cuotas debe tener un contenedor principal propio');
+    assert(cuotasTableWrapper !== null, 'Cuotas debe tener un wrapper específico para la tabla');
+    assert(cuotasTableWrapper.classList.contains('border'), 'La tabla de Cuotas debe usar borde Bootstrap como campo compuesto');
+    assert(cuotasTableWrapper.classList.contains('rounded'), 'La tabla de Cuotas debe usar el mismo criterio de radio que el formulario');
+    assert(addCuotaBtn.parentElement !== null, 'Agregar cuota debe tener contenedor dentro del footer del panel');
+    assert(addCuotaBtn.parentElement.classList.contains('d-flex'), 'Agregar cuota debe quedar alineado dentro del footer del panel');
+    assert(cuotasLabel?.textContent.includes('Cuotas'), 'Cuotas debe tener label visible');
+    assert(cuotasLabel?.classList.contains('form-label'), 'El label de Cuotas debe usar el mismo estilo base del formulario');
+    assert(cuotasRequiredMark?.textContent === '*', 'Cuotas debe mostrar asterisco de campo obligatorio');
     assert(tipoInput.getAttribute('aria-describedby') !== 'tipoDeuda-error', 'Tipo de deuda no debe renderizarse como panel con error custom');
 
     document.body.removeChild(form);
@@ -958,7 +958,7 @@ async function testDebtFormCampoReordenadoMuestraEstadoInvalido() {
         acreedor: 'Visa',
         tipoDeuda: 'Tarjeta',
         notas: '',
-        montos: [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }]
+        cuotas: [{ cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }]
     });
 
     const appForm = form.querySelector('app-form');
@@ -984,7 +984,7 @@ async function testDebtFormTipoDeudaEsObligatorio() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
+    form.cuotas = [{ cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
 
     const appForm = form.querySelector('app-form');
     const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
@@ -1011,42 +1011,42 @@ async function testDebtFormTipoDeudaEsObligatorio() {
 }
 
 // ===================================================================
-// UC16: showFormError muestra el error cerca de la sección de Montos
+// UC16: showFormError muestra el error cerca de la sección de Cuotas
 // ===================================================================
-async function testShowFormErrorNearMontos() {
-    console.log('  UC16: showFormError inserta el mensaje cerca de la sección Montos');
+async function testShowFormErrorNearCuotas() {
+    console.log('  UC16: showFormError inserta el mensaje cerca de la sección Cuotas');
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.showFormError(form.getMontosRequiredError());
+    form.showFormError(form.getCuotasRequiredError());
 
     const errEl = form.querySelector('#form-error');
     assert(errEl !== null, 'Debe existir el elemento #form-error');
-    assert(errEl.textContent === form.getMontosRequiredError(), 'El mensaje de error debe ser correcto');
+    assert(errEl.textContent === form.getCuotasRequiredError(), 'El mensaje de error debe ser correcto');
 
-    const montosList = form.querySelector('.montos-list');
-    const montosFieldContainer = form.querySelector('#montos-field');
-    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
-    assert(montosList !== null, 'Debe existir .montos-list');
-    assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
-    assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
-    assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
-    const montoFormTitle = form.querySelector('#monto-form-title');
-    const montoFormContainer = form.querySelector('#add-monto-form-container');
-    const addMontoBtn = form.querySelector('#add-monto');
-    assert(errEl.nextElementSibling === montoFormTitle, 'El título del formulario de monto debe quedar debajo del mensaje de error');
-    assert(montoFormTitle.nextElementSibling === montoFormContainer, 'El contenedor del formulario de alta debe quedar debajo del título');
-    assert(montoFormContainer.nextElementSibling?.querySelector('#add-monto') === addMontoBtn, 'El botón Agregar monto debe quedar debajo del mensaje de error y del formulario de alta');
-    assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
-    assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
-    assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
+    const cuotasList = form.querySelector('.cuotas-list');
+    const cuotasFieldContainer = form.querySelector('#cuotas-field');
+    const cuotasTableWrapper = form.querySelector('#cuotas-table-wrapper');
+    assert(cuotasList !== null, 'Debe existir .cuotas-list');
+    assert(cuotasList.contains(errEl), 'El error debe renderizarse dentro del bloque de cuotas');
+    assert(errEl.parentElement === cuotasFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Cuotas');
+    assert(errEl.previousElementSibling === cuotasTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de cuotas');
+    const cuotaFormTitle = form.querySelector('#cuota-form-title');
+    const cuotaFormContainer = form.querySelector('#add-cuota-form-container');
+    const addCuotaBtn = form.querySelector('#add-cuota');
+    assert(errEl.nextElementSibling === cuotaFormTitle, 'El título del formulario de cuota debe quedar debajo del mensaje de error');
+    assert(cuotaFormTitle.nextElementSibling === cuotaFormContainer, 'El contenedor del formulario de alta debe quedar debajo del título');
+    assert(cuotaFormContainer.nextElementSibling?.querySelector('#add-cuota') === addCuotaBtn, 'El botón Agregar cuota debe quedar debajo del mensaje de error y del formulario de alta');
+    assert(cuotasTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Cuotas debe marcarse visualmente como inválida');
+    assert(!cuotasFieldContainer.classList.contains('border-danger'), 'El contenedor general de Cuotas no debe marcarse en rojo');
+    assert(!errEl.classList.contains('d-none'), 'El mensaje de error de cuotas debe hacerse visible');
 
     document.body.removeChild(form);
 }
 
-async function testDebtFormRequiereMontosAlEnviar() {
-    console.log('  UC16b: DebtForm marca error visible si se envía sin montos');
+async function testDebtFormRequiereCuotasAlEnviar() {
+    console.log('  UC16b: DebtForm marca error visible si se envía sin cuotas');
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
@@ -1054,17 +1054,17 @@ async function testDebtFormRequiereMontosAlEnviar() {
     const appForm = form.querySelector('app-form');
     const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
     const tipoInput = form.querySelector('[data-field-name="tipoDeuda"] input[name="tipoDeuda"]');
-    const montosFieldContainer = form.querySelector('#montos-field');
-    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
+    const cuotasFieldContainer = form.querySelector('#cuotas-field');
+    const cuotasTableWrapper = form.querySelector('#cuotas-table-wrapper');
     const errEl = form.querySelector('#form-error');
 
     acreedorInput.value = 'Visa';
     tipoInput.value = 'Tarjeta';
     appForm.triggerSubmit();
 
-    assert(errEl.textContent === form.getMontosRequiredError(), 'Debe mostrar error cuando faltan montos');
-    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente al enviar sin montos');
-    assert(!montosFieldContainer.classList.contains('border-danger'), 'El bloque general de Montos no debe quedar en rojo al enviar sin montos');
+    assert(errEl.textContent === form.getCuotasRequiredError(), 'Debe mostrar error cuando faltan cuotas');
+    assert(cuotasTableWrapper.classList.contains('border-danger'), 'La tabla de Cuotas debe marcarse visualmente al enviar sin cuotas');
+    assert(!cuotasFieldContainer.classList.contains('border-danger'), 'El bloque general de Cuotas no debe quedar en rojo al enviar sin cuotas');
 
     document.body.removeChild(form);
 }
@@ -1096,10 +1096,10 @@ async function testDebtModalCancelClosesModal() {
 }
 
 // ===================================================================
-// UC17b: Cancelar monto inline no debe cerrar el DebtModal
+// UC17b: Cancelar cuota inline no debe cerrar el DebtModal
 // ===================================================================
-async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
-    console.log('  UC17b: Cancelar monto inline no cierra el modal de deuda');
+async function testDebtModalInlineCuotaCancelDoesNotCloseModal() {
+    console.log('  UC17b: Cancelar cuota inline no cierra el modal de deuda');
 
     const modal = document.createElement('debt-modal');
     document.body.appendChild(modal);
@@ -1111,22 +1111,22 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
 
     const debtForm = modal.querySelector('debt-form');
     debtForm.openInlineAdd();
-    const inlineMontoForm = debtForm.querySelector('#add-monto-form-container app-form');
-    const inlineActionRow = inlineMontoForm?.querySelector('[data-form-actions="true"]');
+    const inlineCuotaForm = debtForm.querySelector('#add-cuota-form-container app-form');
+    const inlineActionRow = inlineCuotaForm?.querySelector('[data-form-actions="true"]');
     const inlineCancelBtn = inlineActionRow?.querySelector('#cancelBtn');
     const inlineSaveBtn = inlineActionRow?.querySelector('button[type="submit"]');
     const footerCancelBtn = modal.querySelector('.modal-footer .btn.btn-primary');
     const footerSaveBtn = modal.querySelector('.modal-footer .btn.btn-success');
-    assert(inlineMontoForm !== null, 'Debe existir app-form inline para cancelar monto');
-    assert(inlineCancelBtn?.classList.contains('btn-sm'), 'Cancelar del monto inline debe usar tamaño chico');
-    assert(inlineSaveBtn?.classList.contains('btn-sm'), 'Guardar del monto inline debe usar tamaño chico');
+    assert(inlineCuotaForm !== null, 'Debe existir app-form inline para cancelar cuota');
+    assert(inlineCancelBtn?.classList.contains('btn-sm'), 'Cancelar dla cuota inline debe usar tamaño chico');
+    assert(inlineSaveBtn?.classList.contains('btn-sm'), 'Guardar dla cuota inline debe usar tamaño chico');
     assert(!footerCancelBtn?.classList.contains('btn-sm'), 'Cancelar del footer del modal no debe usar tamaño chico');
     assert(!footerSaveBtn?.classList.contains('btn-sm'), 'Guardar del footer del modal no debe usar tamaño chico');
 
-    inlineMontoForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+    inlineCuotaForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
 
-    assert(closeCalls === 0, 'Cancelar el monto inline no debe cerrar el modal de deuda');
-    assert(debtForm._inlineEditIdx === null, 'Cancelar monto inline debe cerrar sólo la fila inline');
+    assert(closeCalls === 0, 'Cancelar la cuota inline no debe cerrar el modal de deuda');
+    assert(debtForm._inlineEditIdx === null, 'Cancelar cuota inline debe cerrar sólo la fila inline');
 
     modal.ui.close = origClose;
     document.body.removeChild(modal);
@@ -1142,7 +1142,7 @@ async function testDebtModalFooterUxValidacionConsistente() {
     const appForm = modal.querySelector('app-form');
     const nativeForm = appForm.querySelector('form');
     const acreedorField = modal.querySelector('[data-field-name="acreedor"]');
-    const montosTableWrapper = modal.querySelector('#montos-table-wrapper');
+    const cuotasTableWrapper = modal.querySelector('#cuotas-table-wrapper');
     const formError = modal.querySelector('#form-error');
     const saveBtn = modal.querySelector('.modal-footer .btn.btn-success');
 
@@ -1154,8 +1154,8 @@ async function testDebtModalFooterUxValidacionConsistente() {
 
     assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el formulario al intentar guardar vacío desde el footer');
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe mostrar el estado inválido recién después del envío');
-    assert(formError.textContent === modal.querySelector('debt-form').getMontosRequiredError(), 'Montos debe mostrar error también cuando el formulario está vacío');
-    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente cuando se intenta guardar vacío');
+    assert(formError.textContent === modal.querySelector('debt-form').getCuotasRequiredError(), 'Cuotas debe mostrar error también cuando el formulario está vacío');
+    assert(cuotasTableWrapper.classList.contains('border-danger'), 'La tabla de Cuotas debe marcarse visualmente cuando se intenta guardar vacío');
 
     document.body.removeChild(modal);
 }
@@ -1173,13 +1173,13 @@ async function testDebtModalReopenClearsValidationState() {
 
     let nativeForm = debtForm.querySelector('app-form form');
     let acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
-    let montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
+    let cuotasTableWrapper = debtForm.querySelector('#cuotas-table-wrapper');
     let formError = debtForm.querySelector('#form-error');
 
     assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el form inválido antes de reabrir');
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe marcarse inválido antes de reabrir');
-    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse inválida antes de reabrir');
-    assert(formError.textContent === debtForm.getMontosRequiredError(), 'Debe existir error de montos antes de reabrir');
+    assert(cuotasTableWrapper.classList.contains('border-danger'), 'La tabla de Cuotas debe marcarse inválida antes de reabrir');
+    assert(formError.textContent === debtForm.getCuotasRequiredError(), 'Debe existir error de cuotas antes de reabrir');
 
     modal.close();
     modal.openCreate();
@@ -1187,13 +1187,13 @@ async function testDebtModalReopenClearsValidationState() {
 
     nativeForm = debtForm.querySelector('app-form form');
     acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
-    montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
+    cuotasTableWrapper = debtForm.querySelector('#cuotas-table-wrapper');
     formError = debtForm.querySelector('#form-error');
 
     assert(!nativeForm.classList.contains('was-validated'), 'No debe persistir was-validated al reabrir el modal');
     assert(!acreedorField.classList.contains('was-validated'), 'Acreedor no debe conservar estado inválido al reabrir');
-    assert(!montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos no debe conservar borde de error al reabrir');
-    assert(formError.textContent === '', 'El error de montos debe limpiarse al reabrir');
+    assert(!cuotasTableWrapper.classList.contains('border-danger'), 'La tabla de Cuotas no debe conservar borde de error al reabrir');
+    assert(formError.textContent === '', 'El error de cuotas debe limpiarse al reabrir');
 
     document.body.removeChild(modal);
 }
@@ -1229,7 +1229,7 @@ async function testDebtEntityShellRenderConEntidades() {
     // Crear una deuda directamente usando el formulario
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [{ monto: 10000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }];
+    form.cuotas = [{ cuota: 10000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Test', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
@@ -1258,10 +1258,10 @@ async function testDebtEntityShellCuotasFormato() {
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [
-        { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
-        { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: true },
-        { monto: 5000, moneda: 'ARS', vencimiento: '2026-05-01', pagado: false }
+    form.cuotas = [
+        { cuota: 5000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
+        { cuota: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: true },
+        { cuota: 5000, moneda: 'ARS', vencimiento: '2026-05-01', pagado: false }
     ];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
@@ -1304,7 +1304,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     // Agregar una deuda y disparar el evento deuda:saved
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [{ monto: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
+    form.cuotas = [{ cuota: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Acreedor Nuevo', tipoDeuda: 'Tarjeta', notas: '' } });
     document.body.removeChild(form);
 
@@ -1397,9 +1397,9 @@ async function testDebtListRenderTotalsPendienteYPagado() {
 
     // Amount text must contain both currencies joined with /
     const amountEl = totalsEl.querySelector('.bg-warning-subtle .fw-bold');
-    assert(amountEl !== null, 'Debe existir el elemento de monto pendiente');
+    assert(amountEl !== null, 'Debe existir el elemento de cuota pendiente');
     const secondaryEl = amountEl.querySelector('small');
-    assert(secondaryEl !== null, 'Monto pendiente con multi-moneda debe tener elemento small para moneda secundaria');
+    assert(secondaryEl !== null, 'Cuota pendiente con multi-moneda debe tener elemento small para moneda secundaria');
 
     const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
     assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
@@ -1502,7 +1502,7 @@ async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
     list.totalesPendientes = { ARS: 1500 };
     list.totalesPagados = {};
     list.debts = [{
-        montos: [
+        cuotas: [
             { pagado: false, vencimiento: yesterday },
             { pagado: false, vencimiento: '' },
             { pagado: false, vencimiento: 'sin-fecha' },
@@ -1538,9 +1538,9 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
     list.debts = [{
         acreedor: 'Banco Galicia',
         tipoDeuda: 'Prestamo',
-        montos: [
-            { id: 1, deudaId: 10, monto: 1000, moneda: 'ARS', vencimiento: '2026-12-01', pagado: false },
-            { id: 2, deudaId: 10, monto: 500, moneda: 'ARS', vencimiento: '2026-12-10', pagado: false },
+        cuotas: [
+            { id: 1, deudaId: 10, cuota: 1000, moneda: 'ARS', vencimiento: '2026-12-01', pagado: false },
+            { id: 2, deudaId: 10, cuota: 500, moneda: 'ARS', vencimiento: '2026-12-10', pagado: false },
         ]
     }];
 
@@ -1551,7 +1551,7 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
     assert(list.querySelector('.debt-card-avatar') !== null, 'La vista agrupada debe usar la estructura de DebtRowItem');
     assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
     assert(list.querySelector('i.bi-chevron-right') !== null, 'La fila agrupada debe mostrar acción de detalle individual cuando show-detail-action está habilitado');
-    assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
+    assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar la cuota agregada');
 
     document.body.removeChild(list);
 }
@@ -1565,10 +1565,10 @@ async function testDebtEntityShellTotalesBarPorMoneda() {
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [
-        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false },
-        { monto: 5000,  moneda: 'ARS', vencimiento: '2026-07-01', pagado: false },
-        { monto: 50,    moneda: 'USD', vencimiento: '2026-06-01', pagado: false }
+    form.cuotas = [
+        { cuota: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false },
+        { cuota: 5000,  moneda: 'ARS', vencimiento: '2026-07-01', pagado: false },
+        { cuota: 50,    moneda: 'USD', vencimiento: '2026-06-01', pagado: false }
     ];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Multi', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
@@ -1600,8 +1600,8 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
-    form.montos = [
-        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: true }
+    form.cuotas = [
+        { cuota: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: true }
     ];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Pagado', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
@@ -1613,7 +1613,7 @@ async function testDebtEntityShellTotalesBarSinPendiente() {
 
     const container = shell.querySelector('#entity-table-container');
     const totalsBar = container.querySelector('.border-top');
-    assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos los montos están pagados');
+    assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos las cuotas están pagados');
 
     document.body.removeChild(shell);
     window.history.pushState({}, '', '/');
@@ -1630,11 +1630,11 @@ async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.montos = [{ monto: 20000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
+    form.cuotas = [{ cuota: 20000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad A', tipoDeuda: 'Prestamo', notas: '' } });
     form.reset();
 
-    form.montos = [{ monto: 8000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }];
+    form.cuotas = [{ cuota: 8000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }];
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad B', tipoDeuda: 'Tarjeta', notas: '' } });
     document.body.removeChild(form);
 
@@ -1698,7 +1698,7 @@ async function testDebtRowItem() {
         id: 99,
         acreedor: 'Test Acreedor',
         tipoDeuda: 'Prestamo',
-        monto: 1000,
+        cuota: 1000,
         moneda: 'ARS',
         vencimiento: '2026-12-01',
         pagado: false,
@@ -1737,8 +1737,8 @@ async function testDebtRowItem() {
     assert(nameEl !== null && nameEl.textContent === 'Test Acreedor', 'Debe mostrar nombre del acreedor');
 
     const amountEl = tr.querySelector('.fw-normal.text-nowrap');
-    assert(amountEl !== null, 'Debe mostrar monto con peso normal');
-    assert(amountEl.textContent === '$ 1.000,00', 'Monto debe mantener dos decimales');
+    assert(amountEl !== null, 'Debe mostrar cuota con peso normal');
+    assert(amountEl.textContent === '$ 1.000,00', 'Cuota debe mantener dos decimales');
 
     // Badge de tipo con ícono Bootstrap Icons
     const tipoBadge = tr.querySelector('.badge.rounded-pill');
@@ -1786,16 +1786,16 @@ export const tests = [
     testEdicionInlineGuardar,
     testCancelarEdicionInline,
     testSoloUnInlineAbierto,
-    testDuplicarMontoInline,
+    testDuplicarCuotaInline,
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,
     testDebtFormLayoutMobileFirst,
     testDebtFormCampoReordenadoMuestraEstadoInvalido,
     testDebtFormTipoDeudaEsObligatorio,
-    testShowFormErrorNearMontos,
-    testDebtFormRequiereMontosAlEnviar,
+    testShowFormErrorNearCuotas,
+    testDebtFormRequiereCuotasAlEnviar,
     testDebtModalCancelClosesModal,
-    testDebtModalInlineMontoCancelDoesNotCloseModal,
+    testDebtModalInlineCuotaCancelDoesNotCloseModal,
     testDebtModalFooterUxValidacionConsistente,
     testDebtModalReopenClearsValidationState,
     testDebtEntityShellRenderVacio,

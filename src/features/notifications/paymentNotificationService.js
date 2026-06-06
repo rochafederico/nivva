@@ -10,7 +10,7 @@ import { formatDate, formatRelativeDate, showInAppPanel } from './paymentNotific
 function paymentKey(p) {
     return p.deudaId != null
         ? `${p.deudaId}-${p.vencimiento}`
-        : `${p.acreedor}-${p.monto}-${p.moneda}-${p.vencimiento}`;
+        : `${p.acreedor}-${p.cuota}-${p.moneda}-${p.vencimiento}`;
 }
 
 function getNotifiedKeys() {
@@ -52,12 +52,12 @@ function isOverdue(dueDate, now) {
 }
 
 /**
- * Returns montos that are unpaid and either overdue in the current month or
+ * Returns cuotas that are unpaid and either overdue in the current month or
  * due within the next `days` days.
- * @param {Array<{id?: number, acreedor: string, montos: Array}>} deudas
+ * @param {Array<{id?: number, acreedor: string, cuotas: Array}>} deudas
  * @param {number} [days=DAYS_AHEAD]
  * @param {Date} [now=new Date()]
- * @returns {Array<{deudaId?: number, acreedor: string, monto: number, moneda: string, vencimiento: string}>}
+ * @returns {Array<{deudaId?: number, acreedor: string, cuota: number, moneda: string, vencimiento: string}>}
  */
 export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date()) {
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -66,18 +66,18 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
     const upcoming = [];
 
     for (const deuda of deudas) {
-        for (const monto of (deuda.montos || [])) {
-            if (monto.pagado || !monto.vencimiento) continue;
-            const venc = new Date(monto.vencimiento + 'T00:00:00');
+        for (const cuota of (deuda.cuotas || [])) {
+            if (cuota.pagado || !cuota.vencimiento) continue;
+            const venc = new Date(cuota.vencimiento + 'T00:00:00');
             const isOverdueThisMonth = venc < todayStart && isSameMonth(venc, todayStart);
             const isUpcoming = venc >= todayStart && venc <= limitDate;
             if (isOverdueThisMonth || isUpcoming) {
                 upcoming.push({
                     deudaId: deuda.id,
                     acreedor: deuda.acreedor,
-                    monto: monto.monto,
-                    moneda: monto.moneda || 'ARS',
-                    vencimiento: monto.vencimiento
+                    cuota: cuota.cuota,
+                    moneda: cuota.moneda || 'ARS',
+                    vencimiento: cuota.vencimiento
                 });
             }
         }
@@ -88,16 +88,16 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
 
 /**
  * Sends a native browser notification for a single payment.
- * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
+ * @param {{acreedor: string, cuota: number, moneda: string, vencimiento: string}} payment
  * @param {Date} [now=new Date()]
  */
 export function sendPaymentNotification(payment, now = new Date()) {
     if (!isNotificationSupported() || Notification.permission !== 'granted') return;
-    const { acreedor, monto, moneda, vencimiento } = payment;
+    const { acreedor, cuota, moneda, vencimiento } = payment;
     const overdue = isOverdue(vencimiento, now);
     const verb = overdue ? 'Venció' : 'Vence';
     const title = overdue ? `⚠️ Vencimiento pendiente: ${acreedor}` : `⚠️ Próximo vencimiento: ${acreedor}`;
-    const body = `💰 ${moneda} ${monto.toLocaleString('es-AR')} · 📅 ${verb} ${formatRelativeDate(vencimiento, now)} (${formatDate(vencimiento)})`;
+    const body = `💰 ${moneda} ${cuota.toLocaleString('es-AR')} · 📅 ${verb} ${formatRelativeDate(vencimiento, now)} (${formatDate(vencimiento)})`;
     new Notification(title, { body, icon: '/favicon.ico' });
 }
 

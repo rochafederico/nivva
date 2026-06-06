@@ -96,7 +96,7 @@
 ### Reglas responsive específicas
 
 - **Modal:** en mobile, el modal ocupa toda la pantalla (`modal-fullscreen-sm-down` recomendado para formularios).
-- **Tabla de montos:** en mobile puede requerir scroll horizontal (`.overflow-auto` en el wrapper — ya implementado en DebtDetailModal).
+- **Tabla de cuotas:** en mobile puede requerir scroll horizontal (`.overflow-auto` en el wrapper — ya implementado en DebtDetailModal).
 - **StatsCards:** `row-cols-1 row-cols-sm-2 row-cols-md-4` — copy de título y valor debe funcionar en mínimo 1 columna.
 - **Toasts:** `position-fixed top-0 end-0` — en mobile ocupan casi el ancho completo. Asegurar que el texto sea legible en ~320px de ancho.
 - **BottomNav:** 4 ítems fijos. Agregar un quinto requeriría revisar el layout.

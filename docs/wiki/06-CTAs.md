@@ -42,7 +42,7 @@ Exportar datos        ← verbo + objeto
 
 | Verbo | Uso en Nivva | Ejemplo de CTA |
 |---|---|---|
-| **Agregar** | Alta de ítems (egresos, ingresos, inversiones, montos) | `Agregar egreso`, `Agregar monto`, `Agregar inversión` |
+| **Agregar** | Alta de ítems (egresos, ingresos, inversiones, cuotas) | `Agregar egreso`, `Agregar cuota`, `Agregar inversión` |
 | **Guardar** | Confirmar formulario con cambios | `Guardar`, `Guardar cambios` |
 | **Cancelar** | Descartar acción/modal sin guardar | `Cancelar` |
 | **Eliminar** | Borrar un ítem o todos los datos | `Eliminar`, `Eliminar todos los datos` |
@@ -81,12 +81,12 @@ Exportar datos        ← verbo + objeto
 
 | CTA actual | Pantalla | ¿Cumple patrón? | Propuesta |
 |---|---|---|---|
-| `Agregar monto` | DebtForm | ✅ | — |
-| `Guardar` | DebtForm, MontoForm, InversionModal | ✅ | — |
-| `Cancelar` | DebtForm, MontoForm, IngresoForm, InversionModal | ✅ | — |
-| `Editar` | DebtForm (monto), DebtDetailModal | ✅ | — |
-| `Eliminar` | DebtForm (monto), InversionesList | ✅ | — |
-| `Duplicar` | DebtForm (monto) | ✅ | — |
+| `Agregar cuota` | DebtForm | ✅ | — |
+| `Guardar` | DebtForm, CuotaForm, InversionModal | ✅ | — |
+| `Cancelar` | DebtForm, CuotaForm, IngresoForm, InversionModal | ✅ | — |
+| `Editar` | DebtForm (cuota), DebtDetailModal | ✅ | — |
+| `Eliminar` | DebtForm (cuota), InversionesList | ✅ | — |
+| `Duplicar` | DebtForm (cuota) | ✅ | — |
 | `Marcar como pagado` | DebtForm | ✅ | — |
 | `Agregar ingreso` | IngresoForm | ✅ | — |
 | `Agregar inversión` | InversionesList | ✅ | — |
@@ -112,7 +112,7 @@ Exportar datos        ← verbo + objeto
 Agregar egreso
 Agregar ingreso
 Agregar inversión
-Agregar monto
+Agregar cuota
 ```
 
 ### Edición / actualización

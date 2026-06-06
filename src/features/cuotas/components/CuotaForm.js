@@ -1,21 +1,21 @@
-// src/components/MontoForm.js
+// src/components/CuotaForm.js
 import monedas from '../../../shared/config/monedas.js';
 import '../../../shared/components/AppForm.js';
 
-export const MONTO_FORM_GENERAL_ERROR_MESSAGE = 'Completá monto, moneda y vencimiento para agregar el monto.';
+export const CUOTA_FORM_GENERAL_ERROR_MESSAGE = 'Completá cuota, moneda y vencimiento para agregar la cuota.';
 
-export class MontoForm extends HTMLElement {
+export class CuotaForm extends HTMLElement {
     constructor() {
         super();
-        this._monto = {};
+        this._cuota = {};
     }
 
-    set monto(data) {
-        this._monto = data || {};
+    set cuota(data) {
+        this._cuota = data || {};
         this.render();
     }
-    get monto() {
-        return this._monto;
+    get cuota() {
+        return this._cuota;
     }
 
     get inline() {
@@ -47,8 +47,8 @@ export class MontoForm extends HTMLElement {
         this.render();
         this.form = this.querySelector('app-form');
         if (this.form) {
-            this.form.addEventListener('monto:submit', e => {
-                this.dispatchEvent(new CustomEvent('monto:save', {
+            this.form.addEventListener('cuota:submit', e => {
+                this.dispatchEvent(new CustomEvent('cuota:save', {
                     detail: e.detail,
                     bubbles: true,
                     composed: true
@@ -56,7 +56,7 @@ export class MontoForm extends HTMLElement {
             });
             this.form.addEventListener('form:cancel', (e) => {
                 e.stopPropagation();
-                this.dispatchEvent(new CustomEvent('monto:cancel', { bubbles: true, composed: true }));
+                this.dispatchEvent(new CustomEvent('cuota:cancel', { bubbles: true, composed: true }));
             });
         }
     }
@@ -65,16 +65,16 @@ export class MontoForm extends HTMLElement {
         this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = [
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'cuota', type: 'number', label: 'Cuota', required: true, min: 0.01 },
             { name: 'moneda', type: 'select', label: 'Moneda', options: monedas, required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'vencimiento', type: 'date', label: 'Vencimiento', required: true }
         ];
-        form.initialValues = this._monto || {};
+        form.initialValues = this._cuota || {};
         form.submitText = 'Guardar';
         form.cancelText = 'Cancelar';
         // Usar evento personalizado para submit
         form.addEventListener('form:submit', e => {
-            form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
+            form.dispatchEvent(new CustomEvent('cuota:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
         if (this.compactErrors) {
             this._applyCompactErrors(form);
@@ -92,7 +92,7 @@ export class MontoForm extends HTMLElement {
 
         const fieldsRow = document.createElement('div');
         fieldsRow.className = 'row g-2 align-items-end';
-        const fieldNames = ['monto', 'moneda', 'vencimiento'];
+        const fieldNames = ['cuota', 'moneda', 'vencimiento'];
         const fields = fieldNames.map(fieldName => formEl.querySelector(`[data-field-name="${fieldName}"]`));
         if (fields.some(field => field === null)) return;
         fields.forEach(field => {
@@ -112,7 +112,7 @@ export class MontoForm extends HTMLElement {
         const formEl = form.querySelector('form');
         if (!formEl) return;
         const actionRow = formEl.querySelector('[data-form-actions="true"]');
-        const generalError = formEl.querySelector('[data-monto-general-error="true"]');
+        const generalError = formEl.querySelector('[data-cuota-general-error="true"]');
 
         if (generalError) {
             generalError.classList.add('w-100', 'mt-0');
@@ -138,8 +138,8 @@ export class MontoForm extends HTMLElement {
             const input = feedbackEl.previousElementSibling;
             if (!input) return;
             const fieldName = input.name;
-            if (fieldName === 'monto') {
-                feedbackEl.textContent = 'Ingresá un monto válido.';
+            if (fieldName === 'cuota') {
+                feedbackEl.textContent = 'Ingresá una cuota válido.';
             } else if (fieldName === 'moneda') {
                 feedbackEl.textContent = 'Seleccioná una moneda.';
             } else if (fieldName === 'vencimiento') {
@@ -153,8 +153,8 @@ export class MontoForm extends HTMLElement {
         if (!formEl) return;
         const generalError = document.createElement('div');
         generalError.className = 'invalid-feedback mt-2 d-none';
-        generalError.dataset.montoGeneralError = 'true';
-        generalError.textContent = MONTO_FORM_GENERAL_ERROR_MESSAGE;
+        generalError.dataset.cuotaGeneralError = 'true';
+        generalError.textContent = CUOTA_FORM_GENERAL_ERROR_MESSAGE;
         formEl.appendChild(generalError);
 
         const clearGeneralError = () => {
@@ -171,4 +171,4 @@ export class MontoForm extends HTMLElement {
         form.addEventListener('change', clearGeneralError);
     }
 }
-customElements.define('monto-form', MontoForm);
+customElements.define('cuota-form', CuotaForm);

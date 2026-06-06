@@ -44,7 +44,7 @@
 > `#Nivva #finanzaspersonales #controlfinanciero #egresos #deudas #Argentina #appgratis`
 
 **Post 2 (06/05) — Carrusel:**
-> Slide 1: Agregá tus egresos con acreedor, monto y fecha de vencimiento.
+> Slide 1: Agregá tus egresos con acreedor, cuota y fecha de vencimiento.
 > Slide 2: Navegá entre meses para ver lo que viene.
 > Slide 3: Mirá tu resumen: total a pagar, por moneda (ARS y USD).
 >
@@ -77,7 +77,7 @@
 **Post 4 (11/05) — Reel:**
 > Con Nivva podés cargar:
 > ✔️ Acreedor
-> ✔️ Monto en ARS o USD
+> ✔️ Cuota en ARS o USD
 > ✔️ Fecha de vencimiento
 > ✔️ Cuántas cuotas quedan
 >
@@ -88,9 +88,9 @@
 > `#Nivva #finanzas #deudas #ARS #USD #controldedeudas #Argentina`
 
 **Post 5 (13/05) — Carrusel:**
-> 📌 Egreso fijo: monto constante todos los meses. Alquiler, cuota del seguro, servicio de streaming.
+> 📌 Egreso fijo: cuota constante todos los meses. Alquiler, cuota del seguro, servicio de streaming.
 >
-> 📌 Egreso variable: monto que cambia. La boleta de luz, el súper, salir a comer.
+> 📌 Egreso variable: cuota que cambia. La boleta de luz, el súper, salir a comer.
 >
 > Registrar los fijos primero te da una base sólida para planificar. Nivva te ayuda a hacerlo.
 >

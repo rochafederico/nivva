@@ -18,8 +18,8 @@ export class ExportDataModal extends HTMLElement {
             acreedor: d.acreedor,
             tipoDeuda: d.tipoDeuda,
             notas: d.notas,
-            montos: (d.montos || []).map(m => ({
-                monto: m.monto,
+            cuotas: (d.cuotas || []).map(m => ({
+                cuota: m.cuota,
                 moneda: m.moneda,
                 vencimiento: m.vencimiento,
                 periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : ''),

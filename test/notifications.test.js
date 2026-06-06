@@ -33,20 +33,20 @@ async function testGetUpcomingPayments() {
     const deudas = [
         {
             acreedor: 'Banco A',
-            montos: [
-                { monto: 1000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: false }, // today
-                { monto: 2000, moneda: 'ARS', vencimiento: '2026-04-05', pagado: false }, // 2 days ahead
-                { monto: 3000, moneda: 'ARS', vencimiento: '2026-04-06', pagado: false }, // 3 days ahead (limit)
-                { monto: 4000, moneda: 'ARS', vencimiento: '2026-04-07', pagado: false }, // 4 days ahead (out)
-                { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: true },  // paid (excluded)
-                { monto: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // overdue this month (included)
-                { monto: 7000, moneda: 'ARS', vencimiento: '2026-03-31', pagado: false }, // past previous month (excluded)
+            cuotas: [
+                { cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: false }, // today
+                { cuota: 2000, moneda: 'ARS', vencimiento: '2026-04-05', pagado: false }, // 2 days ahead
+                { cuota: 3000, moneda: 'ARS', vencimiento: '2026-04-06', pagado: false }, // 3 days ahead (limit)
+                { cuota: 4000, moneda: 'ARS', vencimiento: '2026-04-07', pagado: false }, // 4 days ahead (out)
+                { cuota: 5000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: true },  // paid (excluded)
+                { cuota: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // overdue this month (included)
+                { cuota: 7000, moneda: 'ARS', vencimiento: '2026-03-31', pagado: false }, // past previous month (excluded)
             ]
         },
         {
             acreedor: 'Banco B',
-            montos: [
-                { monto: 100, moneda: 'USD', vencimiento: '2026-04-04', pagado: false } // 1 day ahead
+            cuotas: [
+                { cuota: 100, moneda: 'USD', vencimiento: '2026-04-04', pagado: false } // 1 day ahead
             ]
         }
     ];
@@ -54,14 +54,14 @@ async function testGetUpcomingPayments() {
     const upcoming = getUpcomingPayments(deudas, 3, now);
 
     assert(upcoming.length === 5, `Debe haber 5 pagos a considerar, encontrados: ${upcoming.length}`);
-    assert(upcoming.some(p => p.monto === 1000), 'Incluye pago de hoy');
-    assert(upcoming.some(p => p.monto === 2000), 'Incluye pago en 2 días');
-    assert(upcoming.some(p => p.monto === 3000), 'Incluye pago en 3 días (límite)');
-    assert(upcoming.some(p => p.monto === 100 && p.moneda === 'USD'), 'Incluye pago USD');
-    assert(upcoming.some(p => p.monto === 6000), 'Incluye pago vencido del mes actual');
-    assert(!upcoming.some(p => p.monto === 4000), 'Excluye pago fuera de rango');
-    assert(!upcoming.some(p => p.monto === 5000), 'Excluye pago ya pagado');
-    assert(!upcoming.some(p => p.monto === 7000), 'Excluye pago vencido de otro mes');
+    assert(upcoming.some(p => p.cuota === 1000), 'Incluye pago de hoy');
+    assert(upcoming.some(p => p.cuota === 2000), 'Incluye pago en 2 días');
+    assert(upcoming.some(p => p.cuota === 3000), 'Incluye pago en 3 días (límite)');
+    assert(upcoming.some(p => p.cuota === 100 && p.moneda === 'USD'), 'Incluye pago USD');
+    assert(upcoming.some(p => p.cuota === 6000), 'Incluye pago vencido del mes actual');
+    assert(!upcoming.some(p => p.cuota === 4000), 'Excluye pago fuera de rango');
+    assert(!upcoming.some(p => p.cuota === 5000), 'Excluye pago ya pagado');
+    assert(!upcoming.some(p => p.cuota === 7000), 'Excluye pago vencido de otro mes');
 }
 
 // ===================================================================
@@ -74,7 +74,7 @@ async function testGetUpcomingPaymentsShape() {
     const deudas = [{
         id: 42,
         acreedor: 'Visa',
-        montos: [{ monto: 500, moneda: 'USD', vencimiento: '2026-04-04', pagado: false }]
+        cuotas: [{ cuota: 500, moneda: 'USD', vencimiento: '2026-04-04', pagado: false }]
     }];
 
     const upcoming = getUpcomingPayments(deudas, 3, now);
@@ -83,7 +83,7 @@ async function testGetUpcomingPaymentsShape() {
     const p = upcoming[0];
     assert(p.deudaId === 42, 'deudaId correcto');
     assert(p.acreedor === 'Visa', 'acreedor correcto');
-    assert(p.monto === 500, 'monto correcto');
+    assert(p.cuota === 500, 'cuota correcto');
     assert(p.moneda === 'USD', 'moneda correcta');
     assert(p.vencimiento === '2026-04-04', 'vencimiento correcto');
 }
@@ -172,9 +172,9 @@ async function testCheckAndNotifySendsNotifications() {
 
     const deudas = [{
         acreedor: 'MiCredito',
-        montos: [
-            { monto: 800, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false },
-            { monto: 999, moneda: 'USD', vencimiento: '2026-04-07', pagado: false } // out of range
+        cuotas: [
+            { cuota: 800, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false },
+            { cuota: 999, moneda: 'USD', vencimiento: '2026-04-07', pagado: false } // out of range
         ]
     }];
 
@@ -213,7 +213,7 @@ async function testCheckAndNotifySendsOverdueNotifications() {
     };
 
     const { sendPaymentNotification: spn } = await import('../src/features/notifications/NotificationService.js');
-    spn({ acreedor: 'MiCredito', monto: 800, moneda: 'ARS', vencimiento: '2026-04-02' }, now);
+    spn({ acreedor: 'MiCredito', cuota: 800, moneda: 'ARS', vencimiento: '2026-04-02' }, now);
 
     assert(notificationsSent.length === 1, 'Debe enviar 1 notificación vencida');
     assert(notificationsSent[0].title === '⚠️ Vencimiento pendiente: MiCredito', 'Título vencido correcto');
@@ -264,7 +264,7 @@ async function testShowInAppNotification() {
 
     // Pass a fixed `now` so the relative-date label is deterministic
     showInAppNotification(
-        { acreedor: 'Pago Test', monto: 999, moneda: 'ARS', vencimiento: '2026-04-05' },
+        { acreedor: 'Pago Test', cuota: 999, moneda: 'ARS', vencimiento: '2026-04-05' },
         localDate(2026, 4, 4)
     );
 
@@ -290,7 +290,7 @@ async function testShowInAppNotificationOverdue() {
     window.addEventListener('app:notify', handler);
 
     showInAppNotification(
-        { acreedor: 'Pago Vencido', monto: 999, moneda: 'ARS', vencimiento: '2026-04-02' },
+        { acreedor: 'Pago Vencido', cuota: 999, moneda: 'ARS', vencimiento: '2026-04-02' },
         localDate(2026, 4, 3)
     );
 
@@ -324,13 +324,13 @@ async function testCheckAndNotifyGroupedNative() {
     // Use getUpcomingPayments + sendGroupedNotification directly with a fixed date
     const { getUpcomingPayments: gup, sendGroupedNotification: sgn } = await import('../src/features/notifications/NotificationService.js');
     const now = localDate(2026, 4, 3);
-    const montos = Array.from({ length: 6 }, (_, i) => ({
-        monto: (i + 1) * 100,
+    const cuotas = Array.from({ length: 6 }, (_, i) => ({
+        cuota: (i + 1) * 100,
         moneda: 'ARS',
         vencimiento: '2026-04-04',
         pagado: false
     }));
-    const deudas = [{ acreedor: 'Banco Test', montos }];
+    const deudas = [{ acreedor: 'Banco Test', cuotas }];
     const upcoming = gup(deudas, 3, now);
 
     assert(upcoming.length === 6, `Deben haber 6 pagos pendientes, encontrados: ${upcoming.length}`);
@@ -394,17 +394,17 @@ async function testBuildUpcomingPaymentsHTML() {
     const now = localDate(2026, 4, 3);
 
     const payments = [
-        { acreedor: 'Cable',    monto: 1500,   moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue
-        { acreedor: 'Patente',  monto: 2100,   moneda: 'ARS', vencimiento: '2026-03-31' }, // old overdue (excluded)
-        { acreedor: 'NaranjaX', monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
-        { acreedor: 'Brubank',  monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
-        { acreedor: 'Juli',     monto: 598646, moneda: 'ARS', vencimiento: '2026-04-04' }, // tomorrow
-        { acreedor: 'Personal', monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
-        { acreedor: 'Edenor',   monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
-        { acreedor: 'Netflix',  monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
-        { acreedor: 'San Lorenzo', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
-        { acreedor: 'Expensas', monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
-        { acreedor: 'MercadoPago', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest (6th → truncated)
+        { acreedor: 'Cable',    cuota: 1500,   moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue
+        { acreedor: 'Patente',  cuota: 2100,   moneda: 'ARS', vencimiento: '2026-03-31' }, // old overdue (excluded)
+        { acreedor: 'NaranjaX', cuota: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
+        { acreedor: 'Brubank',  cuota: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
+        { acreedor: 'Juli',     cuota: 598646, moneda: 'ARS', vencimiento: '2026-04-04' }, // tomorrow
+        { acreedor: 'Personal', cuota: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'Edenor',   cuota: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'Netflix',  cuota: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'San Lorenzo', cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
+        { acreedor: 'Expensas', cuota: 1000,   moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
+        { acreedor: 'MercadoPago', cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest (6th → truncated)
     ];
 
     const { html, todayCount, overdueCount } = buildUpcomingPaymentsHTML(payments, now);
@@ -434,7 +434,7 @@ async function testBuildUpcomingPaymentsHTML() {
     // Totals section – 1 overdue payment (Cable ARS 1500)
     assert(html.includes('1 vencido'), 'Incluye conteo de pagos vencidos');
     assert(html.includes('text-bg-danger'), 'Usa badge Bootstrap text-bg-danger para totales');
-    assert(html.includes('1.500'), 'Incluye monto total del vencido en ARS');
+    assert(html.includes('1.500'), 'Incluye cuota total del vencido en ARS');
 
     // View link
     assert(html.includes('Ver cuotas del mes'), 'Incluye link "Ver cuotas del mes"');
@@ -466,10 +466,10 @@ async function testBuildUpcomingPaymentsHTMLMultiCurrencyTotals() {
     const now = localDate(2026, 4, 3);
 
     const payments = [
-        { acreedor: 'Banco A', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01' }, // overdue ARS
-        { acreedor: 'Banco B', monto: 2000, moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue ARS
-        { acreedor: 'Banco C', monto: 100,  moneda: 'USD', vencimiento: '2026-04-02' }, // overdue USD
-        { acreedor: 'Banco D', monto: 500,  moneda: 'ARS', vencimiento: '2026-04-04' }, // upcoming (not overdue)
+        { acreedor: 'Banco A', cuota: 1000, moneda: 'ARS', vencimiento: '2026-04-01' }, // overdue ARS
+        { acreedor: 'Banco B', cuota: 2000, moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue ARS
+        { acreedor: 'Banco C', cuota: 100,  moneda: 'USD', vencimiento: '2026-04-02' }, // overdue USD
+        { acreedor: 'Banco D', cuota: 500,  moneda: 'ARS', vencimiento: '2026-04-04' }, // upcoming (not overdue)
     ];
 
     const { html } = buildUpcomingPaymentsHTML(payments, now);
@@ -481,7 +481,7 @@ async function testBuildUpcomingPaymentsHTMLMultiCurrencyTotals() {
     // USD total: 100
     assert(html.includes('USD') && html.includes('100'), 'Incluye total USD de vencidos');
     // Should not include upcoming payment in totals (500 ARS)
-    assert(!html.includes('3.500'), 'No suma montos próximos en el total vencido');
+    assert(!html.includes('3.500'), 'No suma cuotas próximos en el total vencido');
 }
 
 // ===================================================================
@@ -503,7 +503,7 @@ async function testCheckAndNotifyDeduplication() {
     const deuda = {
         id: 1,
         acreedor: 'TestBank',
-        montos: [{ monto: 500, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
+        cuotas: [{ cuota: 500, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
     };
 
     const { checkAndNotify: can } = await import('../src/features/notifications/NotificationService.js');
@@ -520,7 +520,7 @@ async function testCheckAndNotifyDeduplication() {
     const deuda2 = {
         id: 2,
         acreedor: 'NewBank',
-        montos: [{ monto: 300, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
+        cuotas: [{ cuota: 300, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
     };
     await can([deuda, deuda2], localDate(2026, 4, 3));
     assert(panelEvents.length === 3, 'Nueva deuda también muestra el panel');

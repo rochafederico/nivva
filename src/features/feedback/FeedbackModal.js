@@ -104,7 +104,7 @@ export class FeedbackModal extends HTMLElement {
                             💡 Si tenés imagen o video, adjuntalo luego en la plataforma.
                         </p>
                         <p class="small mb-0">
-                            ⚠️ Evitá incluir datos sensibles como montos u otros datos personales.
+                            ⚠️ Evitá incluir datos sensibles como cuotas u otros datos personales.
                         </p>
                     </div>
                 </form>

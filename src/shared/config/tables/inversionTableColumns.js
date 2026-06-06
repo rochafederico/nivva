@@ -6,9 +6,9 @@ import { formatMoneda } from "../monedas.js";
 export const inversionTableColumns = [
     { key: 'nombre', label: 'Nombre' },
     { key: 'fechaCompra', label: 'Fecha compra' },
-    { key: 'valorInicial', label: 'Monto inicial', render: row => formatMoneda(row.valorInicial, row.moneda) },
+    { key: 'valorInicial', label: 'Cuota inicial', render: row => formatMoneda(row.valorInicial, row.moneda) },
     {
-        key: 'valorActual', label: 'Monto actual', render: row => {
+        key: 'valorActual', label: 'Cuota actual', render: row => {
             let valor = row.valorInicial;
             let moneda = row.moneda;
             if (row.historialValores.length > 0)

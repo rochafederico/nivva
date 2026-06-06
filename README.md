@@ -1,6 +1,6 @@
 # Registro de Deudas — Nivva
 
-Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript puro, Web Components y IndexedDB.
+Aplicación web para gestionar deudas, cuotas y vencimientos usando JavaScript puro, Web Components y IndexedDB.
 
 ## 📚 Documentación de marca y copy
 
@@ -24,39 +24,39 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - **Frontend moderno:** HTML5, CSS y JavaScript sin frameworks.
 - **Web Components:** UI modular con componentes personalizados (`AppShell`, `DebtForm`, `DebtList`, etc).
 - **IndexedDB:** Persistencia local de datos, sin backend.
-- **Modelo flexible:** Cada deuda puede tener múltiples montos, cada uno con moneda, vencimiento y periodo.
+- **Modelo flexible:** Cada deuda puede tener múltiples cuotas, cada una con moneda, vencimiento y periodo.
 - **Navegación por mes:** Filtra y navega deudas por mes con flechas.
-- **CRUD completo:** Alta, edición y borrado de deudas y montos.
-- **Confirmación contextual:** Al borrar, muestra acreedor, monto, moneda, vencimiento y periodo.
+- **CRUD completo:** Alta, edición y borrado de deudas y cuotas.
+- **Confirmación contextual:** Al borrar, muestra acreedor, cuota, moneda, vencimiento y periodo.
 - **Demo data:** Se generan datos de ejemplo realistas al iniciar.
 - **Estilo oscuro:** UI moderna y responsiva.
 
 ## Funcionalidades
 
 - [x] Alta, edición y borrado de deudas
-- [x] Cada deuda puede tener múltiples montos/cuotas, con moneda (ARS/USD) y fecha de vencimiento
-- [x] Edición y eliminación de montos/cuotas
+- [x] Cada deuda puede tener múltiples cuotas, con moneda (ARS/USD) y fecha de vencimiento
+- [x] Edición y eliminación de cuotas
 - [x] Navegación y filtrado por mes
 - [x] Resumen mensual: muestra totales a pagar por moneda en el mes seleccionado
-- [x] Confirmación contextual al borrar montos
+- [x] Confirmación contextual al borrar cuotas
 - [x] Persistencia local en IndexedDB (los datos no salen del navegador)
 - [x] Demo de datos realistas al iniciar
-- [x] Duplicar montos/cuotas: permite copiar una cuota y elegir la nueva fecha de vencimiento fácilmente.
+- [x] Duplicar cuotas: permite copiar una cuota y elegir la nueva fecha de vencimiento fácilmente.
 - [x] Exportar datos
  - [x] Importar datos
 - [ ] Encriptar exportación
  - [x] Agregar ingresos (sueldo o ingresos sueltos) para calcular balance mensual
-- [ ] Marcar montos como pagados
- - [x] Marcar montos como pagados
+- [ ] Marcar cuotas como pagadas
+ - [x] Marcar cuotas como pagadas
 - [ ] Dashboard con gráficos y cálculos para ayudar en la toma de decisiones
 - [ ] Mejoras en validaciones de formularios
 - [ ] Onboarding/tour para nuevos usuarios
-- [x] Agrupamiento de montos en la lista por acreedor, tipo, moneda o vencimiento
+- [x] Agrupamiento de cuotas en la lista por acreedor, tipo, moneda o vencimiento
 
 ## Arquitectura y estructura
 El proyecto está organizado en carpetas según responsabilidad:
 - **components/**: Web Components para UI y lógica de interacción.
-- **models/**: Modelos de datos para deudas y montos.
+- **models/**: Modelos de datos para deudas y cuotas.
 - **entity/**: Entidades para la persistencia en IndexedDB.
 - **database/**: Inicialización, esquema y datos demo de la base de datos.
 - **repository/**: Acceso y operaciones sobre los datos.
@@ -90,7 +90,7 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 - El código está modularizado y es fácil de mantener.
 
 Importante:
-- La importación/exportación de datos está implementada. La función de importación fusiona deudas por **Acreedor + Tipo de Deuda** para evitar duplicados y agrega montos que no estén ya presentes (comparación por monto, moneda y periodo/vencimiento). Esto permite combinar backups sin crear grupos duplicados.
+- La importación/exportación de datos está implementada. La función de importación fusiona deudas por **Acreedor + Tipo de Deuda** para evitar duplicados y agrega cuotas que no estén ya presentes (comparación por cuota, moneda y periodo/vencimiento). Esto permite combinar backups sin crear grupos duplicados.
 - Las operaciones de acceso a datos se organizan en los módulos de `src/features/**`, mientras que la infraestructura de `IndexedDB` se encuentra en `src/shared/database`, usando transacciones para consistencia.
 
 ## Licencia
@@ -123,7 +123,7 @@ MIT
   - ✅ Alta/edición de deuda en modal
   - ✅ Detalle de deuda en modal
   - ✅ Marcar cuotas como pagadas
-  - ✅ Duplicar cuotas / montos
+  - ✅ Duplicar cuotas / cuotas
   - ⏳ Dashboard visual y proyecciones *(Épica #3: HU #34–#38)*
   - ⏳ Categorización avanzada y filtros persistentes *(Épica #8: HU #57–#60)*
 
@@ -174,7 +174,7 @@ MIT
 ### Funcionalidades implementadas vs. pendientes
 
 - ✅ Persistencia 100 % local en IndexedDB
-- ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
+- ✅ Fusión inteligente al importar *(acreedor+tipo y cuota+moneda+periodo/vencimiento)*
 - ✅ Resumen mensual con KPIs de ingresos, gastos, balance, total a pagar e inversiones
 - ✅ Notificaciones toast (`AppToast`)
 - ⏳ Privacidad, cifrado y acceso con PIN *(Épica #5: HU #44–#47, #67–#72)*
