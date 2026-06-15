@@ -35,7 +35,6 @@
 **Captions desarrollados:**
 
 **Post 1 (04/05):**
-> Nivva es la app gratuita para registrar tus egresos, ingresos e objetivos — todo desde tu celular, sin que tus datos salgan de tu dispositivo.
 >
 > Sin suscripciones. Sin cuentas. Solo vos y tus registros.
 >
@@ -150,24 +149,18 @@
 ---
 
 ### Semana 4 — 25 al 29 de mayo de 2026
-> **Foco:** Objetivos, cierre de mes relatable y recap final con CTA
 
 | # | Fecha | Día | Pilar | Formato | Hook | CTA | Persona objetivo |
 |---|---|---|---|---|---|---|---|
-| 10 | 25/05 | Lunes | Funcionalidad destacada | Carrusel (3 slides) | ¿Ahorrás? Llevá el registro de todo en un solo lugar | ¿Ya usás la sección de objetivos? → link en bio | Ana |
 | 11 | 27/05 | Miércoles | Identificación con el usuario | Reel (15 seg) | '¿A dónde fueron tus gastos?' — Historia universal | ¿Lo viviste? Dale ❤️ si te pasó | Facundo / Claudia |
 | 12 | 29/05 | Viernes | Recap y CTA | Carrusel (4 slides) | Un mes de Nivva: todo lo que podés hacer, gratis | Probala gratis → link en bio | Ana / Facundo / Claudia |
 
 **Captions desarrollados:**
 
 **Post 10 (25/05) — Carrusel:**
-> Además de egresos e ingresos, Nivva tiene una sección de Objetivos.
 >
-> Registrá plazo fijo, fintech, dólares, acciones — lo que sea.
 >
-> Mirá el total reservado por moneda y seguí cómo evoluciona con cada nuevo valor que cargás.
 >
-> `#Nivva #objetivos #finanzaspersonales #plazoFijo #Argentina #ahorro #fintech`
 
 **Post 11 (27/05) — Reel:**
 > Fin de mes. Revisás la cuenta y no entendés nada.
@@ -183,7 +176,6 @@
 **Post 12 (29/05) — Carrusel resumen:**
 > Registrá egresos y cuotas 📋
 > Seguí tus ingresos 💵
-> Controlá tus objetivos 📈
 > Recibí recordatorios de vencimientos 🔔
 > Exportá e importá tus datos 💾
 > Todo sin que nada salga de tu dispositivo 🔐

@@ -166,7 +166,7 @@ MIT
 
 - ✅ Persistencia 100 % local en IndexedDB
 - ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
-- ✅ Resumen mensual con KPIs de ingresos, gastos, balance, total a pagar
+- ✅ Resumen mensual con KPIs de ingresos, gastos, balance y total a pagar
 - ✅ Notificaciones toast (`AppToast`)
 - ⏳ Privacidad, cifrado y acceso con PIN *(Épica #5: HU #44–#47, #67–#72)*
 - ⏳ Importación/exportación CSV, backups automáticos y multi-cuenta *(Épica #7: HU #53–#56)*

@@ -21,7 +21,6 @@
 
 El logotipo de Nivva combina un **símbolo** y un **wordmark**:
 
-- **Símbolo:** monograma N+V insfintech dentro de una forma de escudo/corazón que apunta hacia abajo. Transmite protección, control y claridad.
 - **Wordmark:** "NIVVA" en tipografía sans-serif bold, versalitas, color negro casi puro.
 - **Composición:** símbolo centrado sobre wordmark, sobre fondo crema.
 

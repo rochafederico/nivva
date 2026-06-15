@@ -26,7 +26,6 @@ Priorizar:
 
 No usar:
 - gráficos bursátiles
-- símbolos fintech
 - lujo
 - billetes exagerados
 - dashboards complejos

@@ -13,7 +13,6 @@ flowchart TD
     NAV([Navegación]) --> A
     NAV --> B
     NAV --> C
-    NAV --> D
 
     A["🏠 Inicio (/)
     Resumen mensual"]
@@ -21,8 +20,6 @@ flowchart TD
     Lista de cuotas del mes"]
     C["💰 Ingresos (/ingresos)
     Ingresos del mes"]
-    D["📈 Objetivos (/ahorros)
-    Seguimiento de ahorros"]
 
     B --> B1[Agregar egreso]
     B --> B2[Detalle de egreso]
@@ -30,8 +27,6 @@ flowchart TD
 
     C --> C1[Agregar ingreso]
 
-    D --> D1[Agregar objetivo]
-    D --> D2[Registrar nuevo valor]
 
     NAV --> E[Ajustes]
     E --> E1[Exportar datos]
@@ -63,12 +58,10 @@ flowchart TD
 | Nav | navConfig | Page title | `Panorama financiero` | ✅ Correcto |
 | Nav | navConfig | Page title | `Ingresos del mes` | ✅ Correcto |
 | Nav | navConfig | Page title | `Gastos del mes` | ✅ Correcto |
-| Nav | navConfig | Page title | `Seguimiento de ahorros` | ✅ Correcto |
 | Nav | navConfig | Subtitle | `Gestioná y visualizá la información del período seleccionado.` | ✅ Correcto (vos) |
 | Nav | navConfig | Nav label | `Inicio` | ✅ |
 | Nav | navConfig | Nav label | `Ingresos` | ✅ |
 | Nav | navConfig | Nav label | `Gastos` | ✅ |
-| Nav | navConfig | Nav label | `Objetivos` | ✅ |
 
 ### Egresos / DebtList
 
@@ -128,20 +121,6 @@ flowchart TD
 | Formulario | IngresoForm | Submit | `Agregar ingreso` | ✅ |
 | Formulario | IngresoForm | Cancel | `Cancelar` | ✅ |
 
-### Objetivos
-
-| Pantalla/Flow | Componente | Tipo | Texto actual | Observación |
-|---|---|---|---|---|
-| Lista | ObjetivosList | Button | `Agregar objetivo` | ✅ |
-| Lista | ObjetivosList | Button | `Nuevo valor` | ✅ |
-| Lista | ObjetivosList | Button | `Eliminar` | ✅ |
-| Lista | ObjetivosList | Label | `Total reservado:` | ⚠️ Falta dos puntos al final de otros labels para consistencia |
-| Modal alta | ObjetivoModal | Label | `Nombre` | ✅ |
-| Modal alta | ObjetivoModal | Label | `Valor Inicial` | ⚠️ Mayúscula inconsistente — debería ser "Valor inicial" |
-| Modal alta | ObjetivoModal | Label | `Moneda` | ✅ |
-| Modal alta | ObjetivoModal | Label | `Fecha Compra` | ⚠️ "Fecha Compra" → debería ser "Fecha de compra" |
-| Modal alta | ObjetivoModal | Submit | `Guardar` | ✅ |
-| Modal alta | ObjetivoModal | Cancel | `Cancelar` | ✅ |
 
 ### Import / Export
 
@@ -163,8 +142,6 @@ flowchart TD
 | Importar | ImportDataModal | Error | `❌ Error durante la importación` | ⚠️ Falta próximo paso |
 | Importar | ImportDataModal | Loading | `Importando datos...` | ✅ |
 | Importar | ImportDataModal | Loading | `Importando ingresos...` | ✅ |
-| Importar | ImportDataModal | Loading | `Importando objetivos...` | ✅ |
-| Importar | ImportDataModal | Toast success | `✅ Importación exitosa: N deudas, N ingresos, N objetivos` | ✅ |
 | Importar | ImportDataModal | Toast warning | `⚠️ Importación parcial: ...` | ✅ |
 
 ### Eliminar todos los datos
@@ -238,7 +215,6 @@ flowchart TD
 | P-04 | 🟡 Media | "Error al cargar los módulos de datos" (técnico) | dataActions | "No pudimos eliminar tus datos. Intentá de nuevo." |
 | P-05 | 🟡 Media | "No hay datos." sin contexto ni próximo paso | DebtList | "Todavía no cargaste ningún egreso. ¡Agregá tu primera deuda!" |
 | P-06 | 🟡 Media | "Tipo de Deuda" (inconsistente con "Tipo de deuda") | DebtForm | Uniformizar en "Tipo de deuda" |
-| P-07 | 🟡 Media | "Valor Inicial" / "Fecha Compra" (mayúsculas incorrectas) | ObjetivoModal | "Valor inicial" / "Fecha de compra" |
 | P-08 | 🟡 Media | "backup" en inglés en tour paso 5 | TourTooltip | "copia de seguridad" |
 | P-09 | 🟡 Media | "feedback" en modal title | FeedbackModal | "Enviar comentario" (a evaluar) |
 | P-10 | 🟢 Baja | "Error al exportar los datos" sin próximo paso | ExportDataModal | Agregar "Intentá nuevamente." |
@@ -249,7 +225,6 @@ flowchart TD
 
 ## ✅ Checklist QA — 02-Relevamiento
 
-- [x] Cubre las 3 rutas principales (`/`, `/ingresos`, `/ahorros`)
 - [x] Cubre acciones secundarias (Ajustes, Notificaciones, Tour, Feedback)
 - [x] Cubre estados vacíos, errores, éxito, loading
 - [x] Identifica tecnicismos expuestos al usuario

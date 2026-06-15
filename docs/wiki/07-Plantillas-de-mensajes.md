@@ -85,7 +85,6 @@ Todo mensaje visible al usuario debe tener como mínimo:
 
 | ✅ Do | ❌ Don't |
 |---|---|
-| `Vas a eliminar todos tus egresos, ingresos e objetivos. Esta acción no se puede deshacer. ¿Continuás?` | `¿Estás seguro de que deseas eliminar todos los datos?` |
 | `Vas a eliminar este egreso y todos sus montos. No se puede recuperar.` | `¿Seguro que querés borrar esto?` |
 
 ---
@@ -106,7 +105,6 @@ Todo mensaje visible al usuario debe tener como mínimo:
 |---|---|---|
 | DebtList (mes sin egresos) | `Todavía no hay egresos este mes. Agregá el primero.` | `No hay datos.` |
 | Ingresos vacíos | `No tenés ingresos registrados para este período.` | `Sin registros.` |
-| Objetivos vacías | `Todavía no registraste objetivos. Agregá la primera.` | `Lista vacía.` |
 | Notificaciones sin vencimientos | `No hay vencimientos próximos. Buen momento para revisar el mes.` | `Sin vencimientos.` |
 
 ---

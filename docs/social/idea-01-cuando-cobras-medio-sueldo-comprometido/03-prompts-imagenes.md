@@ -10,7 +10,6 @@ Marca Nivva:
 - textura cálida
 
 No parecer banco.
-No parecer fintech agresiva.
 No usar símbolos de riqueza.
 
 ---

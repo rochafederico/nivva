@@ -163,7 +163,6 @@ Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **A
 ## 📝 Caption para publicación
 
 ```
-Nivva es la app gratuita para registrar tus egresos, ingresos e objetivos — todo desde tu celular, sin que tus datos salgan de tu dispositivo.
 
 Sin suscripciones. Sin cuentas. Solo vos y tus registros.
 

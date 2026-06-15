@@ -17,7 +17,6 @@
 ## 2. Bio sugerida
 
 Tus numeros, facil y simple.
-Registra egresos, ingresos e objetivos desde tu celular.
 Gratis. Sin cuenta. Tus datos quedan en tu dispositivo.
 
 ---

@@ -14,7 +14,6 @@
 | **Acreedor** | A quién le debo, prestamista, empresa | Entidad o persona a la que se le debe el pago del egreso | "Acreedor: Banco Galicia" |
 | **Tipo de deuda** | Categoría, tipo, clase | Clasificación libre del egreso (ej: tarjeta, alquiler, préstamo, servicio) | "Tipo de deuda: Tarjeta de crédito" |
 | **Ingreso** | Sueldo, entrada, plata que entra | Dinero recibido en un período (sueldo, honorarios, renta, etc.) | "Agregar ingreso" / "Ingresos del mes" |
-| **Objetivo** | Activo, ahorro reservado, capital | Dinero colocado en un instrumento financiero con historial de valores | "Agregar objetivo" / "Seguimiento de ahorros" |
 | **Moneda** | Divisa, currency, tipo de cambio | Unidad monetaria del monto (ARS, USD, etc.) | "Moneda: ARS" |
 | **Vencimiento** | Fecha límite, due date, fecha de pago | Fecha en la que el monto debe pagarse | "Vencimiento: 10/05/2026" |
 | **Período** | Mes, periodo, ciclo | Mes al que corresponde el monto (formato YYYY-MM) | "Período: 2026-04" |
@@ -22,8 +21,6 @@
 | **Ajustes** | Configuración, settings, opciones | Menú con acciones administrativas (exportar, importar, eliminar datos) | "Desde Ajustes podés exportar tus datos." |
 | **Balance** | Saldo, diferencia, resultado | Diferencia entre ingresos y egresos del mes | "Balance: +$5.000 ARS" |
 | **Pendientes** | Por pagar, a cobrar, impagos | Montos no marcados como pagados en el período | "Pendientes: $30.000 ARS" |
-| **Valor inicial** | Precio de compra, costo, valor de entrada | Monto con el que se registra una objetivo al darla de alta | "Valor inicial: USD 100" |
-| **Fecha de compra** | Fecha inicial, fecha de entrada | Fecha en la que se registra o adquirió la objetivo | "Fecha de compra: 01/01/2026" |
 
 ---
 
@@ -85,7 +82,6 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ## ✅ Checklist QA — 05-Glosario
 
 - [x] Cada término tiene: término aprobado, sinónimos prohibidos, definición, ejemplo de uso
-- [x] Cubre: Egreso, Monto, Acreedor, Tipo de deuda, Ingreso, Objetivo, Moneda, Vencimiento, Período
 - [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes
 - [x] Sección de términos técnicos internos que no deben exponerse al usuario
 - [x] Regla de anglicismos con decisión por término
