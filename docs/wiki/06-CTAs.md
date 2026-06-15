@@ -42,7 +42,7 @@ Exportar datos        ← verbo + objeto
 
 | Verbo | Uso en Nivva | Ejemplo de CTA |
 |---|---|---|
-| **Agregar** | Alta de ítems (egresos, ingresos, inversiones, montos) | `Agregar egreso`, `Agregar monto`, `Agregar inversión` |
+| **Agregar** | Alta de ítems (egresos, ingresos, objetivos, montos) | `Agregar egreso`, `Agregar monto`, `Agregar objetivo` |
 | **Guardar** | Confirmar formulario con cambios | `Guardar`, `Guardar cambios` |
 | **Cancelar** | Descartar acción/modal sin guardar | `Cancelar` |
 | **Eliminar** | Borrar un ítem o todos los datos | `Eliminar`, `Eliminar todos los datos` |
@@ -82,15 +82,15 @@ Exportar datos        ← verbo + objeto
 | CTA actual | Pantalla | ¿Cumple patrón? | Propuesta |
 |---|---|---|---|
 | `Agregar monto` | DebtForm | ✅ | — |
-| `Guardar` | DebtForm, MontoForm, InversionModal | ✅ | — |
-| `Cancelar` | DebtForm, MontoForm, IngresoForm, InversionModal | ✅ | — |
+| `Guardar` | DebtForm, MontoForm, ObjetivoModal | ✅ | — |
+| `Cancelar` | DebtForm, MontoForm, IngresoForm, ObjetivoModal | ✅ | — |
 | `Editar` | DebtForm (monto), DebtDetailModal | ✅ | — |
-| `Eliminar` | DebtForm (monto), InversionesList | ✅ | — |
+| `Eliminar` | DebtForm (monto), ObjetivosList | ✅ | — |
 | `Duplicar` | DebtForm (monto) | ✅ | — |
 | `Marcar como pagado` | DebtForm | ✅ | — |
 | `Agregar ingreso` | IngresoForm | ✅ | — |
-| `Agregar inversión` | InversionesList | ✅ | — |
-| `Nuevo valor` | InversionesList | ⚠️ Sustantivo como CTA | `Agregar valor` |
+| `Agregar objetivo` | ObjetivosList | ✅ | — |
+| `Nuevo valor` | ObjetivosList | ⚠️ Sustantivo como CTA | `Agregar valor` |
 | `Exportar datos` | AppHeader, BottomNav | ✅ | — |
 | `Importar datos` | AppHeader, BottomNav | ✅ | — |
 | `Eliminar todo` | AppHeader, BottomNav | ⚠️ Ambiguo | `Eliminar todos los datos` |
@@ -111,7 +111,7 @@ Exportar datos        ← verbo + objeto
 ```
 Agregar egreso
 Agregar ingreso
-Agregar inversión
+Agregar objetivo
 Agregar monto
 ```
 

@@ -7,7 +7,6 @@ import { printResults } from './setup.js';
 import { tests as deudasTests } from './deudas.test.js';
 import { tests as montosTests } from './montos.test.js';
 import { tests as ingresosTests } from './ingresos.test.js';
-import { tests as inversionesTests } from './inversiones.test.js';
 import { tests as importExportTests } from './import-export.test.js';
 import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
@@ -33,9 +32,6 @@ async function run() {
 
         console.log('\n--- Ingresos ---');
         for (const test of ingresosTests) { await test(); }
-
-        console.log('\n--- Inversiones ---');
-        for (const test of inversionesTests) { await test(); }
 
         console.log('\n--- Import/Export ---');
         for (const test of importExportTests) { await test(); }

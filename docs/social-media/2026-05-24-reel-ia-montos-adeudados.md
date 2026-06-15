@@ -29,7 +29,7 @@ El reel se armó en **4 escenas**, sin textos agregados sobre el video.
 - Escribir en registro rioplatense con “vos”.
 - No prometer resultados financieros.
 - No dramatizar deudas.
-- No usar estética futurista, cripto, bancaria ni exageradamente “IA”.
+- No usar estética futurista, fintech, bancaria ni exageradamente “IA”.
 - Mostrar Nivva como herramienta de registro y visibilidad.
 - Usar IA como apoyo visual, no como protagonista del mensaje.
 - Priorizar escenas realistas, cálidas y cotidianas.
@@ -93,7 +93,7 @@ Tone: calm, useful, premium but simple.
 Usar como restricción en todos los nodos de imagen o video.
 
 ```text
-No futuristic holograms, no neon, no cyberpunk, no flying charts, no crypto coins, no bank logos, no credit card brands, no real personal data, no QR codes, no messy unreadable UI, no distorted phone screen, no dramatic anxiety, no luxury lifestyle, no money flying, no exaggerated AI glow, no robotic interface, no extra fingers, no broken hands, no fake captions, no watermark, no perfect corporate stock-photo look.
+No futuristic holograms, no neon, no cyberpunk, no flying charts, no fintech coins, no bank logos, no credit card brands, no real personal data, no QR codes, no messy unreadable UI, no distorted phone screen, no dramatic anxiety, no luxury lifestyle, no money flying, no exaggerated AI glow, no robotic interface, no extra fingers, no broken hands, no fake captions, no watermark, no perfect corporate stock-photo look.
 ```
 
 ## Prompts por escena

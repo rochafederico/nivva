@@ -113,11 +113,6 @@ export class ImportDataModal extends HTMLElement {
             return false;
         }
 
-        const inversiones = data.inversiones || (data.data && data.data.inversiones);
-        if (inversiones && !Array.isArray(inversiones)) {
-            return false;
-        }
-
         return true;
     }
 
@@ -133,7 +128,6 @@ export class ImportDataModal extends HTMLElement {
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
-        const inversiones = data.inversiones || (data.data && data.data.inversiones) || [];
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
         const renderCompactList = (items, renderItem) => {
@@ -154,13 +148,11 @@ export class ImportDataModal extends HTMLElement {
                 <div class="d-flex flex-wrap gap-3 bg-body-tertiary rounded p-2 mb-3">
                     <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalMontos}</strong> montos</span>
                     ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
-                    ${inversiones.length ? `<span class="small"><strong>${inversiones.length}</strong> inversiones</span>` : ''}
                     ${exportDateStr}
                 </div>
                 <div class="d-grid gap-1">
                     <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
                     ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => this.#escapeHtml(i.descripcion || 'Ingreso'))}</div>` : ''}
-                    ${inversiones.length ? `<div><span class="fw-semibold small">Inversiones: </span>${renderCompactList(inversiones, inv => this.#escapeHtml(inv.nombre))}</div>` : ''}
                 </div>
             </div>
         `;
@@ -188,10 +180,8 @@ export class ImportDataModal extends HTMLElement {
 
             const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
             const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
-            const { addInversion } = await import('../../inversiones/inversionRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
-            const inversiones = this.importData.inversiones || (this.importData.data && this.importData.data.inversiones) || [];
             let importedCount = 0;
             let errorCount = 0;
 
@@ -237,49 +227,25 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
-            let inversionesImported = 0;
-            let inversionesErrors = 0;
-            if (inversiones && inversiones.length > 0) {
-                this.#showLoading('Importando inversiones...');
-                for (const inv of inversiones) {
-                    try {
-                        const inversionData = {
-                            nombre: inv.nombre,
-                            fechaCompra: inv.fechaCompra,
-                            valorInicial: inv.valorInicial,
-                            moneda: inv.moneda || 'ARS',
-                            historialValores: inv.historialValores || []
-                        };
-                        await addInversion(inversionData);
-                        inversionesImported++;
-                    } catch (error) {
-                        console.error('Error al importar inversión:', inv, error);
-                        inversionesErrors++;
-                    }
-                }
-            }
-
-            const totalErrors = errorCount + ingresosErrors + inversionesErrors;
+            const totalErrors = errorCount + ingresosErrors;
             const notifyType = totalErrors === 0 ? 'success' : 'warning';
             const notifyMsg = totalErrors === 0
-                ? `✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`
-                : `⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err), ${inversionesImported} inversiones (${inversionesErrors} err)`;
+                ? `✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos`
+                : `⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err)`;
 
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: notifyMsg, type: notifyType } }));
             window.dispatchEvent(new CustomEvent('data-imported', {
                 bubbles: true,
-                detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
+                detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors }
             }));
             trackEvent('import_data_used', {
                 deudasImported: importedCount,
                 ingresosImported,
-                inversionesImported,
                 errors: totalErrors
             });
             await trackFlowComplete('import_data', {
                 deudasImported: importedCount,
                 ingresosImported,
-                inversionesImported,
                 errors: totalErrors
             });
             this._analyticsStarted = false;

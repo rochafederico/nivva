@@ -138,8 +138,7 @@ async function testImportSuccessAndPaymentRegistrationSendClarityEvents() {
     document.body.appendChild(modal);
     modal.importData = {
         deudas: [{ acreedor: 'Otra deuda', tipoDeuda: 'Servicio', notas: '', montos: [] }],
-        ingresos: [],
-        inversiones: []
+        ingresos: []
     };
     await modal.importDataToDb();
 
