@@ -42,18 +42,16 @@ function reloadHomeAfterDelete() {
 }
 
 export async function deleteAllData() {
-  const confirmed = confirm('Vas a eliminar todos tus egresos, ingresos e inversiones. Esta acción no se puede deshacer. ¿Continuás?');
+  const confirmed = confirm('Vas a eliminar todos tus egresos e ingresos. Esta acción no se puede deshacer. ¿Continuás?');
   if (!confirmed) return;
 
   let stores;
   try {
     const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
     const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
-    const { listInversiones, deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
     stores = [
       { name: 'Deudas', list: listDeudas, del: deleteDeudas },
       { name: 'Ingresos', list: getAll, del: deleteAllIngresos },
-      { name: 'Inversiones', list: listInversiones, del: deleteAllInversiones },
     ];
   } catch (error) {
     console.error('Error al cargar módulos de datos:', error);

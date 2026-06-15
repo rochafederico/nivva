@@ -18,7 +18,6 @@
 | **Mensaje de validación inline** | 60 caracteres | 80 caracteres | Debe ser completo (qué + cómo corregir) |
 | **Paso de tour** | 60 caracteres | 100 caracteres | Debe ser descriptivo pero escaneable |
 | **Empty state** | 60 caracteres | 100 caracteres | Puede tener 2 frases si incluye CTA contextual |
-| **Ítem de navegación (nav label)** | 10 caracteres | 15 caracteres | Ej: "Inversiones" = 11 chars ✅ |
 | **Título de tarjeta (StatsCard)** | 12 caracteres | 20 caracteres | Ej: "Pendientes" = 10 chars ✅ |
 | **Nombre de acreedor (campo libre)** | — | 50 caracteres | Recomendación de UX, no validación estricta |
 | **Notas (textarea)** | — | 500 caracteres | Campo libre con límite visual recomendado |
@@ -73,7 +72,6 @@
 ### Nav items (BottomNav / Menu)
 
 - **Overflow behavior:** `text-overflow: ellipsis` + `overflow: hidden` en el span de texto.
-- **Regla:** máximo 2 palabras. "Inversiones" ya está en el límite.
 - **Mobile:** el label se muestra bajo el ícono; si no cabe en 1 línea, evaluar abreviar.
 
 ### Empty states
@@ -111,9 +109,7 @@
 | Notas de egreso | ⚠️ Sin `maxlength` explícito | Sin límite definido — pendiente |
 | Acreedor | ⚠️ Sin `maxlength` explícito | Sin límite definido — pendiente |
 | Descripción de ingreso | ⚠️ Sin `maxlength` explícito | Sin límite definido — pendiente |
-| Nombre de inversión | ⚠️ Sin `maxlength` explícito | Sin límite definido — pendiente |
 
-> ⏳ **Pendiente:** agregar `maxlength` con feedback visual a los campos principales. Prioridad: Acreedor (50), Notas (500), Descripción (200), Nombre inversión (100).
 
 ---
 

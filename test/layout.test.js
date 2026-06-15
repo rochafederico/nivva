@@ -9,7 +9,6 @@ import '../src/layout/BottomNav.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
-import HomeQuickActions from '../src/pages/HomeQuickActions.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
 
 export const tests = [
@@ -95,7 +94,7 @@ export const tests = [
     // ===================================================================
     async function navConfig_hasPageMetadata() {
         console.log('  navConfig: all routes have title and subtitle');
-        const requiredPaths = ['/', '/gastos', '/ingresos', '/inversiones'];
+        const requiredPaths = ['/', '/gastos', '/ingresos'];
         for (const path of requiredPaths) {
             const item = navItems.find(i => i.path === path);
             assert(item !== undefined, `navConfig debe tener ruta ${path}`);
@@ -135,12 +134,6 @@ export const tests = [
         console.log('  navConfig: Ingresos title is "Ingresos del mes"');
         const ingresos = navItems.find(i => i.path === '/ingresos');
         assert(ingresos.title === 'Ingresos del mes', 'Ingresos debe tener título "Ingresos del mes"');
-    },
-
-    async function navConfig_inversionesTitle() {
-        console.log('  navConfig: Inversiones title is "Seguimiento de inversiones"');
-        const inversiones = navItems.find(i => i.path === '/inversiones');
-        assert(inversiones.title === 'Seguimiento de inversiones', 'Inversiones debe tener título "Seguimiento de inversiones"');
     },
 
     // ===================================================================
@@ -427,32 +420,6 @@ export const tests = [
         assert(egreso !== null, 'Debe existir un enlace a /gastos');
         assert(egreso.textContent.includes('Agregar egreso'), 'CTA debe decir "Agregar egreso"');
         assert(egreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA egreso debe tener bi-plus-circle');
-    },
-
-    async function home_quickActions_ctaVerInversiones() {
-        console.log('  Home: CTA "Ver inversiones" apunta a /inversiones con Bootstrap Icon');
-        const container = Home();
-        const card = Array.from(container.querySelectorAll('.card')).find(c => {
-            const title = c.querySelector('h5.card-title');
-            return title !== null && title.textContent.includes('Acciones rápidas');
-        });
-        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
-        const inv = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/inversiones');
-        assert(inv !== null, 'Debe existir un enlace a /inversiones');
-        assert(inv.textContent.includes('Ver inversiones'), 'CTA debe decir "Ver inversiones"');
-        assert(inv.querySelector('i.bi.bi-graph-up') !== null, 'CTA inversiones debe tener bi-graph-up');
-    },
-
-    // ===================================================================
-    // UC HomeQuickActions: componente independiente devuelve la misma estructura
-    // ===================================================================
-    async function homeQuickActions_isStandaloneComponent() {
-        console.log('  HomeQuickActions: devuelve .card con título y tres CTAs independientemente de Home');
-        const card = HomeQuickActions();
-        assert(card.classList.contains('card'), 'HomeQuickActions debe devolver un elemento con clase .card');
-        assert(card.querySelector('i.bi.bi-lightning-charge') !== null, 'Debe tener bi-lightning-charge en el título');
-        const links = card.querySelectorAll('a[href]');
-        assert(links.length === 3, 'Debe tener exactamente 3 CTAs');
     },
 
     async function settings_modal_isDedicatedSpaceWithListGroupAndDangerZone() {

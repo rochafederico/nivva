@@ -27,7 +27,7 @@ Nivva no promete hacerte ganar más plata ni resolver la economía. Promete algo
 - Simple.
 - Con humor suave.
 - Sin culpa.
-- Sin sonar a banco, cripto, inversión o asesor financiero.
+- Sin sonar a banco, cripto o asesor financiero.
 
 ## Público
 

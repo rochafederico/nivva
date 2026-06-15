@@ -5,13 +5,11 @@ import Home from './pages/Home.js';
 import Gastos from './pages/Gastos.js';
 import GastosMensual from './pages/GastosMensual.js';
 import Ingresos from './pages/Ingresos.js';
-import Inversiones from './pages/Inversiones.js';
 
 const componentMap = {
   '/': Home,
   '/gastos': Gastos,
   '/ingresos': Ingresos,
-  '/inversiones': Inversiones,
 };
 
 const routes = [

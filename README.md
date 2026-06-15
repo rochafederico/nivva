@@ -106,10 +106,10 @@ MIT
 - ✅ **Shell de navegación Bootstrap**
   - ✅ **Header desktop (`AppHeader`)**
     - ✅ Marca **Nivva** → redirige a `/`
-    - ✅ Navegación principal: **Egresos**, **Ingresos**, **Inversiones**
+    - ✅ Navegación principal: **Egresos**, **Ingresos**
     - ✅ Acciones secundarias: **⚙️ Config**, **🔔 vencimientos próximos**, **❓ tour**
   - ✅ **Bottom navbar mobile (`BottomNav`)**
-    - ✅ Secciones primarias visibles: **Egresos** (`/`), **Ingresos** (`/ingresos`), **Inversiones** (`/inversiones`)
+    - ✅ Secciones primarias visibles: **Egresos** (`/`), **Ingresos** (`/ingresos`)
     - ✅ Acceso secundario: **⚙️ Config** abre un offcanvas, no una ruta
 
 ### Rutas primarias implementadas
@@ -134,17 +134,9 @@ MIT
   - ✅ Usa el selector global de mes
   - ⏳ Ingresos recurrentes, proyección y categorización *(Épica #4: HU #39–#43)*
 
-- ✅ **Inversiones** (`/inversiones`)
-  - ✅ Alta de inversión *(base alineada con HU #61)*
-  - ✅ Registro de nuevos valores
-  - ✅ Listado e historial de valores
-  - ✅ Total invertido por moneda
-  - 🚧 Rendimiento básico *(hay comparación de valores, pero faltan cálculo porcentual y visualización más rica de HU #62)*
-  - ⏳ Patrimonio neto consolidado *(HU #63)*
-
 ### Rutas secundarias
 
-- ✅ No hay rutas secundarias implementadas además de `/`, `/ingresos` y `/inversiones`
+- ✅ No hay rutas secundarias implementadas además de `/` y `/ingresos`
 - 🚧 `src/pages/Dashboard.js` existe como placeholder, pero no está conectado al router ni a la navegación Bootstrap
 - ⏳ No existen rutas dedicadas para configuración, ayuda, notificaciones o reportes
 
@@ -153,7 +145,7 @@ MIT
 - ✅ **⚙️ Config** *(dropdown en desktop, offcanvas en mobile)*
   - ✅ Exportar datos
   - ✅ Importar datos
-  - 🚧 Eliminar todo *(la acción existe y borra deudas, ingresos e inversiones, pero la HU #47 pide doble confirmación y limpieza de localStorage)*
+  - 🚧 Eliminar todo *(la acción existe y borra deudas e ingresos, pero la HU #47 pide doble confirmación y limpieza de localStorage)*
 - ✅ **🔔 Vencimientos próximos**
   - ✅ Popover/panel desde el header
   - ✅ Notificaciones nativas + aviso in-app *(HU #29 implementada)*
@@ -169,13 +161,12 @@ MIT
   - ✅ Detalle de deuda
   - ✅ Ingreso
   - ✅ Exportación / importación
-  - ✅ Alta de inversión / nuevo valor
 
 ### Funcionalidades implementadas vs. pendientes
 
 - ✅ Persistencia 100 % local en IndexedDB
 - ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
-- ✅ Resumen mensual con KPIs de ingresos, gastos, balance, total a pagar e inversiones
+- ✅ Resumen mensual con KPIs de ingresos, gastos, balance y total a pagar
 - ✅ Notificaciones toast (`AppToast`)
 - ⏳ Privacidad, cifrado y acceso con PIN *(Épica #5: HU #44–#47, #67–#72)*
 - ⏳ Importación/exportación CSV, backups automáticos y multi-cuenta *(Épica #7: HU #53–#56)*

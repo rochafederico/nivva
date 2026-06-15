@@ -121,7 +121,6 @@ Ver plantillas completas en [07 — Plantillas](https://github.com/rochafederico
 |---|---|
 | Egresos — mes sin datos | "Todavía no hay egresos este mes. Agregá el primero." |
 | Ingresos — mes sin datos | "No tenés ingresos registrados para este período." |
-| Inversiones — sin datos | "Todavía no registraste inversiones. Agregá la primera." |
 | Notificaciones — sin vencimientos | "No hay vencimientos próximos este mes." |
 
 ---
