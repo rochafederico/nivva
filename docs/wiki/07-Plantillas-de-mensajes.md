@@ -85,6 +85,7 @@ Todo mensaje visible al usuario debe tener como mínimo:
 
 | ✅ Do | ❌ Don't |
 |---|---|
+| `Vas a eliminar todos tus egresos e ingresos. Esta acción no se puede deshacer. ¿Continuás?` | `¿Estás seguro de que deseas eliminar todos los datos?` |
 | `Vas a eliminar este egreso y todos sus montos. No se puede recuperar.` | `¿Seguro que querés borrar esto?` |
 
 ---

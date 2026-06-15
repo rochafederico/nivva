@@ -25,6 +25,7 @@
 | Dimensión | Competencia | Nivva |
 |---|---|---|
 | **Complejidad** | Alta (Mobills, Spendee) o muy básica (Monefy) | Simple y directa — sin curva de aprendizaje |
+| **Foco** | Finanzas generales o solo deudas externas | Compromisos financieros personales, egresos + ingresos |
 | **Modelo** | Freemium con funciones clave bloqueadas | Sin restricciones de funcionalidad en v1 |
 | **Privacidad** | Datos en la nube / sincronización | Datos 100% en el dispositivo del usuario |
 | **Lenguaje** | Inglés o español neutro / formal | Español rioplatense, registro "vos", cercano |

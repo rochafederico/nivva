@@ -121,7 +121,6 @@ flowchart TD
 | Formulario | IngresoForm | Submit | `Agregar ingreso` | ✅ |
 | Formulario | IngresoForm | Cancel | `Cancelar` | ✅ |
 
-
 ### Import / Export
 
 | Pantalla/Flow | Componente | Tipo | Texto actual | Observación |
@@ -225,6 +224,7 @@ flowchart TD
 
 ## ✅ Checklist QA — 02-Relevamiento
 
+- [x] Cubre las rutas principales (`/`, `/ingresos`)
 - [x] Cubre acciones secundarias (Ajustes, Notificaciones, Tour, Feedback)
 - [x] Cubre estados vacíos, errores, éxito, loading
 - [x] Identifica tecnicismos expuestos al usuario

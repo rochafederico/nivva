@@ -35,6 +35,7 @@
 **Captions desarrollados:**
 
 **Post 1 (04/05):**
+> Nivva es la app gratuita para registrar tus egresos e ingresos — todo desde tu celular, sin que tus datos salgan de tu dispositivo.
 >
 > Sin suscripciones. Sin cuentas. Solo vos y tus registros.
 >
@@ -149,6 +150,7 @@
 ---
 
 ### Semana 4 — 25 al 29 de mayo de 2026
+> **Foco:** cierre de mes relatable y recap final con CTA
 
 | # | Fecha | Día | Pilar | Formato | Hook | CTA | Persona objetivo |
 |---|---|---|---|---|---|---|---|
@@ -156,11 +158,6 @@
 | 12 | 29/05 | Viernes | Recap y CTA | Carrusel (4 slides) | Un mes de Nivva: todo lo que podés hacer, gratis | Probala gratis → link en bio | Ana / Facundo / Claudia |
 
 **Captions desarrollados:**
-
-**Post 10 (25/05) — Carrusel:**
->
->
->
 
 **Post 11 (27/05) — Reel:**
 > Fin de mes. Revisás la cuenta y no entendés nada.

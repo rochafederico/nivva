@@ -42,6 +42,7 @@ Exportar datos        ← verbo + objeto
 
 | Verbo | Uso en Nivva | Ejemplo de CTA |
 |---|---|---|
+| **Agregar** | Alta de ítems (egresos, ingresos, montos) | `Agregar egreso`, `Agregar monto` |
 | **Guardar** | Confirmar formulario con cambios | `Guardar`, `Guardar cambios` |
 | **Cancelar** | Descartar acción/modal sin guardar | `Cancelar` |
 | **Eliminar** | Borrar un ítem o todos los datos | `Eliminar`, `Eliminar todos los datos` |
@@ -81,7 +82,10 @@ Exportar datos        ← verbo + objeto
 | CTA actual | Pantalla | ¿Cumple patrón? | Propuesta |
 |---|---|---|---|
 | `Agregar monto` | DebtForm | ✅ | — |
+| `Guardar` | DebtForm, MontoForm | ✅ | — |
+| `Cancelar` | DebtForm, MontoForm, IngresoForm | ✅ | — |
 | `Editar` | DebtForm (monto), DebtDetailModal | ✅ | — |
+| `Eliminar` | DebtForm (monto) | ✅ | — |
 | `Duplicar` | DebtForm (monto) | ✅ | — |
 | `Marcar como pagado` | DebtForm | ✅ | — |
 | `Agregar ingreso` | IngresoForm | ✅ | — |

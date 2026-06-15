@@ -26,6 +26,7 @@ Priorizar:
 
 No usar:
 - gráficos bursátiles
+- símbolos crypto
 - lujo
 - billetes exagerados
 - dashboards complejos

@@ -82,6 +82,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ## ✅ Checklist QA — 05-Glosario
 
 - [x] Cada término tiene: término aprobado, sinónimos prohibidos, definición, ejemplo de uso
+- [x] Cubre: Egreso, Monto, Acreedor, Tipo de deuda, Ingreso, Moneda, Vencimiento, Período
 - [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes
 - [x] Sección de términos técnicos internos que no deben exponerse al usuario
 - [x] Regla de anglicismos con decisión por término
