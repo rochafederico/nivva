@@ -2,12 +2,6 @@
 // Global page header: page title + global month selector + subtitle
 import './MonthSelector.js';
 import { DEFAULT_SUBTITLE } from './navConfig.js';
-import { formatMonthLabel, getSelectedMonth } from '../shared/MonthFilter.js';
-
-function formatFeaturedMonth(month) {
-    const label = formatMonthLabel(month);
-    return `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
-}
 
 export default function ResumenHeader({ title = 'Tu panorama financiero', subtitle = DEFAULT_SUBTITLE } = {}) {
     const el = document.createElement('div');
@@ -19,23 +13,11 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
     titleEl.id = 'resumen-header-title';
     titleEl.textContent = title;
 
-    const periodIcon = document.createElement('i');
-    periodIcon.className = 'bi bi-calendar-event h5 mb-0';
-    periodIcon.setAttribute('aria-hidden', 'true');
-
-    const monthLabel = document.createElement('div');
-    monthLabel.className = 'h5 fw-semibold mb-0';
-    monthLabel.id = 'resumen-header-month';
-    monthLabel.textContent = formatFeaturedMonth(getSelectedMonth());
-
     const monthSelector = document.createElement('month-selector');
-    monthSelector.classList.add('flex-shrink-0');
 
     const topRow = document.createElement('div');
-    topRow.className = 'd-inline-flex align-items-center gap-2 mb-1';
-    topRow.appendChild(periodIcon);
+    topRow.className = 'mb-1';
     topRow.appendChild(monthSelector);
-    topRow.appendChild(monthLabel);
 
     const subtitleEl = document.createElement('p');
     subtitleEl.className = 'text-body-secondary mb-0';
@@ -46,11 +28,6 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
     el.appendChild(titleEl);
     el.appendChild(subtitleEl);
 
-    el._onUiMonth = (event) => {
-        const month = event.detail?.mes || getSelectedMonth();
-        monthLabel.textContent = formatFeaturedMonth(month);
-    };
-    window.addEventListener('ui:month', el._onUiMonth);
 
     el.update = ({ title: newTitle, subtitle: newSubtitle, hideMonthSelector } = {}) => {
         if (newTitle !== undefined) {
@@ -60,14 +37,8 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
             el.querySelector('#resumen-header-subtitle').textContent = newSubtitle;
         }
         if (hideMonthSelector !== undefined) {
-            periodIcon.classList.toggle('d-none', !!hideMonthSelector);
             monthSelector.classList.toggle('d-none', !!hideMonthSelector);
-            monthLabel.classList.toggle('d-none', !!hideMonthSelector);
         }
-    };
-
-    el.destroy = () => {
-        window.removeEventListener('ui:month', el._onUiMonth);
     };
 
     return el;

@@ -1,5 +1,5 @@
 // src/layout/MonthSelector.js
-// Compact global month selector web component — Bootstrap Input Group with input[type=date]
+// Compact global month selector web component — Bootstrap Input Group with input[type=month]
 import {
     getSelectedMonth,
     setSelectedMonth,
@@ -22,12 +22,16 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         const group = document.createElement('div');
-        group.className = 'd-inline-flex align-items-center gap-1';
+        group.className = 'input-group input-group-sm mb-3';
         group.dataset.tourStep = 'navegacion-mes';
+
+        const icon = document.createElement('span');
+        icon.className = 'input-group-text';
+        icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
 
         const prev = document.createElement('button');
         prev.id = 'ms-prev';
-        prev.className = 'btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center';
+        prev.className = 'btn btn-outline-secondary';
         prev.type = 'button';
         prev.title = 'Mes anterior';
         prev.setAttribute('aria-label', 'Mes anterior');
@@ -35,20 +39,20 @@ export class MonthSelector extends HTMLElement {
 
         const input = document.createElement('input');
         input.id = 'ms-input';
-        input.type = 'date';
-        input.className = 'visually-hidden-focusable';
-        input.value = `${getSelectedMonth()}-01`;
-        input.setAttribute('aria-label', 'Seleccionar fecha del mes');
-        input.setAttribute('title', 'Seleccionar fecha del mes');
+        input.type = 'month';
+        input.className = 'form-control';
+        input.value = getSelectedMonth();
+        input.setAttribute('aria-label', 'Seleccionar mes');
 
         const next = document.createElement('button');
         next.id = 'ms-next';
-        next.className = 'btn btn-sm btn-outline-secondary rounded-circle d-inline-flex align-items-center justify-content-center';
+        next.className = 'btn btn-outline-secondary';
         next.type = 'button';
         next.title = 'Mes siguiente';
         next.setAttribute('aria-label', 'Mes siguiente');
         next.textContent = '›';
 
+        group.appendChild(icon);
         group.appendChild(prev);
         group.appendChild(next);
         group.appendChild(input);
@@ -71,11 +75,10 @@ export class MonthSelector extends HTMLElement {
         });
         this.querySelector('#ms-input').addEventListener('change', (e) => {
             if (e.target.value) {
-                const selectedMonth = e.target.value.slice(0, 7);
-                setSelectedMonth(selectedMonth);
+                setSelectedMonth(e.target.value);
                 trackEvent('monthly_navigation_used', {
                     direction: 'direct_select',
-                    month: selectedMonth
+                    month: e.target.value
                 });
             }
         });
@@ -83,8 +86,7 @@ export class MonthSelector extends HTMLElement {
 
     _syncInput(month) {
         const input = this.querySelector('#ms-input');
-        const dateValue = `${month}-01`;
-        if (input && input.value !== dateValue) input.value = dateValue;
+        if (input && input.value !== month) input.value = month;
     }
 }
 

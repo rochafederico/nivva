@@ -7,7 +7,6 @@ import '../src/layout/PageSectionLayout.js';
 import '../src/layout/Sidebar.js';
 import '../src/layout/BottomNav.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
-import { setSelectedMonth } from '../src/shared/MonthFilter.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
@@ -153,8 +152,9 @@ export const tests = [
         assert(subtitleEl !== null, 'ResumenHeader debe tener #resumen-header-subtitle');
         assert(subtitleEl.textContent === 'Gestioná tus pagos y vencimientos del período.', 'Subtítulo debe usar la bajada breve');
 
-        const monthEl = header.querySelector('#resumen-header-month');
-        assert(monthEl !== null, 'ResumenHeader debe destacar el mes seleccionado');
+        const selector = header.querySelector('month-selector');
+        assert(selector !== null, 'ResumenHeader debe mostrar el selector de mes');
+        assert(header.querySelector('#resumen-header-month') === null, 'ResumenHeader no debe duplicar el mes fuera del input');
 
         document.body.removeChild(header);
     },
@@ -174,39 +174,34 @@ export const tests = [
     },
 
 
-    async function resumenHeader_updatesFeaturedMonth() {
-        console.log('  ResumenHeader: updates featured month label when global month changes');
+    async function resumenHeader_doesNotRenderSeparateMonthText() {
+        console.log('  ResumenHeader: does not render separate month text outside selector');
         const header = ResumenHeader();
         document.body.appendChild(header);
 
-        setSelectedMonth('2026-06');
-
         const monthEl = header.querySelector('#resumen-header-month');
-        assert(monthEl.textContent === 'Junio de 2026', 'Mes destacado debe reflejar el mes seleccionado con capitalización correcta');
+        assert(monthEl === null, 'ResumenHeader no debe renderizar texto de mes separado del selector');
 
-        header.destroy();
         document.body.removeChild(header);
     },
 
     async function monthSelector_usesAccessibleDateInput() {
-        console.log('  MonthSelector: uses accessible input[type=date]');
+        console.log('  MonthSelector: uses compact input group with month input');
         const selector = document.createElement('month-selector');
         document.body.appendChild(selector);
 
         const input = selector.querySelector('#ms-input');
-        assert(input.type === 'date', 'Selector debe mantener un input date accesible');
-        assert(input.getAttribute('aria-label') === 'Seleccionar fecha del mes', 'Input date debe tener aria-label');
-        assert(input.classList.contains('visually-hidden-focusable'), 'Input date debe permanecer oculto visualmente hasta recibir foco');
+        assert(input.type === 'month', 'Selector debe usar un input month visible');
+        assert(input.getAttribute('aria-label') === 'Seleccionar mes', 'Input month debe tener aria-label');
+        assert(input.classList.contains('form-control'), 'Input month debe usar form-control');
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
-        assert(group.classList.contains('d-inline-flex'), 'Controles visibles deben alinearse con flexbox');
-        assert(!group.classList.contains('btn-group'), 'Controles visibles no deben usar btn-group');
-        assert(selector.querySelector('#ms-prev').classList.contains('rounded-circle'), 'Botón anterior debe ser redondeado');
-        assert(selector.querySelector('#ms-next').classList.contains('rounded-circle'), 'Botón siguiente debe ser redondeado');
+        assert(group.classList.contains('input-group'), 'Controles visibles deben agruparse como input-group');
+        assert(group.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
 
-        input.value = '2026-07-15';
+        input.value = '2026-07';
         input.dispatchEvent(new Event('change'));
-        assert(selector.querySelector('#ms-input').value === '2026-07-01', 'Selector debe normalizar la fecha al mes seleccionado');
+        assert(selector.querySelector('#ms-input').value === '2026-07', 'Selector debe conservar el mes seleccionado');
 
         document.body.removeChild(selector);
     },
