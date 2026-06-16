@@ -7,6 +7,7 @@ import '../src/layout/PageSectionLayout.js';
 import '../src/layout/Sidebar.js';
 import '../src/layout/BottomNav.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
+import { setSelectedMonth } from '../src/shared/MonthFilter.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
@@ -119,9 +120,9 @@ export const tests = [
     },
 
     async function navConfig_homeTitle() {
-        console.log('  navConfig: Home title is "Panorama financiero"');
+        console.log('  navConfig: Home title is "Tu panorama financiero"');
         const home = navItems.find(i => i.path === '/');
-        assert(home.title === 'Panorama financiero', 'Home debe tener título "Panorama financiero"');
+        assert(home.title === 'Tu panorama financiero', 'Home debe tener título "Tu panorama financiero"');
     },
 
     async function navConfig_gastosTitle() {
@@ -146,11 +147,14 @@ export const tests = [
 
         const titleEl = header.querySelector('#resumen-header-title');
         assert(titleEl !== null, 'ResumenHeader debe tener #resumen-header-title');
-        assert(titleEl.textContent === 'Panorama financiero', 'Título por defecto debe ser "Panorama financiero"');
+        assert(titleEl.textContent === 'Tu panorama financiero', 'Título por defecto debe ser "Tu panorama financiero"');
 
         const subtitleEl = header.querySelector('#resumen-header-subtitle');
         assert(subtitleEl !== null, 'ResumenHeader debe tener #resumen-header-subtitle');
-        assert(subtitleEl.textContent.length > 0, 'Subtítulo no debe estar vacío');
+        assert(subtitleEl.textContent === 'Gestioná tus pagos y vencimientos del período.', 'Subtítulo debe usar la bajada breve');
+
+        const monthEl = header.querySelector('#resumen-header-month');
+        assert(monthEl !== null, 'ResumenHeader debe destacar el mes seleccionado');
 
         document.body.removeChild(header);
     },
@@ -167,6 +171,37 @@ export const tests = [
         assert(subtitleEl.textContent === 'Mi subtítulo personalizado.', 'Debe renderizar el subtítulo personalizado');
 
         document.body.removeChild(header);
+    },
+
+
+    async function resumenHeader_updatesFeaturedMonth() {
+        console.log('  ResumenHeader: updates featured month label when global month changes');
+        const header = ResumenHeader();
+        document.body.appendChild(header);
+
+        setSelectedMonth('2026-06');
+
+        const monthEl = header.querySelector('#resumen-header-month span');
+        assert(monthEl.textContent === 'junio de 2026', 'Mes destacado debe reflejar el mes seleccionado');
+
+        header.destroy();
+        document.body.removeChild(header);
+    },
+
+    async function monthSelector_usesAccessibleDateInput() {
+        console.log('  MonthSelector: uses accessible input[type=date]');
+        const selector = document.createElement('month-selector');
+        document.body.appendChild(selector);
+
+        const input = selector.querySelector('#ms-input');
+        assert(input.type === 'date', 'Selector debe mantener un input date accesible');
+        assert(input.getAttribute('aria-label') === 'Seleccionar fecha del mes', 'Input date debe tener aria-label');
+
+        input.value = '2026-07-15';
+        input.dispatchEvent(new Event('change'));
+        assert(selector.querySelector('#ms-input').value === '2026-07-01', 'Selector debe normalizar la fecha al mes seleccionado');
+
+        document.body.removeChild(selector);
     },
 
     async function resumenHeader_updateChangesTitle() {

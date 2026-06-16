@@ -1,5 +1,5 @@
 // src/layout/MonthSelector.js
-// Compact global month selector web component — Bootstrap Input Group with input[type=month]
+// Compact global month selector web component — Bootstrap Input Group with input[type=date]
 import {
     getSelectedMonth,
     setSelectedMonth,
@@ -35,10 +35,10 @@ export class MonthSelector extends HTMLElement {
 
         const input = document.createElement('input');
         input.id = 'ms-input';
-        input.type = 'month';
-        input.className = 'form-control text-center';
-        input.value = getSelectedMonth();
-        input.setAttribute('aria-label', 'Seleccionar mes');
+        input.type = 'date';
+        input.className = 'form-control text-center flex-grow-0 w-auto';
+        input.value = `${getSelectedMonth()}-01`;
+        input.setAttribute('aria-label', 'Seleccionar fecha del mes');
 
         const next = document.createElement('button');
         next.id = 'ms-next';
@@ -70,10 +70,11 @@ export class MonthSelector extends HTMLElement {
         });
         this.querySelector('#ms-input').addEventListener('change', (e) => {
             if (e.target.value) {
-                setSelectedMonth(e.target.value);
+                const selectedMonth = e.target.value.slice(0, 7);
+                setSelectedMonth(selectedMonth);
                 trackEvent('monthly_navigation_used', {
                     direction: 'direct_select',
-                    month: e.target.value
+                    month: selectedMonth
                 });
             }
         });
@@ -81,7 +82,8 @@ export class MonthSelector extends HTMLElement {
 
     _syncInput(month) {
         const input = this.querySelector('#ms-input');
-        if (input && input.value !== month) input.value = month;
+        const dateValue = `${month}-01`;
+        if (input && input.value !== dateValue) input.value = dateValue;
     }
 }
 
