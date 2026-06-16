@@ -36,9 +36,10 @@ export class MonthSelector extends HTMLElement {
         const input = document.createElement('input');
         input.id = 'ms-input';
         input.type = 'date';
-        input.className = 'form-control text-center flex-grow-0 w-auto';
+        input.className = 'visually-hidden-focusable';
         input.value = `${getSelectedMonth()}-01`;
         input.setAttribute('aria-label', 'Seleccionar fecha del mes');
+        input.setAttribute('title', 'Seleccionar fecha del mes');
 
         const next = document.createElement('button');
         next.id = 'ms-next';

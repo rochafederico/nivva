@@ -196,6 +196,7 @@ export const tests = [
         const input = selector.querySelector('#ms-input');
         assert(input.type === 'date', 'Selector debe mantener un input date accesible');
         assert(input.getAttribute('aria-label') === 'Seleccionar fecha del mes', 'Input date debe tener aria-label');
+        assert(input.classList.contains('visually-hidden-focusable'), 'Input date debe permanecer oculto visualmente hasta recibir foco');
 
         input.value = '2026-07-15';
         input.dispatchEvent(new Event('change'));
