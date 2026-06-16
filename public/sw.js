@@ -2,7 +2,7 @@
 // Estrategia: precache de assets públicos estables + runtime cache para el resto.
 // Los bundles de Vite quedan fuera del precache porque usan nombres hasheados.
 
-const CACHE_VERSION = 'nivva-v3';
+const CACHE_VERSION = '__NIVVA_CACHE_VERSION__';
 
 const APP_SHELL = [
     './',
