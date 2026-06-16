@@ -181,7 +181,7 @@ export const tests = [
 
         setSelectedMonth('2026-06');
 
-        const monthEl = header.querySelector('#resumen-header-month span');
+        const monthEl = header.querySelector('#resumen-header-month');
         assert(monthEl.textContent === 'Junio de 2026', 'Mes destacado debe reflejar el mes seleccionado con capitalización correcta');
 
         header.destroy();
@@ -199,7 +199,10 @@ export const tests = [
         assert(input.classList.contains('visually-hidden-focusable'), 'Input date debe permanecer oculto visualmente hasta recibir foco');
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
-        assert(group.classList.contains('btn-group'), 'Controles visibles deben agruparse como btn-group compacto');
+        assert(group.classList.contains('d-inline-flex'), 'Controles visibles deben alinearse con flexbox');
+        assert(!group.classList.contains('btn-group'), 'Controles visibles no deben usar btn-group');
+        assert(selector.querySelector('#ms-prev').classList.contains('rounded-circle'), 'Botón anterior debe ser redondeado');
+        assert(selector.querySelector('#ms-next').classList.contains('rounded-circle'), 'Botón siguiente debe ser redondeado');
 
         input.value = '2026-07-15';
         input.dispatchEvent(new Event('change'));

@@ -19,18 +19,23 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
     titleEl.id = 'resumen-header-title';
     titleEl.textContent = title;
 
+    const periodIcon = document.createElement('i');
+    periodIcon.className = 'bi bi-calendar-event h5 mb-0';
+    periodIcon.setAttribute('aria-hidden', 'true');
+
     const monthLabel = document.createElement('div');
-    monthLabel.className = 'h5 fw-semibold mb-0 d-inline-flex align-items-center gap-2';
+    monthLabel.className = 'h5 fw-semibold mb-0';
     monthLabel.id = 'resumen-header-month';
-    monthLabel.innerHTML = `<i class="bi bi-calendar-event" aria-hidden="true"></i><span>${formatFeaturedMonth(getSelectedMonth())}</span>`;
+    monthLabel.textContent = formatFeaturedMonth(getSelectedMonth());
 
     const monthSelector = document.createElement('month-selector');
     monthSelector.classList.add('flex-shrink-0');
 
     const topRow = document.createElement('div');
     topRow.className = 'd-inline-flex align-items-center gap-2 mb-1';
-    topRow.appendChild(monthLabel);
+    topRow.appendChild(periodIcon);
     topRow.appendChild(monthSelector);
+    topRow.appendChild(monthLabel);
 
     const subtitleEl = document.createElement('p');
     subtitleEl.className = 'text-body-secondary mb-0';
@@ -43,7 +48,7 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
 
     el._onUiMonth = (event) => {
         const month = event.detail?.mes || getSelectedMonth();
-        monthLabel.querySelector('span').textContent = formatFeaturedMonth(month);
+        monthLabel.textContent = formatFeaturedMonth(month);
     };
     window.addEventListener('ui:month', el._onUiMonth);
 
@@ -55,6 +60,7 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
             el.querySelector('#resumen-header-subtitle').textContent = newSubtitle;
         }
         if (hideMonthSelector !== undefined) {
+            periodIcon.classList.toggle('d-none', !!hideMonthSelector);
             monthSelector.classList.toggle('d-none', !!hideMonthSelector);
             monthLabel.classList.toggle('d-none', !!hideMonthSelector);
         }
