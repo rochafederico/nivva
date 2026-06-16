@@ -22,12 +22,16 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         const group = document.createElement('div');
-        group.className = 'input-group input-group-sm';
+        group.className = 'input-group input-group-lg mb-3';
         group.dataset.tourStep = 'navegacion-mes';
+
+        const icon = document.createElement('span');
+        icon.className = 'input-group-text';
+        icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
 
         const prev = document.createElement('button');
         prev.id = 'ms-prev';
-        prev.className = 'btn btn-outline-secondary';
+        prev.className = 'btn btn-primary';
         prev.type = 'button';
         prev.title = 'Mes anterior';
         prev.setAttribute('aria-label', 'Mes anterior');
@@ -36,21 +40,22 @@ export class MonthSelector extends HTMLElement {
         const input = document.createElement('input');
         input.id = 'ms-input';
         input.type = 'month';
-        input.className = 'form-control text-center';
+        input.className = 'form-control';
         input.value = getSelectedMonth();
         input.setAttribute('aria-label', 'Seleccionar mes');
 
         const next = document.createElement('button');
         next.id = 'ms-next';
-        next.className = 'btn btn-outline-secondary';
+        next.className = 'btn btn-primary';
         next.type = 'button';
         next.title = 'Mes siguiente';
         next.setAttribute('aria-label', 'Mes siguiente');
         next.textContent = '›';
 
+        group.appendChild(icon);
         group.appendChild(prev);
-        group.appendChild(input);
         group.appendChild(next);
+        group.appendChild(input);
 
         this.innerHTML = '';
         this.appendChild(group);

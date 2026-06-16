@@ -119,9 +119,9 @@ export const tests = [
     },
 
     async function navConfig_homeTitle() {
-        console.log('  navConfig: Home title is "Panorama financiero"');
+        console.log('  navConfig: Home title is "Tu panorama financiero"');
         const home = navItems.find(i => i.path === '/');
-        assert(home.title === 'Panorama financiero', 'Home debe tener título "Panorama financiero"');
+        assert(home.title === 'Tu panorama financiero', 'Home debe tener título "Tu panorama financiero"');
     },
 
     async function navConfig_gastosTitle() {
@@ -146,11 +146,15 @@ export const tests = [
 
         const titleEl = header.querySelector('#resumen-header-title');
         assert(titleEl !== null, 'ResumenHeader debe tener #resumen-header-title');
-        assert(titleEl.textContent === 'Panorama financiero', 'Título por defecto debe ser "Panorama financiero"');
+        assert(titleEl.textContent === 'Tu panorama financiero', 'Título por defecto debe ser "Tu panorama financiero"');
 
         const subtitleEl = header.querySelector('#resumen-header-subtitle');
         assert(subtitleEl !== null, 'ResumenHeader debe tener #resumen-header-subtitle');
-        assert(subtitleEl.textContent.length > 0, 'Subtítulo no debe estar vacío');
+        assert(subtitleEl.textContent === 'Gestioná tus pagos y vencimientos del período.', 'Subtítulo debe usar la bajada breve');
+
+        const selector = header.querySelector('month-selector');
+        assert(selector !== null, 'ResumenHeader debe mostrar el selector de mes');
+        assert(header.querySelector('#resumen-header-month') === null, 'ResumenHeader no debe duplicar el mes fuera del input');
 
         document.body.removeChild(header);
     },
@@ -167,6 +171,42 @@ export const tests = [
         assert(subtitleEl.textContent === 'Mi subtítulo personalizado.', 'Debe renderizar el subtítulo personalizado');
 
         document.body.removeChild(header);
+    },
+
+
+    async function resumenHeader_doesNotRenderSeparateMonthText() {
+        console.log('  ResumenHeader: does not render separate month text outside selector');
+        const header = ResumenHeader();
+        document.body.appendChild(header);
+
+        const monthEl = header.querySelector('#resumen-header-month');
+        assert(monthEl === null, 'ResumenHeader no debe renderizar texto de mes separado del selector');
+
+        document.body.removeChild(header);
+    },
+
+    async function monthSelector_usesAccessibleDateInput() {
+        console.log('  MonthSelector: uses compact input group with month input');
+        const selector = document.createElement('month-selector');
+        document.body.appendChild(selector);
+
+        const input = selector.querySelector('#ms-input');
+        assert(input.type === 'month', 'Selector debe usar un input month visible');
+        assert(input.getAttribute('aria-label') === 'Seleccionar mes', 'Input month debe tener aria-label');
+        assert(input.classList.contains('form-control'), 'Input month debe usar form-control');
+
+        const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
+        assert(group.classList.contains('input-group'), 'Controles visibles deben agruparse como input-group');
+        assert(group.classList.contains('input-group-lg'), 'Controles visibles deben usar input-group-lg');
+        assert(group.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
+        assert(selector.querySelector('#ms-prev').classList.contains('btn-primary'), 'Botón anterior debe usar btn-primary');
+        assert(selector.querySelector('#ms-next').classList.contains('btn-primary'), 'Botón siguiente debe usar btn-primary');
+
+        input.value = '2026-07';
+        input.dispatchEvent(new Event('change'));
+        assert(selector.querySelector('#ms-input').value === '2026-07', 'Selector debe conservar el mes seleccionado');
+
+        document.body.removeChild(selector);
     },
 
     async function resumenHeader_updateChangesTitle() {
