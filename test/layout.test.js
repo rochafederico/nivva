@@ -197,7 +197,10 @@ export const tests = [
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
         assert(group.classList.contains('input-group'), 'Controles visibles deben agruparse como input-group');
+        assert(group.classList.contains('input-group-lg'), 'Controles visibles deben usar input-group-lg');
         assert(group.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
+        assert(selector.querySelector('#ms-prev').classList.contains('btn-primary'), 'Botón anterior debe usar btn-primary');
+        assert(selector.querySelector('#ms-next').classList.contains('btn-primary'), 'Botón siguiente debe usar btn-primary');
 
         input.value = '2026-07';
         input.dispatchEvent(new Event('change'));
