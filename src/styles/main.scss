@@ -75,3 +75,48 @@ app-sidebar {
     top: 0;
     overflow-y: auto;
 }
+
+// Fixed period selector layout: calendar | centered month input | grouped arrows.
+// Keeps navigation reachable on mobile even with long localized month names.
+.period-selector {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: stretch;
+    width: min(100%, 26rem);
+}
+
+.period-selector__icon,
+.period-selector__button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.period-selector__icon {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.period-selector__input {
+    min-width: 0;
+    text-align: center;
+    border-radius: 0;
+}
+
+.period-selector__actions {
+    display: inline-flex;
+}
+
+.period-selector__button {
+    border-radius: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding-inline: 0.75rem;
+}
+
+.period-selector__button + .period-selector__button {
+    border-top-right-radius: var(--bs-border-radius-lg);
+    border-bottom-right-radius: var(--bs-border-radius-lg);
+}

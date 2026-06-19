@@ -186,25 +186,38 @@ export const tests = [
     },
 
     async function monthSelector_usesAccessibleDateInput() {
-        console.log('  MonthSelector: uses compact input group with month input');
+        console.log('  MonthSelector: uses fixed period selector with month input');
         const selector = document.createElement('month-selector');
         document.body.appendChild(selector);
 
-        const input = selector.querySelector('#ms-input');
+        const label = selector.querySelector('label[for="period-selector"]');
+        assert(label !== null, 'Selector debe asociar un label al input de período');
+        assert(label.textContent === 'Período', 'Label debe describir el período');
+
+        const input = selector.querySelector('#period-selector');
         assert(input.type === 'month', 'Selector debe usar un input month visible');
-        assert(input.getAttribute('aria-label') === 'Seleccionar mes', 'Input month debe tener aria-label');
+        assert(input.getAttribute('aria-label') === 'Seleccionar período', 'Input month debe tener aria-label');
         assert(input.classList.contains('form-control'), 'Input month debe usar form-control');
+        assert(input.classList.contains('period-selector__input'), 'Input debe usar clase del layout centrado');
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
-        assert(group.classList.contains('input-group'), 'Controles visibles deben agruparse como input-group');
-        assert(group.classList.contains('input-group-lg'), 'Controles visibles deben usar input-group-lg');
-        assert(group.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
+        assert(group.classList.contains('period-selector'), 'Controles visibles deben usar layout fijo de período');
+        assert(group.children[0].classList.contains('period-selector__icon'), 'Icono debe quedar primero');
+        assert(group.children[1] === input, 'Input debe quedar centrado entre icono y flechas');
+        assert(group.querySelector('.period-selector__icon .bi-calendar-event') !== null, 'Selector debe incluir icono de calendario');
+
+        const actions = group.querySelector('.period-selector__actions');
+        assert(actions !== null, 'Flechas deben estar agrupadas en un contenedor de acciones');
+        assert(actions.children[0].id === 'ms-prev', 'Botón anterior debe ser la primera flecha agrupada');
+        assert(actions.children[1].id === 'ms-next', 'Botón siguiente debe ser la segunda flecha agrupada');
+        assert(selector.querySelector('#ms-prev').classList.contains('period-selector__button'), 'Botón anterior debe usar clase táctil');
+        assert(selector.querySelector('#ms-next').classList.contains('period-selector__button'), 'Botón siguiente debe usar clase táctil');
         assert(selector.querySelector('#ms-prev').classList.contains('btn-primary'), 'Botón anterior debe usar btn-primary');
         assert(selector.querySelector('#ms-next').classList.contains('btn-primary'), 'Botón siguiente debe usar btn-primary');
 
         input.value = '2026-07';
         input.dispatchEvent(new Event('change'));
-        assert(selector.querySelector('#ms-input').value === '2026-07', 'Selector debe conservar el mes seleccionado');
+        assert(selector.querySelector('#period-selector').value === '2026-07', 'Selector debe conservar el mes seleccionado');
 
         document.body.removeChild(selector);
     },

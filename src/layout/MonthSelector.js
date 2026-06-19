@@ -1,5 +1,5 @@
 // src/layout/MonthSelector.js
-// Compact global month selector web component — Bootstrap Input Group with input[type=month]
+// Compact global month selector web component with fixed mobile controls
 import {
     getSelectedMonth,
     setSelectedMonth,
@@ -21,43 +21,54 @@ export class MonthSelector extends HTMLElement {
     }
 
     _render() {
+        const label = document.createElement('label');
+        label.className = 'visually-hidden';
+        label.htmlFor = 'period-selector';
+        label.textContent = 'Período';
+
         const group = document.createElement('div');
-        group.className = 'input-group input-group-lg mb-3';
+        group.className = 'period-selector mb-3';
         group.dataset.tourStep = 'navegacion-mes';
 
         const icon = document.createElement('span');
-        icon.className = 'input-group-text';
+        icon.className = 'period-selector__icon input-group-text';
         icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
+
+        const input = document.createElement('input');
+        input.id = 'period-selector';
+        input.type = 'month';
+        input.className = 'period-selector__input form-control form-control-lg';
+        input.value = getSelectedMonth();
+        input.setAttribute('aria-label', 'Seleccionar período');
+
+        const actions = document.createElement('div');
+        actions.className = 'period-selector__actions';
+        actions.setAttribute('aria-label', 'Navegación de período');
 
         const prev = document.createElement('button');
         prev.id = 'ms-prev';
-        prev.className = 'btn btn-primary';
+        prev.className = 'period-selector__button btn btn-primary';
         prev.type = 'button';
         prev.title = 'Mes anterior';
         prev.setAttribute('aria-label', 'Mes anterior');
         prev.textContent = '‹';
 
-        const input = document.createElement('input');
-        input.id = 'ms-input';
-        input.type = 'month';
-        input.className = 'form-control';
-        input.value = getSelectedMonth();
-        input.setAttribute('aria-label', 'Seleccionar mes');
-
         const next = document.createElement('button');
         next.id = 'ms-next';
-        next.className = 'btn btn-primary';
+        next.className = 'period-selector__button btn btn-primary';
         next.type = 'button';
         next.title = 'Mes siguiente';
         next.setAttribute('aria-label', 'Mes siguiente');
         next.textContent = '›';
 
+        actions.appendChild(prev);
+        actions.appendChild(next);
         group.appendChild(icon);
-        group.appendChild(prev);
-        group.appendChild(next);
         group.appendChild(input);
+        group.appendChild(actions);
 
         this.innerHTML = '';
+        this.appendChild(label);
         this.appendChild(group);
         this.querySelector('#ms-prev').addEventListener('click', () => {
             goToPreviousMonth();
@@ -73,7 +84,7 @@ export class MonthSelector extends HTMLElement {
                 month: getSelectedMonth()
             });
         });
-        this.querySelector('#ms-input').addEventListener('change', (e) => {
+        this.querySelector('#period-selector').addEventListener('change', (e) => {
             if (e.target.value) {
                 setSelectedMonth(e.target.value);
                 trackEvent('monthly_navigation_used', {
@@ -85,7 +96,7 @@ export class MonthSelector extends HTMLElement {
     }
 
     _syncInput(month) {
-        const input = this.querySelector('#ms-input');
+        const input = this.querySelector('#period-selector');
         if (input && input.value !== month) input.value = month;
     }
 }
