@@ -22,7 +22,7 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         const group = document.createElement('div');
-        group.className = 'd-flex align-items-stretch gap-2 mb-3';
+        group.className = 'd-flex align-items-stretch gap-2 mb-3 col-12 col-lg-2';
         group.dataset.tourStep = 'navegacion-mes';
 
         const prev = document.createElement('button');
@@ -34,7 +34,8 @@ export class MonthSelector extends HTMLElement {
         prev.textContent = '‹';
 
         const inputGroup = document.createElement('div');
-        inputGroup.className = 'input-group input-group-lg flex-grow-1';
+        inputGroup.className = 'input-group input-group-lg flex-grow-1 w-100';
+        inputGroup.style.minWidth = '0';
 
         const icon = document.createElement('span');
         icon.className = 'input-group-text';

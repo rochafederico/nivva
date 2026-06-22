@@ -198,9 +198,13 @@ export const tests = [
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
         assert(group.classList.contains('d-flex'), 'Controles visibles deben usar layout Bootstrap d-flex');
         assert(group.classList.contains('gap-2'), 'Las flechas deben separarse del input group con gap Bootstrap');
+        assert(group.classList.contains('col-12'), 'Selector debe ocupar el ancho disponible en mobile');
+        assert(group.classList.contains('col-lg-2'), 'Selector debe usar col-lg-2 en desktop');
         const inputGroup = group.querySelector('.input-group.input-group-lg');
         assert(inputGroup !== null, 'Icono e input deben renderizarse dentro de un input group Bootstrap');
         assert(inputGroup.classList.contains('flex-grow-1'), 'Input group debe ocupar el espacio central disponible');
+        assert(inputGroup.classList.contains('w-100'), 'Input group debe mantener ancho estable');
+        assert(inputGroup.style.minWidth === '0px' || inputGroup.style.minWidth === '0', 'Input group debe permitir shrink sin depender del contenido');
         assert(inputGroup.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
         assert(inputGroup.querySelector('#ms-input.form-control') !== null, 'Input month debe estar dentro del input group con form-control');
         assert(selector.querySelector('#ms-prev').classList.contains('flex-shrink-0'), 'Botón anterior debe mantener tamaño con utilidad Bootstrap');
