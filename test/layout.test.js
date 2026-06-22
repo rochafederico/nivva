@@ -199,10 +199,12 @@ export const tests = [
         assert(group.classList.contains('d-flex'), 'Controles visibles deben usar layout Bootstrap d-flex');
         assert(group.classList.contains('gap-2'), 'Las flechas deben separarse del input group con gap Bootstrap');
         assert(selector.classList.contains('col-12'), 'Selector debe ocupar el ancho disponible en mobile');
-        assert(selector.classList.contains('col-lg-2'), 'Selector debe usar col-lg-2 en desktop');
+        assert(selector.classList.contains('col-md-6'), 'Selector debe usar col-md-6 desde md');
+        assert(selector.classList.contains('col-lg-5'), 'Selector debe usar col-lg-5 en desktop');
         assert(group.classList.contains('w-100'), 'Controles internos deben ocupar el ancho fijo del selector');
-        const inputGroup = group.querySelector('.input-group.input-group-lg');
+        const inputGroup = group.querySelector('.input-group');
         assert(inputGroup !== null, 'Icono e input deben renderizarse dentro de un input group Bootstrap');
+        assert(!inputGroup.classList.contains('input-group-lg'), 'Input group no debe usar input-group-lg');
         assert(inputGroup.classList.contains('flex-grow-1'), 'Input group debe ocupar el espacio central disponible');
         assert(inputGroup.classList.contains('w-100'), 'Input group debe mantener ancho estable');
         assert(inputGroup.style.minWidth === '0px' || inputGroup.style.minWidth === '0', 'Input group debe permitir shrink sin depender del contenido');

@@ -11,7 +11,7 @@ import { trackEvent } from '../shared/observability/index.js';
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
         this.classList.remove('d-inline-flex');
-        this.classList.add('d-flex', 'align-items-center', 'col-12', 'col-lg-2');
+        this.classList.add('d-flex', 'align-items-center', 'col-12', 'col-md-6', 'col-lg-5');
         this._render();
         this._onUiMonth = (e) => this._syncInput(e.detail.mes);
         window.addEventListener('ui:month', this._onUiMonth);
@@ -35,7 +35,7 @@ export class MonthSelector extends HTMLElement {
         prev.textContent = '‹';
 
         const inputGroup = document.createElement('div');
-        inputGroup.className = 'input-group input-group-lg flex-grow-1 w-100';
+        inputGroup.className = 'input-group flex-grow-1 w-100';
         inputGroup.style.minWidth = '0';
 
         const icon = document.createElement('span');
