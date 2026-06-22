@@ -1,11 +1,10 @@
 // src/layout/MonthSelector.js
-// Global month selector web component — Bootstrap-only layout with native month input.
+// Global month selector web component — Bootstrap input group with side navigation.
 import {
     getSelectedMonth,
     setSelectedMonth,
     goToPreviousMonth,
     goToNextMonth,
-    formatMonthLabel,
 } from '../shared/MonthFilter.js';
 import { trackEvent } from '../shared/observability/index.js';
 
@@ -34,23 +33,17 @@ export class MonthSelector extends HTMLElement {
         prev.setAttribute('aria-label', 'Mes anterior');
         prev.textContent = '‹';
 
-        const center = document.createElement('label');
-        center.className = 'form-control form-control-lg d-flex align-items-center justify-content-center gap-2 position-relative overflow-hidden m-0 fw-semibold text-nowrap';
-        center.setAttribute('for', 'ms-input');
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group input-group-lg flex-grow-1';
 
         const icon = document.createElement('span');
-        icon.className = 'text-secondary flex-shrink-0';
+        icon.className = 'input-group-text';
         icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
-
-        const label = document.createElement('span');
-        label.id = 'ms-label';
-        label.className = 'text-truncate text-capitalize';
-        label.textContent = formatMonthLabel(getSelectedMonth());
 
         const input = document.createElement('input');
         input.id = 'ms-input';
         input.type = 'month';
-        input.className = 'form-control position-absolute top-0 start-0 w-100 h-100 opacity-0';
+        input.className = 'form-control';
         input.value = getSelectedMonth();
         input.setAttribute('aria-label', 'Seleccionar mes');
 
@@ -62,11 +55,10 @@ export class MonthSelector extends HTMLElement {
         next.setAttribute('aria-label', 'Mes siguiente');
         next.textContent = '›';
 
-        center.appendChild(icon);
-        center.appendChild(label);
-        center.appendChild(input);
+        inputGroup.appendChild(icon);
+        inputGroup.appendChild(input);
         group.appendChild(prev);
-        group.appendChild(center);
+        group.appendChild(inputGroup);
         group.appendChild(next);
 
         this.innerHTML = '';
@@ -98,9 +90,7 @@ export class MonthSelector extends HTMLElement {
 
     _syncInput(month) {
         const input = this.querySelector('#ms-input');
-        const label = this.querySelector('#ms-label');
         if (input && input.value !== month) input.value = month;
-        if (label) label.textContent = formatMonthLabel(month);
     }
 }
 

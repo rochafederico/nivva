@@ -186,7 +186,7 @@ export const tests = [
     },
 
     async function monthSelector_usesAccessibleDateInput() {
-        console.log('  MonthSelector: uses Bootstrap-only centered native month input');
+        console.log('  MonthSelector: uses Bootstrap input group for icon and month input');
         const selector = document.createElement('month-selector');
         document.body.appendChild(selector);
 
@@ -197,13 +197,12 @@ export const tests = [
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
         assert(group.classList.contains('d-flex'), 'Controles visibles deben usar layout Bootstrap d-flex');
-        assert(group.classList.contains('gap-2'), 'Las flechas deben separarse del período con gap Bootstrap');
-        assert(group.querySelector('label.form-control.form-control-lg') !== null, 'Debe renderizar un bloque central Bootstrap clickeable');
-        assert(group.querySelector('.text-secondary .bi-calendar-event') !== null, 'Bloque central debe incluir icono de calendario con utilidad Bootstrap');
-        assert(group.querySelector('#ms-label').classList.contains('text-truncate'), 'Etiqueta visible debe manejar overflow con Bootstrap');
-        assert(group.querySelector('#ms-label').textContent.includes('2026'), 'Bloque central debe mostrar mes y año legibles');
-        assert(input.classList.contains('position-absolute'), 'Input nativo debe superponerse con utilidad Bootstrap');
-        assert(input.classList.contains('opacity-0'), 'Input nativo debe ocultarse visualmente con utilidad Bootstrap');
+        assert(group.classList.contains('gap-2'), 'Las flechas deben separarse del input group con gap Bootstrap');
+        const inputGroup = group.querySelector('.input-group.input-group-lg');
+        assert(inputGroup !== null, 'Icono e input deben renderizarse dentro de un input group Bootstrap');
+        assert(inputGroup.classList.contains('flex-grow-1'), 'Input group debe ocupar el espacio central disponible');
+        assert(inputGroup.querySelector('.input-group-text .bi-calendar-event') !== null, 'Input group debe incluir icono de calendario');
+        assert(inputGroup.querySelector('#ms-input.form-control') !== null, 'Input month debe estar dentro del input group con form-control');
         assert(selector.querySelector('#ms-prev').classList.contains('flex-shrink-0'), 'Botón anterior debe mantener tamaño con utilidad Bootstrap');
         assert(selector.querySelector('#ms-next').classList.contains('flex-shrink-0'), 'Botón siguiente debe mantener tamaño con utilidad Bootstrap');
         assert(selector.querySelector('#ms-prev').classList.contains('btn-primary'), 'Botón anterior debe usar btn-primary');
