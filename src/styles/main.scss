@@ -75,3 +75,78 @@ app-sidebar {
     top: 0;
     overflow-y: auto;
 }
+
+// Month selector: side arrows separated from a centered native month input.
+month-selector {
+    max-width: 100%;
+}
+
+.month-selector-control {
+    display: grid;
+    grid-template-columns: 44px minmax(12rem, 18rem) 44px;
+    align-items: stretch;
+    gap: .75rem;
+    max-width: 100%;
+}
+
+.month-selector-arrow {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.month-selector-period {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-width: 0;
+    min-height: 44px;
+    margin: 0;
+    padding: .5rem 2.25rem .5rem .875rem;
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-lg);
+    cursor: pointer;
+}
+
+.month-selector-calendar {
+    flex: 0 0 auto;
+    color: var(--bs-secondary-color);
+}
+
+.month-selector-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.month-selector-native-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.month-selector-period:focus-within {
+    border-color: $input-focus-border-color;
+    box-shadow: $input-focus-box-shadow;
+}
+
+@media (max-width: 420px) {
+    .month-selector-control {
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        gap: .5rem;
+    }
+}

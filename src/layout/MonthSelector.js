@@ -1,10 +1,11 @@
 // src/layout/MonthSelector.js
-// Compact global month selector web component — Bootstrap Input Group with input[type=month]
+// Global month selector web component — centered native input with side navigation.
 import {
     getSelectedMonth,
     setSelectedMonth,
     goToPreviousMonth,
     goToNextMonth,
+    formatMonthLabel,
 } from '../shared/MonthFilter.js';
 import { trackEvent } from '../shared/observability/index.js';
 
@@ -22,40 +23,51 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         const group = document.createElement('div');
-        group.className = 'input-group input-group-lg mb-3';
+        group.className = 'month-selector-control mb-3';
         group.dataset.tourStep = 'navegacion-mes';
-
-        const icon = document.createElement('span');
-        icon.className = 'input-group-text';
-        icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
 
         const prev = document.createElement('button');
         prev.id = 'ms-prev';
-        prev.className = 'btn btn-primary';
+        prev.className = 'btn btn-primary month-selector-arrow';
         prev.type = 'button';
         prev.title = 'Mes anterior';
         prev.setAttribute('aria-label', 'Mes anterior');
         prev.textContent = '‹';
 
+        const center = document.createElement('label');
+        center.className = 'month-selector-period';
+        center.setAttribute('for', 'ms-input');
+
+        const icon = document.createElement('span');
+        icon.className = 'month-selector-calendar';
+        icon.innerHTML = '<i class="bi bi-calendar-event" aria-hidden="true"></i>';
+
+        const label = document.createElement('span');
+        label.id = 'ms-label';
+        label.className = 'month-selector-label';
+        label.textContent = formatMonthLabel(getSelectedMonth());
+
         const input = document.createElement('input');
         input.id = 'ms-input';
         input.type = 'month';
-        input.className = 'form-control';
+        input.className = 'form-control month-selector-native-input';
         input.value = getSelectedMonth();
         input.setAttribute('aria-label', 'Seleccionar mes');
 
         const next = document.createElement('button');
         next.id = 'ms-next';
-        next.className = 'btn btn-primary';
+        next.className = 'btn btn-primary month-selector-arrow';
         next.type = 'button';
         next.title = 'Mes siguiente';
         next.setAttribute('aria-label', 'Mes siguiente');
         next.textContent = '›';
 
-        group.appendChild(icon);
+        center.appendChild(icon);
+        center.appendChild(label);
+        center.appendChild(input);
         group.appendChild(prev);
+        group.appendChild(center);
         group.appendChild(next);
-        group.appendChild(input);
 
         this.innerHTML = '';
         this.appendChild(group);
@@ -86,7 +98,9 @@ export class MonthSelector extends HTMLElement {
 
     _syncInput(month) {
         const input = this.querySelector('#ms-input');
+        const label = this.querySelector('#ms-label');
         if (input && input.value !== month) input.value = month;
+        if (label) label.textContent = formatMonthLabel(month);
     }
 }
 
