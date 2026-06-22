@@ -186,7 +186,7 @@ export const tests = [
     },
 
     async function monthSelector_usesAccessibleDateInput() {
-        console.log('  MonthSelector: uses centered native month input with separated arrows');
+        console.log('  MonthSelector: uses Bootstrap-only centered native month input');
         const selector = document.createElement('month-selector');
         document.body.appendChild(selector);
 
@@ -196,12 +196,16 @@ export const tests = [
         assert(input.classList.contains('form-control'), 'Input month debe usar form-control');
 
         const group = selector.querySelector('[data-tour-step="navegacion-mes"]');
-        assert(group.classList.contains('month-selector-control'), 'Controles visibles deben usar el layout del selector de mes');
-        assert(group.querySelector('.month-selector-period') !== null, 'Debe renderizar un bloque central clickeable');
-        assert(group.querySelector('.month-selector-calendar .bi-calendar-event') !== null, 'Bloque central debe incluir icono de calendario');
+        assert(group.classList.contains('d-flex'), 'Controles visibles deben usar layout Bootstrap d-flex');
+        assert(group.classList.contains('gap-2'), 'Las flechas deben separarse del período con gap Bootstrap');
+        assert(group.querySelector('label.form-control.form-control-lg') !== null, 'Debe renderizar un bloque central Bootstrap clickeable');
+        assert(group.querySelector('.text-secondary .bi-calendar-event') !== null, 'Bloque central debe incluir icono de calendario con utilidad Bootstrap');
+        assert(group.querySelector('#ms-label').classList.contains('text-truncate'), 'Etiqueta visible debe manejar overflow con Bootstrap');
         assert(group.querySelector('#ms-label').textContent.includes('2026'), 'Bloque central debe mostrar mes y año legibles');
-        assert(selector.querySelector('#ms-prev').classList.contains('month-selector-arrow'), 'Botón anterior debe usar clase de flecha separada');
-        assert(selector.querySelector('#ms-next').classList.contains('month-selector-arrow'), 'Botón siguiente debe usar clase de flecha separada');
+        assert(input.classList.contains('position-absolute'), 'Input nativo debe superponerse con utilidad Bootstrap');
+        assert(input.classList.contains('opacity-0'), 'Input nativo debe ocultarse visualmente con utilidad Bootstrap');
+        assert(selector.querySelector('#ms-prev').classList.contains('flex-shrink-0'), 'Botón anterior debe mantener tamaño con utilidad Bootstrap');
+        assert(selector.querySelector('#ms-next').classList.contains('flex-shrink-0'), 'Botón siguiente debe mantener tamaño con utilidad Bootstrap');
         assert(selector.querySelector('#ms-prev').classList.contains('btn-primary'), 'Botón anterior debe usar btn-primary');
         assert(selector.querySelector('#ms-next').classList.contains('btn-primary'), 'Botón siguiente debe usar btn-primary');
 
