@@ -10,7 +10,8 @@ import { trackEvent } from '../shared/observability/index.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
-        this.classList.add('d-inline-flex', 'align-items-center');
+        this.classList.remove('d-inline-flex');
+        this.classList.add('d-flex', 'align-items-center', 'col-12', 'col-lg-2');
         this._render();
         this._onUiMonth = (e) => this._syncInput(e.detail.mes);
         window.addEventListener('ui:month', this._onUiMonth);
@@ -22,7 +23,7 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         const group = document.createElement('div');
-        group.className = 'd-flex align-items-stretch gap-2 mb-3 col-12 col-lg-2';
+        group.className = 'd-flex align-items-stretch gap-2 mb-3 w-100';
         group.dataset.tourStep = 'navegacion-mes';
 
         const prev = document.createElement('button');
@@ -45,6 +46,7 @@ export class MonthSelector extends HTMLElement {
         input.id = 'ms-input';
         input.type = 'month';
         input.className = 'form-control';
+        input.style.minWidth = '0';
         input.value = getSelectedMonth();
         input.setAttribute('aria-label', 'Seleccionar mes');
 
