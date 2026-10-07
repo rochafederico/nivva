@@ -1,10 +1,11 @@
 // src/features/deudas/components/DebtRowItem.js
-// Clase JS que construye una fila <tr> de deuda con diseño consistente en todos los breakpoints.
+// Clase JS que construye la fila <tr> de un monto de egreso con el diseño compartido (ListRow):
 // 2 celdas: info (avatar + nombre + tipo + fecha) y acciones (monto + badge + toggle + chevron).
 
 import '../../../shared/components/AppCheckbox.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
 import { formatFecha } from '../../../shared/utils/fechas.js';
+import { createListRow } from '../../../shared/components/ListRow.js';
 
 // ── Helpers exportados (usados también en tests) ──────────────────────────────
 
@@ -75,10 +76,11 @@ export class DebtRowItem {
         // ── Estado badge (compartido) ──────────────────────────────────
         const badgeSpan = document.createElement('span');
 
+        // El switch ya muestra pagado / pendiente: el badge solo aparece si aporta (Vencido, Vence hoy).
         const renderEstado = () => {
             badgeSpan.replaceChildren();
             const estado = getEstado(row);
-            if (!estado) return;
+            if (!estado || row.pagado || estado.label === 'Pendiente') return;
             const b = document.createElement('span');
             b.className = `badge ${estado.className} fw-normal lh-sm px-1 py-0 ms-2 text-nowrap`;
             b.textContent = estado.label;
@@ -133,125 +135,31 @@ export class DebtRowItem {
             cb.addEventListener('checkbox-change', handleToggle);
         }
 
-        // ── Fila principal ────────────────────────────────────────────
-        const tr = document.createElement('tr');
-        if (this._showDetailAction && typeof row._onRowClick === 'function') {
-            tr.classList.add('cursor-pointer');
-            tr.addEventListener('click', () => row._onRowClick(row, tr));
-        }
-
-        // ── COL 1: info (avatar + nombre + tipo + fecha) ─────────────
-        const tdInfo = document.createElement('td');
-        tdInfo.className = 'd-table-cell py-3';
-
-        const infoFlex = document.createElement('div');
-        infoFlex.className = 'd-flex align-items-center gap-3';
-
-        const avatar = document.createElement('div');
-        avatar.className = `debt-card-avatar d-none d-sm-flex align-items-center justify-content-center rounded-circle flex-shrink-0 fw-semibold ${getAvatarClasses(row.acreedor)}`;
-        avatar.textContent = getInitials(row.acreedor);
-        infoFlex.appendChild(avatar);
-
-        const nameBlock = document.createElement('div');
-        nameBlock.className = 'flex-grow-1 min-w-0';
-
-        // Responsive: acreedor + date inline on desktop, stacked on mobile
-        const nameDateRow = document.createElement('div');
-        nameDateRow.className = 'd-flex flex-column flex-md-row align-items-md-baseline gap-md-2 min-w-0';
-
-        const nameEl = document.createElement('h6');
-        nameEl.className = 'fw-bold text-break mb-0';
-        nameEl.textContent = row.acreedor ?? '';
-        nameDateRow.appendChild(nameEl);
-
-        const venc = String(row.vencimiento ?? '').trim();
-
-        // Helper para construir el elemento de fecha (siempre visible)
-        const makeDateEl = () => {
-            const el = document.createElement('small');
-            el.className = 'd-flex align-items-center text-muted mt-1 mt-md-0';
-            const icon = document.createElement('i');
-            icon.className = 'bi bi-calendar3 me-1';
-            icon.setAttribute('aria-hidden', 'true');
-            el.appendChild(icon);
-            el.appendChild(document.createTextNode(formatDate(venc)));
-            return el;
-        };
-
-        if (venc) {
-            nameDateRow.appendChild(makeDateEl());
-        }
-
-        nameBlock.appendChild(nameDateRow);
-
+        // ── Detalle debajo del nombre: badge de tipo ─────────────────
+        let tipoBadge = null;
         const tipo = String(row.tipoDeuda ?? '').trim();
         if (tipo && !excl.includes('tipoDeuda')) {
-            const tipoBadge = document.createElement('span');
+            tipoBadge = document.createElement('span');
             tipoBadge.className = 'badge rounded-pill bg-light text-secondary border fw-normal mt-1 d-inline-block text-truncate mw-100';
             const tipoIcon = document.createElement('i');
             tipoIcon.className = `bi ${getTipoIcon(tipo)} me-1`;
             tipoIcon.setAttribute('aria-hidden', 'true');
             tipoBadge.appendChild(tipoIcon);
             tipoBadge.appendChild(document.createTextNode(tipo));
-            nameBlock.appendChild(tipoBadge);
         }
 
-        infoFlex.appendChild(nameBlock);
-        tdInfo.appendChild(infoFlex);
-        tr.appendChild(tdInfo);
-
-        // ── COL 2: estado + switch + chevron ─────────────────────────
-        const tdActions = document.createElement('td');
-        tdActions.className = 'd-table-cell py-3 pe-1 align-middle';
-
-        const actWrap = document.createElement('div');
-        actWrap.className = 'd-flex align-items-center';
-
-        // Estado: monto + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
-        const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-1 me-sm-4';
-
-        // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
-        const amountRow = document.createElement('div');
-        amountRow.className = 'd-flex flex-wrap align-items-baseline gap-1 justify-content-end';
-
-        const amountEl = document.createElement('span');
-        amountEl.className = 'fw-normal lh-sm text-nowrap';
-        amountEl.textContent = formatMoneda(row.monto, row.moneda);
-        amountRow.appendChild(amountEl);
-        amountRow.appendChild(badgeSpan);
-        estadoCol.appendChild(amountRow);
-
-        actWrap.appendChild(estadoCol);
-
-        // Switch: columna flex-shrink-0 con padding para zona táctil adecuada
-        if (cb) {
-            const switchCol = document.createElement('div');
-            switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-1 px-sm-2';
-            switchCol.addEventListener('click', e => e.stopPropagation());
-            switchCol.appendChild(cb);
-            actWrap.appendChild(switchCol);
-        }
-
-        // Chevron: columna de ancho fijo, siempre pegada al borde derecho
-        if (this._showDetailAction && typeof row._onRowClick === 'function') {
-            const chevronBtn = document.createElement('button');
-            chevronBtn.type = 'button';
-            chevronBtn.className = 'btn btn-link px-1 py-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
-            chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'este egreso'}`);
-            chevronBtn.addEventListener('click', e => {
-                e.stopPropagation();
-                row._onRowClick(row, chevronBtn);
-            });
-            const chevron = document.createElement('i');
-            chevron.className = 'bi bi-chevron-right';
-            chevron.setAttribute('aria-hidden', 'true');
-            chevronBtn.appendChild(chevron);
-            actWrap.appendChild(chevronBtn);
-        }
-
-        tdActions.appendChild(actWrap);
-        tr.appendChild(tdActions);
+        const canOpen = this._showDetailAction && typeof row._onRowClick === 'function';
+        const tr = createListRow({
+            avatar: { text: getInitials(row.acreedor), className: getAvatarClasses(row.acreedor) },
+            title: row.acreedor ?? '',
+            date: row.vencimiento,
+            detail: tipoBadge,
+            amount: formatMoneda(row.monto, row.moneda),
+            status: badgeSpan,
+            controls: cb ? [cb] : [],
+            onOpen: canOpen ? (opener) => row._onRowClick(row, opener) : null,
+            openLabel: `Ver detalle de ${row.acreedor || 'este egreso'}`,
+        });
 
         return tr;
     }

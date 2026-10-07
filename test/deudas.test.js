@@ -1556,7 +1556,7 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
     assert(list.querySelectorAll('tbody tr').length === 1, 'La vista agrupada debe renderizar filas compactas');
     assert(list.querySelector('.debt-card-avatar') !== null, 'La vista agrupada debe usar la estructura de DebtRowItem');
     assert(list.querySelector('app-checkbox') === null, 'La fila agrupada no debe mostrar switch de pago individual');
-    assert(list.querySelector('i.bi-chevron-right') !== null, 'La fila agrupada debe mostrar acción de detalle individual cuando show-detail-action está habilitado');
+    assert(list.querySelector('button.list-row-title') !== null, 'La fila agrupada debe permitir abrir el detalle cuando show-detail-action está habilitado');
     assert(list.querySelector('.fw-normal.text-nowrap')?.textContent === '$ 1.500,00', 'La fila agrupada debe mostrar el monto agregado');
 
     document.body.removeChild(list);
@@ -1751,19 +1751,23 @@ async function testDebtRowItem() {
     assert(tipoBadge !== null, 'Debe renderizar badge de tipo');
     assert(tipoBadge.querySelector('i.bi-bank2') !== null, 'Badge Prestamo debe tener bi-bank2');
 
-    // Fecha con ícono de calendario (formateada DD/MM/YYYY)
-    const calIcon = tr.querySelector('i.bi-calendar3');
-    assert(calIcon !== null, 'Debe mostrar ícono de calendario');
-    const dateText = calIcon.parentElement?.textContent || '';
-    assert(dateText.includes('01/12/2026'), 'Fecha debe mostrarse como DD/MM/YYYY');
+    // Fecha corta sin año ni ícono
+    assert(tr.querySelector('i.bi-calendar3') === null, 'La fecha no lleva ícono de calendario');
+    assert(tr.textContent.includes('01 dic') && !tr.textContent.includes('01/12/2026'), 'Fecha corta "01 dic"');
 
-    // Chevron (affordance de navegación)
-    const chevron = tr.querySelector('i.bi-chevron-right');
-    assert(chevron !== null, 'Con _onRowClick debe mostrar chevron');
+    // Un solo control por fila: sin chevron; el título es el botón que abre el detalle
+    assert(tr.querySelector('i.bi-chevron-right') === null, 'No debe mostrar chevron');
+    const titleBtn = tr.querySelector('button.list-row-title');
+    assert(titleBtn !== null && titleBtn.textContent === 'Test Acreedor', 'El título debe ser un botón con el nombre');
+    assert(titleBtn.getAttribute('aria-label') === 'Ver detalle de Test Acreedor', 'El botón del título tiene nombre accesible');
+    assert(tr.querySelectorAll('button, app-checkbox').length === 2, 'Solo el título y el switch son interactivos');
+
+    // Sin badge redundante para un monto pendiente no vencido
+    assert(tr.querySelector('.badge:not(.rounded-pill)') === null, 'Pendiente sin vencer no muestra badge (lo indica el switch)');
 
     const rowNoDetail = { ...row, _onRowClick: () => {} };
     const rowItemNoDetail = new DebtRowItem(rowNoDetail, { excludeColumns: [], showDetailAction: false });
-    assert(rowItemNoDetail.element.querySelector('i.bi-chevron-right') === null, 'showDetailAction=false debe ocultar chevron');
+    assert(rowItemNoDetail.element.querySelector('button.list-row-title') === null, 'showDetailAction=false no hace del título un botón');
     assert(!rowItemNoDetail.element.classList.contains('cursor-pointer'), 'showDetailAction=false no debe marcar la fila como clickeable');
 
     const rowItemNoPayment = new DebtRowItem(row, { excludeColumns: [], showDetailAction: true, showPaymentAction: false });
@@ -1776,7 +1780,20 @@ async function testDebtRowItem() {
     document.body.removeChild(table);
 }
 
+// ===================================================================
+// DebtRowItem: badge solo cuando aporta información (vencido); pagado lo indica el switch
+// ===================================================================
+async function testDebtRowItemBadgeSoloVencido() {
+    console.log('  DebtRowItem: sin badge Pagado/Pendiente; solo Vencido');
+    const base = { id: 9001, acreedor: 'Badge Test', monto: 10, moneda: 'ARS', _onRowClick: () => {} };
+    const pagado = new DebtRowItem({ ...base, vencimiento: '2000-01-01', pagado: true }, { showDetailAction: true }).element;
+    assert(pagado.querySelector('.badge') === null, 'Un monto pagado no muestra badge (lo indica el switch)');
+    const vencido = new DebtRowItem({ ...base, vencimiento: '2000-01-01', pagado: false }, { showDetailAction: true }).element;
+    assert(vencido.querySelector('.badge')?.textContent === 'Vencido', 'Un monto impago vencido muestra "Vencido"');
+}
+
 export const tests = [
+    testDebtRowItemBadgeSoloVencido,
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
     testImportarConMerge,

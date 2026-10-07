@@ -11,6 +11,7 @@ global.HTMLElement = happyWindow.HTMLElement;
 global.customElements = happyWindow.customElements;
 global.CustomEvent = happyWindow.CustomEvent;
 global.Event = happyWindow.Event;
+global.PopStateEvent = happyWindow.PopStateEvent;
 global.Node = happyWindow.Node;
 global.MutationObserver = happyWindow.MutationObserver;
 global.indexedDB = FakeIndexedDB;
