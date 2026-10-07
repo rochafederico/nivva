@@ -1343,6 +1343,12 @@ async function testDebtEntityShellNavTabsRender() {
     const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
     assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos"');
 
+    // Son links a rutas: nav con nombre accesible, sin roles ARIA de tablist incompletos
+    const nav = tabs.closest('nav');
+    assert(nav !== null && nav.getAttribute('aria-label') === 'Vistas de deudas', 'Las pestañas deben estar en un <nav> con aria-label');
+    assert(!tabs.hasAttribute('role'), 'La lista no debe declarar role="tablist" sin role="tab" en sus hijos');
+    assert(shell.querySelector('.nav-underline [role="presentation"]') === null, 'Los ítems no deben usar role="presentation"');
+
     document.body.removeChild(shell);
     await cleanup();
 }

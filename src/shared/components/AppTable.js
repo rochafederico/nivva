@@ -77,12 +77,13 @@ export class AppTable extends HTMLElement {
                 if (col.opts && col.opts.classCss) {
                     td.className = col.opts.classCss;
                 }
-                let content;
-                if (col.render) {
-                    content = col.render(row);
-                } else {
-                    content = row[col.key] ?? '';
+                if (!col.render) {
+                    // Los datos del usuario se muestran como texto, nunca como HTML.
+                    td.textContent = String(row[col.key] ?? '');
+                    tr.appendChild(td);
+                    return;
                 }
+                const content = col.render(row);
                 if (content instanceof Node) {
                     td.appendChild(content);
                 } else if (typeof content === 'string') {

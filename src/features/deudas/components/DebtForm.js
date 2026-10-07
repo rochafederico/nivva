@@ -135,6 +135,8 @@ export class DebtForm extends HTMLElement {
                                 el('div', {
                                     className: 'overflow-auto',
                                     style: 'min-height: 100px; max-height: 220px;',
+                                    // Zona con scroll: enfocable para poder recorrerla con teclado
+                                    attrs: { tabindex: '0', role: 'region', 'aria-labelledby': 'montos-label' },
                                     children: [
                                         el('table', {
                                             className: 'table table-sm w-100 mb-0',

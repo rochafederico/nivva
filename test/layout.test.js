@@ -10,8 +10,50 @@ import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
+import { createRouteRenderer } from '../src/shared/routeRenderer.js';
+import Ingresos from '../src/pages/Ingresos.js';
 
 export const tests = [
+
+    function routeRenderer_cleansUpPreviousPage() {
+        console.log('  routeRenderer: al cambiar de ruta llama cleanup() de la página anterior');
+        const root = document.createElement('div');
+        const mount = createRouteRenderer(root);
+        let cleaned = 0;
+        const first = document.createElement('div');
+        first.cleanup = () => { cleaned++; };
+        const second = document.createElement('div');
+
+        mount(first);
+        assert(root.firstChild === first, 'Debe montar la primera página');
+        mount(second);
+        assert(cleaned === 1, 'Debe llamar cleanup() de la página anterior una vez');
+        assert(root.childNodes.length === 1 && root.firstChild === second, 'Debe reemplazar el contenido por la nueva página');
+        mount(document.createElement('div'));
+        assert(cleaned === 1, 'Una página sin cleanup() no debe fallar');
+    },
+
+    function routeRenderer_removesIngresosListeners() {
+        console.log('  routeRenderer: salir de Ingresos saca sus listeners de window');
+        const root = document.createElement('div');
+        document.body.appendChild(root);
+        const mount = createRouteRenderer(root);
+        const removed = [];
+        const originalRemove = window.removeEventListener;
+        window.removeEventListener = function (type, ...rest) {
+            removed.push(type);
+            return originalRemove.call(this, type, ...rest);
+        };
+        try {
+            mount(Ingresos());
+            mount(document.createElement('div'));
+        } finally {
+            window.removeEventListener = originalRemove;
+            root.remove();
+        }
+        assert(removed.includes('ingreso:added'), 'Debe sacar el listener ingreso:added');
+        assert(removed.includes('ui:month'), 'Debe sacar el listener ui:month');
+    },
 
     function createIconButton_usesBootstrapAndAccessibleLabel() {
         console.log('  createIconButton: usa Bootstrap y aria-label');

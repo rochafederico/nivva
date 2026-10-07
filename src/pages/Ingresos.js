@@ -10,7 +10,7 @@ import { getSelectedMonth } from '../shared/MonthFilter.js';
 
 export default function Ingresos() {
     const container = document.createElement('div');
-    container.className = 'd-grid gap-3';
+    container.className = 'd-flex flex-column gap-3';
 
     const ingresoModal = document.createElement('ingreso-modal');
     ingresoModal.id = 'ingresoModal';
@@ -33,7 +33,7 @@ export default function Ingresos() {
 
     // Content: stats card + table
     const contentSlot = document.createElement('div');
-    contentSlot.className = 'd-grid gap-3';
+    contentSlot.className = 'd-flex flex-column gap-3';
 
     contentSlot.appendChild(StatsIndicators());
 
