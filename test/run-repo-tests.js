@@ -18,6 +18,7 @@ import { tests as feedbackTests } from './feedback.test.js';
 import { tests as layoutTests } from './layout.test.js';
 import { tests as appFormTests } from './app-form.test.js';
 import { tests as pwaResponsiveTests } from './pwa-responsive.test.js';
+import { tests as resumenTests } from './resumen.test.js';
 
 async function run() {
     try {
@@ -62,6 +63,9 @@ async function run() {
 
         console.log('\n--- Layout ---');
         for (const test of layoutTests) { await test(); }
+
+        console.log('\n--- Resumen (vista única) ---');
+        for (const test of resumenTests) { await test(); }
 
         console.log('\n--- PWA / Responsive ---');
         for (const test of pwaResponsiveTests) { await test(); }

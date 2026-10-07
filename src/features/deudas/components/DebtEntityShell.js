@@ -7,16 +7,8 @@ import '../../../layout/PageSectionLayout.js';
 import './DebtModal.js';
 import './DebtDetailModal.js';
 import './DebtList.js';
+import './AcreedoresList.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
 
 function navigate(path) {
     if (path !== window.location.pathname) {
@@ -28,7 +20,6 @@ function navigate(path) {
 export class DebtEntityShell extends HTMLElement {
     constructor() {
         super();
-        this.entities = [];
         this.currentView = this._getViewFromPath();
     }
 
@@ -40,7 +31,6 @@ export class DebtEntityShell extends HTMLElement {
         this.currentView = this._getViewFromPath();
         this.classList.add('d-block');
         this.render();
-        if (this.currentView === 'deudas') this.loadEntities();
         this._onRefresh = () => this._refreshCurrentView();
         this._onEdit = (e) => this.editDebt(e.detail);
         window.addEventListener('deuda:saved', this._onRefresh);
@@ -58,163 +48,20 @@ export class DebtEntityShell extends HTMLElement {
         window.removeEventListener('deuda:edit', this._onEdit);
     }
 
+    // La vista Acreedores se recarga sola (<acreedores-list>); Montos del mes usa el filtro global de mes.
     _refreshCurrentView() {
-        if (this.currentView === 'deudas') {
-            this.loadEntities();
-        } else {
+        if (this.currentView === 'cuotas') {
             window.dispatchEvent(new CustomEvent('ui:month', { detail: { mes: getSelectedMonth() } }));
         }
     }
 
+    /** Recarga la lista de acreedores (vista /gastos/deudas). */
     async loadEntities() {
-        const { listDeudas } = await import('../deudaRepository.js');
-        this.entities = await listDeudas();
-        this.renderTable();
+        await this.querySelector('acreedores-list')?.load();
     }
 
-    fmtMoneda(moneda, n) {
-        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n);
-    }
-
-    computePendiente(montos) {
-        const totals = {};
-        (montos || []).forEach(m => {
-            if (!m.pagado) {
-                totals[m.moneda] = (totals[m.moneda] || 0) + Number(m.monto);
-            }
-        });
-        return totals;
-    }
-
-    renderTable() {
-        const container = this.querySelector('#entity-table-container');
-        if (!container) return;
-
-        if (this.entities.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center py-4">Todavía no cargaste egresos. Usá <strong>Agregar egreso</strong> para empezar.</p>';
-            return;
-        }
-
-        const rows = this.entities.map(deuda => {
-            const pendiente = this.computePendiente(deuda.montos);
-            const montos = deuda.montos || [];
-            const total = montos.length;
-            const pagadasCount = montos.filter(m => m.pagado).length;
-            const cuotasStr = total > 0 ? `${pagadasCount}/${total}` : '0/0';
-            const pendienteStr = Object.keys(pendiente).length
-                ? Object.entries(pendiente).map(([moneda, tot]) => this.fmtMoneda(moneda, tot)).join(' | ')
-                : '—';
-            const tipo = escapeHtml(deuda.tipoDeuda || '—');
-            // En mobile se muestran 2 columnas (datos + acciones): tipo, cuotas y pendiente
-            // pasan debajo del acreedor para que las acciones no queden fuera de pantalla.
-            return `
-                <tr>
-                    <td>
-                        <div class="fw-semibold text-break">${escapeHtml(deuda.acreedor)}</div>
-                        <div class="small text-body-secondary d-md-none">${tipo} · ${cuotasStr} montos pagados</div>
-                        <div class="small d-md-none">Pendiente: <span class="text-nowrap">${escapeHtml(pendienteStr)}</span></div>
-                    </td>
-                    <td class="d-none d-md-table-cell">${tipo}</td>
-                    <td class="text-center d-none d-md-table-cell">${cuotasStr}</td>
-                    <td class="d-none d-md-table-cell text-nowrap">${escapeHtml(pendienteStr)}</td>
-                    <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                            <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-detail-id="${deuda.id}" aria-label="Ver detalle de ${escapeHtml(deuda.acreedor)}">
-                                <i class="bi bi-eye" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-edit-id="${deuda.id}" aria-label="Editar ${escapeHtml(deuda.acreedor)}">
-                                <i class="bi bi-pencil" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                data-delete-id="${deuda.id}" data-acreedor="${escapeHtml(deuda.acreedor)}"
-                                aria-label="Eliminar ${escapeHtml(deuda.acreedor)}">
-                                <i class="bi bi-trash" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        container.innerHTML = `
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Acreedor</th>
-                            <th class="d-none d-md-table-cell">Tipo</th>
-                            <th class="text-center d-none d-md-table-cell">Pagados</th>
-                            <th class="d-none d-md-table-cell">Pendiente total</th>
-                            <th><span class="visually-hidden">Acciones</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows}</tbody>
-                </table>
-            </div>
-            ${this._renderTotalesBar()}
-        `;
-
-        container.querySelectorAll('[data-detail-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = Number(btn.dataset.detailId);
-                const deuda = this.entities.find(d => d.id === id);
-                if (!deuda) return;
-                const detailModal = this.querySelector('#debtDetailModal');
-                if (!detailModal) return;
-                detailModal.openDetail(deuda);
-                detailModal.attachOpener(btn);
-            });
-        });
-
-        container.querySelectorAll('[data-edit-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = Number(btn.dataset.editId);
-                const deuda = this.entities.find(d => d.id === id);
-                if (!deuda) return;
-                const modal = this.querySelector('#debtModal');
-                if (modal?.attachOpener) {
-                    modal.attachOpener(btn);
-                }
-                this.editDebt(deuda);
-            });
-        });
-
-        container.querySelectorAll('[data-delete-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = Number(btn.dataset.deleteId);
-                const acreedor = btn.dataset.acreedor;
-                if (!confirm(`Vas a eliminar el egreso de "${acreedor}" y todos sus montos. No se puede recuperar. ¿Continuás?`)) return;
-                import('../use-cases/deleteDeudaWithTrackingUseCase.js').then(({ deleteDeudaWithTrackingUseCase }) => {
-                    deleteDeudaWithTrackingUseCase(id).then(() => {
-                        window.dispatchEvent(new CustomEvent('deuda:deleted'));
-                    });
-                });
-            });
-        });
-    }
-
-    _renderTotalesBar() {
-        const totals = {};
-        this.entities.forEach(deuda => {
-            const pendientePorMoneda = this.computePendiente(deuda.montos || []);
-            Object.entries(pendientePorMoneda).forEach(([moneda, total]) => {
-                totals[moneda] = (totals[moneda] || 0) + Number(total);
-            });
-        });
-
-        if (Object.keys(totals).length === 0) return '';
-
-        const badges = Object.entries(totals)
-            .map(([moneda, total]) => `<span class="badge text-bg-warning me-1">${escapeHtml(this.fmtMoneda(moneda, total))}</span>`)
-            .join('');
-
-        return `
-            <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 px-3 py-2 border-top text-end">
-                <span class="text-muted small me-1">Pendiente total:</span>${badges}
-            </div>
-        `;
+    get entities() {
+        return this.querySelector('acreedores-list')?.entities || [];
     }
 
     async editDebt(deuda) {
@@ -262,9 +109,7 @@ export class DebtEntityShell extends HTMLElement {
             debtList.setAttribute('show-detail-action', '');
             contentDiv.appendChild(debtList);
         } else {
-            const entityContainer = document.createElement('div');
-            entityContainer.id = 'entity-table-container';
-            contentDiv.appendChild(entityContainer);
+            contentDiv.appendChild(document.createElement('acreedores-list'));
         }
 
         layout.content = contentDiv;
