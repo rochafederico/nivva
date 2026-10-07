@@ -26,7 +26,7 @@ export default function StatsCard({ title = '', icon = '', items = [], color = '
   body.className = 'card-body kpi-body d-flex flex-column gap-2 p-3';
 
   const titleEl = document.createElement('div');
-  titleEl.className = `d-flex align-items-center gap-2 fw-semibold text-uppercase small ${textClass(color)}`;
+  titleEl.className = `kpi-title d-flex align-items-center gap-2 fw-semibold text-uppercase small ${textClass(color)}`;
   if (icon) {
     const iconEl = document.createElement('i');
     iconEl.className = `bi ${icon}`;
