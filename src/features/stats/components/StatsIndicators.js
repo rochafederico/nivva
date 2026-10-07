@@ -33,7 +33,7 @@ export default function StatsIndicators({ mes } = {}) {
 
       const cards = [
         { title: 'Ingresos',   icon: 'bi-cash-stack',     items: addValue(summary.byCurrency.ingresos),   color: 'success' },
-        { title: 'Gastos',     icon: 'bi-wallet2',         items: addValue(summary.byCurrency.egresos),    color: 'danger' },
+        { title: 'Egresos',    icon: 'bi-wallet2',         items: addValue(summary.byCurrency.egresos),    color: 'danger' },
         { title: 'Balance',    icon: 'bi-briefcase',       items: addValue(summary.byCurrency.saldo),      color: 'primary' },
         { title: 'Pendientes', icon: 'bi-hourglass-split', items: addValue(summary.byCurrency.pendientes), color: 'warning' },
       ];

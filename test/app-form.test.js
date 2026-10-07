@@ -1,6 +1,22 @@
 import { assert } from './setup.js';
 
 export const tests = [
+    async function appForm_buttonNamesMatchVisibleText() {
+        console.log('  AppForm: el nombre accesible de los botones coincide con el texto visible');
+        const appForm = document.createElement('app-form');
+        appForm.fields = [{ name: 'descripcion', type: 'text', label: 'Descripción', required: true }];
+        appForm.submitText = 'Agregar ingreso';
+        appForm.cancelText = 'Cancelar';
+        document.body.appendChild(appForm);
+
+        const submit = appForm.querySelector('button[type="submit"]');
+        const cancel = appForm.querySelector('#cancelBtn');
+        assert(submit.textContent === 'Agregar ingreso', 'El submit debe mostrar el texto configurado');
+        assert(!submit.hasAttribute('aria-label'), 'El submit no debe pisar su texto con un aria-label distinto');
+        assert(cancel.textContent === 'Cancelar' && !cancel.hasAttribute('aria-label'), 'Cancelar no debe tener aria-label distinto al texto');
+        appForm.remove();
+    },
+
     async function appForm_rendersRequiredIndicatorsAndNativeAttributes() {
         console.log('  AppForm: renders required indicators and native validation attributes');
         const appForm = document.createElement('app-form');

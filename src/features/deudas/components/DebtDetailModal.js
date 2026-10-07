@@ -25,7 +25,7 @@ export class DebtDetailModal extends HTMLElement {
 
     async openDetail(deuda) {
         this.deuda = deuda;
-        this.ui.setTitle('Detalle de deuda');
+        this.ui.setTitle('Detalle del egreso');
         this._renderContent();
         this.ui.open();
     }

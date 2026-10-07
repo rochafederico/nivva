@@ -22,8 +22,7 @@ export default function Ingresos() {
     const addBtn = document.createElement('app-button');
     addBtn.id = 'add-income';
     addBtn.setAttribute('variant', 'success');
-    addBtn.setAttribute('aria-label', 'Agregar ingreso');
-    addBtn.textContent = 'Nuevo ingreso';
+    addBtn.textContent = 'Agregar ingreso';
     addBtn.addEventListener('click', () => {
         ingresoModal.openCreate();
         ingresoModal.attachOpener(addBtn);
@@ -48,6 +47,7 @@ export default function Ingresos() {
             table = document.createElement('app-table');
             contentSlot.appendChild(table);
         }
+        table.emptyText = 'No tenés ingresos registrados para este período.';
         table.columnsConfig = ingresosColumns;
         table.tableData = ingresos;
     };

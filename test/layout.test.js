@@ -141,7 +141,7 @@ export const tests = [
             const item = navItems.find(i => i.path === path);
             assert(item !== undefined, `navConfig debe tener ruta ${path}`);
             assert(typeof item.title === 'string' && item.title.length > 0, `ruta ${path} debe tener title`);
-            assert(item.subtitle === DEFAULT_SUBTITLE, `ruta ${path} debe usar DEFAULT_SUBTITLE`);
+            assert(typeof item.subtitle === 'string' && item.subtitle.length > 0, `ruta ${path} debe tener subtitle`);
         }
     },
 
@@ -152,12 +152,20 @@ export const tests = [
         assert(unique.size === titles.length, 'cada ruta debe tener un título único');
     },
 
-    async function navConfig_sharedSubtitleConstant() {
-        console.log('  navConfig: DEFAULT_SUBTITLE is exported and used by all routes');
+    async function navConfig_subtitlePerPage() {
+        console.log('  navConfig: cada pantalla tiene su propio subtítulo; Egresos usa DEFAULT_SUBTITLE');
         assert(typeof DEFAULT_SUBTITLE === 'string' && DEFAULT_SUBTITLE.length > 0, 'DEFAULT_SUBTITLE debe ser un string no vacío');
-        for (const item of navItems) {
-            assert(item.subtitle === DEFAULT_SUBTITLE, `ruta ${item.path} debe usar DEFAULT_SUBTITLE`);
-        }
+        const subtitles = navItems.map(i => i.subtitle);
+        assert(new Set(subtitles).size === subtitles.length, 'cada ruta debe tener un subtítulo distinto');
+        const egresos = navItems.find(i => i.path === '/gastos');
+        assert(egresos.subtitle === DEFAULT_SUBTITLE, 'Egresos debe usar DEFAULT_SUBTITLE (pagos y vencimientos)');
+    },
+
+    async function navConfig_glossaryLabels() {
+        console.log('  navConfig: etiquetas según el glosario (Egresos, no Deudas/Gastos)');
+        const labels = navItems.map(i => i.label);
+        assert(labels.includes('Egresos'), 'La navegación debe decir "Egresos"');
+        assert(!labels.some(l => /deuda|gasto/i.test(l)), 'La navegación no debe usar "Deudas" ni "Gastos"');
     },
 
     async function navConfig_homeTitle() {
@@ -167,9 +175,9 @@ export const tests = [
     },
 
     async function navConfig_gastosTitle() {
-        console.log('  navConfig: Gastos title is "Deudas"');
+        console.log('  navConfig: /gastos title is "Egresos"');
         const gastos = navItems.find(i => i.path === '/gastos');
-        assert(gastos.title === 'Deudas', 'Gastos debe tener título "Deudas"');
+        assert(gastos.title === 'Egresos', '/gastos debe tener título "Egresos"');
     },
 
     async function navConfig_ingresosTitle() {
