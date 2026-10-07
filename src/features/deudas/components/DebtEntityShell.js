@@ -104,26 +104,35 @@ export class DebtEntityShell extends HTMLElement {
             const pendienteStr = Object.keys(pendiente).length
                 ? Object.entries(pendiente).map(([moneda, tot]) => this.fmtMoneda(moneda, tot)).join(' | ')
                 : '—';
+            const tipo = escapeHtml(deuda.tipoDeuda || '—');
+            // En mobile se muestran 2 columnas (datos + acciones): tipo, cuotas y pendiente
+            // pasan debajo del acreedor para que las acciones no queden fuera de pantalla.
             return `
                 <tr>
-                    <td>${escapeHtml(deuda.acreedor)}</td>
-                    <td>${escapeHtml(deuda.tipoDeuda || '—')}</td>
-                    <td class="text-center">${cuotasStr}</td>
-                    <td>${escapeHtml(pendienteStr)}</td>
-                    <td class="text-end text-nowrap">
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1"
-                            data-detail-id="${deuda.id}" aria-label="Ver detalle de ${escapeHtml(deuda.acreedor)}">
-                            <i class="bi bi-eye" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1"
-                            data-edit-id="${deuda.id}" aria-label="Editar ${escapeHtml(deuda.acreedor)}">
-                            <i class="bi bi-pencil" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger"
-                            data-delete-id="${deuda.id}" data-acreedor="${escapeHtml(deuda.acreedor)}"
-                            aria-label="Eliminar ${escapeHtml(deuda.acreedor)}">
-                            <i class="bi bi-trash" aria-hidden="true"></i>
-                        </button>
+                    <td>
+                        <div class="fw-semibold text-break">${escapeHtml(deuda.acreedor)}</div>
+                        <div class="small text-body-secondary d-md-none">${tipo} · ${cuotasStr} pagadas</div>
+                        <div class="small d-md-none">Pendiente: <span class="text-nowrap">${escapeHtml(pendienteStr)}</span></div>
+                    </td>
+                    <td class="d-none d-md-table-cell">${tipo}</td>
+                    <td class="text-center d-none d-md-table-cell">${cuotasStr}</td>
+                    <td class="d-none d-md-table-cell text-nowrap">${escapeHtml(pendienteStr)}</td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-detail-id="${deuda.id}" aria-label="Ver detalle de ${escapeHtml(deuda.acreedor)}">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-edit-id="${deuda.id}" aria-label="Editar ${escapeHtml(deuda.acreedor)}">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                data-delete-id="${deuda.id}" data-acreedor="${escapeHtml(deuda.acreedor)}"
+                                aria-label="Eliminar ${escapeHtml(deuda.acreedor)}">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -135,10 +144,10 @@ export class DebtEntityShell extends HTMLElement {
                     <thead class="table-light">
                         <tr>
                             <th>Acreedor</th>
-                            <th>Tipo</th>
-                            <th class="text-center">Cuotas</th>
-                            <th>Pendiente total</th>
-                            <th></th>
+                            <th class="d-none d-md-table-cell">Tipo</th>
+                            <th class="text-center d-none d-md-table-cell">Cuotas</th>
+                            <th class="d-none d-md-table-cell">Pendiente total</th>
+                            <th><span class="visually-hidden">Acciones</span></th>
                         </tr>
                     </thead>
                     <tbody>${rows}</tbody>
@@ -284,19 +293,21 @@ export class DebtEntityShell extends HTMLElement {
         }
     }
 
+    // Las pestañas son links a rutas (no un tablist ARIA): nav + lista + aria-current.
     _renderTabs() {
-        const nav = document.createElement('ul');
-        nav.className = 'nav nav-underline mb-3';
-        nav.setAttribute('role', 'tablist');
-        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos', this.currentView === 'cuotas'));
-        nav.appendChild(this._createTabItem('Deudas', '/gastos/deudas', this.currentView === 'deudas'));
+        const nav = document.createElement('nav');
+        nav.setAttribute('aria-label', 'Vistas de deudas');
+        const list = document.createElement('ul');
+        list.className = 'nav nav-underline mb-3';
+        list.appendChild(this._createTabItem('Cuotas del mes', '/gastos', this.currentView === 'cuotas'));
+        list.appendChild(this._createTabItem('Deudas', '/gastos/deudas', this.currentView === 'deudas'));
+        nav.appendChild(list);
         return nav;
     }
 
     _createTabItem(label, path, isActive) {
         const li = document.createElement('li');
         li.className = 'nav-item';
-        li.setAttribute('role', 'presentation');
 
         const a = document.createElement('a');
         a.className = `nav-link${isActive ? ' active' : ''}`;
