@@ -473,6 +473,13 @@ async function testTablaIngresosFormatoYTextoPlano() {
     assert(fechaHeader.classList.contains('d-none') && fechaHeader.classList.contains('d-md-table-cell'),
         'La columna Fecha se oculta en mobile (la fecha va debajo de la descripción)');
 
+    // Estado vacío configurable
+    table.emptyText = 'No tenés ingresos registrados para este período.';
+    table.tableData = [];
+    assert(table.querySelector('tbody').textContent.trim() === 'No tenés ingresos registrados para este período.',
+        'Sin ingresos debe mostrar el estado vacío configurado');
+    table.tableData = [{ id: 1, fecha: '2026-10-01', descripcion: '<img src=x onerror="window.__xss=1">Sueldo', monto: 934480.8, moneda: 'ARS' }];
+
     // Columnas sin render: AppTable también muestra el valor como texto
     table.columnsConfig = [{ key: 'descripcion', label: 'Descripción' }];
     const plainCell = table.querySelector('tbody td');

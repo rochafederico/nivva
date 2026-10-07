@@ -67,7 +67,7 @@ export const tourSteps = [
     },
     {
         id: 'nueva-deuda',
-        title: 'Nueva deuda',
+        title: 'Tus egresos',
         text: 'Cargá tus egresos: tarjeta, alquiler, préstamos y servicios.',
         getTarget: () => findTourTarget([
             { selector: 'app-shell' },

@@ -22,8 +22,8 @@ const routes = [
   })),
   {
     path: '/gastos/deudas',
-    label: 'Deudas',
-    title: 'Deudas',
+    label: 'Acreedores',
+    title: 'Egresos',
     subtitle: DEFAULT_SUBTITLE,
     component: GastosMensual,
   },

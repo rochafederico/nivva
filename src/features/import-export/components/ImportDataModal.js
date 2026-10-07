@@ -146,12 +146,12 @@ export class ImportDataModal extends HTMLElement {
             <div class="border rounded p-3">
                 <h3 class="h6 text-primary mb-2">📋 Vista previa</h3>
                 <div class="d-flex flex-wrap gap-3 bg-body-tertiary rounded p-2 mb-3">
-                    <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalMontos}</strong> montos</span>
+                    <span class="small"><strong>${deudas.length}</strong> egresos · <strong>${totalMontos}</strong> montos</span>
                     ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
                     ${exportDateStr}
                 </div>
                 <div class="d-grid gap-1">
-                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
+                    <div><span class="fw-semibold small">Egresos: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
                     ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => this.#escapeHtml(i.descripcion || 'Ingreso'))}</div>` : ''}
                 </div>
             </div>
@@ -230,8 +230,8 @@ export class ImportDataModal extends HTMLElement {
             const totalErrors = errorCount + ingresosErrors;
             const notifyType = totalErrors === 0 ? 'success' : 'warning';
             const notifyMsg = totalErrors === 0
-                ? `✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos`
-                : `⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err)`;
+                ? `✅ Importación exitosa: ${importedCount} egresos, ${ingresosImported} ingresos.`
+                : `⚠️ Importación parcial: ${importedCount} egresos importados (${errorCount} con error), ${ingresosImported} ingresos (${ingresosErrors} con error).`;
 
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: notifyMsg, type: notifyType } }));
             window.dispatchEvent(new CustomEvent('data-imported', {
@@ -311,7 +311,7 @@ export class ImportDataModal extends HTMLElement {
                         <p class="mb-1"><strong>⚠️ Importante:</strong></p>
                         <ul class="mb-0 small ps-3">
                             <li>Agregá datos sin borrar los existentes.</li>
-                            <li>Fusión automática: mismo Acreedor + Tipo de Deuda → los montos se agrupan.</li>
+                            <li>Fusión automática: mismo Acreedor + Tipo de deuda → los montos se agrupan.</li>
                             <li>Duplicados ignorados si coinciden monto, moneda y periodo.</li>
                         </ul>
                     </div>

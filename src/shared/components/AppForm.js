@@ -174,13 +174,11 @@ export class AppForm extends HTMLElement {
             cancelBtn.type = 'button';
             cancelBtn.id = 'cancelBtn';
             cancelBtn.className = 'btn btn-primary btn-sm';
-            cancelBtn.setAttribute('aria-label', 'Cancelar formulario');
             cancelBtn.textContent = this._cancelText;
 
             const submitBtn = document.createElement('button');
             submitBtn.type = 'submit';
             submitBtn.className = 'btn btn-success btn-sm';
-            submitBtn.setAttribute('aria-label', 'Guardar formulario');
             submitBtn.textContent = this._submitText;
 
             btnRow.appendChild(cancelBtn);
