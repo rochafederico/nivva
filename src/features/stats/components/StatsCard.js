@@ -12,7 +12,8 @@ export default function StatsCard({ title = '', icon = '', items = [], color = '
   card.className = `card h-100 rounded-4 shadow-sm border border-2 border-${color}`;
 
   const body = document.createElement('div');
-  body.className = 'card-body d-flex flex-column justify-content-between gap-2 p-3';
+  // kpi-body es un container query: el monto achica su fuente si la tarjeta es angosta
+  body.className = 'card-body kpi-body d-flex flex-column justify-content-between gap-2 p-3';
 
   const titleEl = document.createElement('div');
   titleEl.className = `d-flex align-items-center gap-2 fw-semibold text-uppercase small ${textClass(color)}`;
@@ -33,7 +34,7 @@ export default function StatsCard({ title = '', icon = '', items = [], color = '
     const arsEl = document.createElement('h6');
     arsEl.className = `d-flex flex-wrap align-items-center column-gap-2 row-gap-1 fw-bold ${textClass(color)} lh-sm mb-0`;
     const amountEl = document.createElement('span');
-    amountEl.className = 'text-nowrap';
+    amountEl.className = 'kpi-amount text-nowrap';
     amountEl.textContent = mainItem.value;
     const arsBadge = document.createElement('span');
     arsBadge.className = `badge small text-bg-${color}`;

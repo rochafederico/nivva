@@ -75,3 +75,13 @@ app-sidebar {
     top: 0;
     overflow-y: auto;
 }
+
+// Tarjetas KPI: el monto nunca se corta ni se sale de la tarjeta; en tarjetas angostas
+// (p. ej. 2 columnas dentro de otra tarjeta en 360px) achica la fuente según el ancho disponible.
+.kpi-body {
+    container-type: inline-size;
+}
+
+.kpi-amount {
+    font-size: min(1rem, 11cqi);
+}
