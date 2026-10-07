@@ -3,6 +3,8 @@
 import './MonthSelector.js';
 import { DEFAULT_SUBTITLE } from './navConfig.js';
 
+export const GLOBAL_SCOPE_SUBTITLE = 'Todas tus deudas, sin importar el mes.';
+
 export default function ResumenHeader({ title = 'Tu panorama financiero', subtitle = DEFAULT_SUBTITLE } = {}) {
     const el = document.createElement('div');
     el.className = 'mb-3';
@@ -28,6 +30,20 @@ export default function ResumenHeader({ title = 'Tu panorama financiero', subtit
     el.appendChild(titleEl);
     el.appendChild(subtitleEl);
 
+
+    // Vistas sin alcance mensual (p. ej. Acreedores) ocultan el selector de mes y lo aclaran en el subtítulo.
+    let monthlySubtitle = null;
+    window.addEventListener('ui:month-scope', (e) => {
+        const visible = e.detail?.visible !== false;
+        monthSelector.classList.toggle('d-none', !visible);
+        if (!visible && monthlySubtitle === null) {
+            monthlySubtitle = subtitleEl.textContent;
+            subtitleEl.textContent = GLOBAL_SCOPE_SUBTITLE;
+        } else if (visible && monthlySubtitle !== null) {
+            subtitleEl.textContent = monthlySubtitle;
+            monthlySubtitle = null;
+        }
+    });
 
     el.update = ({ title: newTitle, subtitle: newSubtitle, hideMonthSelector } = {}) => {
         if (newTitle !== undefined) {
