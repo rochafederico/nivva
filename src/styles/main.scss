@@ -85,3 +85,40 @@ app-sidebar {
 .kpi-amount {
     font-size: min(1rem, 11cqi);
 }
+
+// Tarjetas KPI clickeables (stretched-link): realce al pasar el mouse y foco visible en toda la tarjeta.
+.kpi-card-link {
+    transition: box-shadow .15s ease-in-out;
+
+    &:hover {
+        box-shadow: $box-shadow !important;
+    }
+
+    &:has(.stretched-link:focus-visible) {
+        outline: 3px solid rgba($primary, .5);
+        outline-offset: 2px;
+    }
+
+    .stretched-link:focus-visible {
+        outline: none;
+    }
+}
+
+// Título de fila que abre el detalle: se ve como texto, se usa como botón (teclado incluido).
+.list-row-title {
+    min-height: 24px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid rgba($primary, .6);
+        outline-offset: 2px;
+        border-radius: .25rem;
+    }
+}
