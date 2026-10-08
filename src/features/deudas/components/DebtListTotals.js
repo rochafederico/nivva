@@ -158,7 +158,7 @@ export class DebtListTotals extends HTMLElement {
 
         if (vencidas > 0) {
             const vencidasEl = document.createElement('div');
-            vencidasEl.className = 'small text-danger mt-1';
+            vencidasEl.className = 'small text-danger-emphasis mt-1';
             const icon = document.createElement('i');
             icon.className = 'bi bi-exclamation-triangle me-1';
             const txt = document.createTextNode(

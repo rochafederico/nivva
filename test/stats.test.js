@@ -79,29 +79,32 @@ async function testStatsCardDefaultColor() {
 }
 
 // ===================================================================
-// UC5: addValue logic — zero values display as "-" without "$" symbol
+// UC5: addValue logic — zero values display as "0" without "$" symbol
 // ===================================================================
-async function testAddValueZeroDisplaysAsDash() {
-    console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
+async function testAddValueZeroDisplaysAsZero() {
+    console.log('  UC5: addValue muestra "0" para valores cero sin símbolo $');
     const result = addValue({ ARS: 0, USD: 2500 });
-    assert(result[0].currency === 'ARS' && result[0].value === '-', 'valor 0 debe tener currency "ARS" y value "-" sin símbolo $');
+    assert(result[0].currency === 'ARS' && result[0].value === '0', 'valor 0 debe tener currency "ARS" y value "0" sin símbolo $');
     assert(result[1].currency === 'USD' && result[1].value === '2.500', 'valor 2500 debe tener currency "USD" y value "2.500"');
 }
 
 // ===================================================================
-// UC6: addValue logic — null/undefined values display as "-"
+// UC6: addValue logic — null/undefined values display as "0"
 // ===================================================================
-async function testAddValueNullDisplaysAsDash() {
-    console.log('  UC6: addValue muestra "-" para valores null o undefined');
+async function testAddValueNullDisplaysAsZero() {
+    console.log('  UC6: addValue muestra "0" para valores null o undefined');
     const resultNull = addValue({ ARS: null });
-    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '-', 'valor null debe tener value "-"');
-    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '-', 'USD ausente debe tener value "-"');
+    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '0', 'valor null debe tener value "0"');
+    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '0', 'USD ausente debe tener value "0"');
 
     const resultUndefined = addValue({ USD: undefined });
-    assert(resultUndefined[1].currency === 'USD' && resultUndefined[1].value === '-', 'valor undefined debe tener value "-"');
+    assert(resultUndefined[1].currency === 'USD' && resultUndefined[1].value === '0', 'valor undefined debe tener value "0"');
 
     const resultBoth = addValue({ ARS: null, USD: null });
-    assert(resultBoth.every(r => r.value === '-'), 'todos los valores null deben tener value "-"');
+    assert(resultBoth.every(r => r.value === '0'), 'todos los valores null deben tener value "0"');
+
+    const negative = addValue({ ARS: -1500.5 });
+    assert(negative[0].value === '-1.500,5', 'un balance negativo debe conservar el signo');
 }
 
 // ===================================================================
@@ -112,13 +115,13 @@ async function testAddValueAlwaysShowsBothCurrencies() {
 
     const resultEmpty = addValue({});
     assert(resultEmpty.length === 2, 'addValue debe retornar siempre 2 filas');
-    assert(resultEmpty[0].currency === 'ARS' && resultEmpty[0].value === '-', 'ARS debe tener value "-" cuando no hay datos');
-    assert(resultEmpty[1].currency === 'USD' && resultEmpty[1].value === '-', 'USD debe tener value "-" cuando no hay datos');
+    assert(resultEmpty[0].currency === 'ARS' && resultEmpty[0].value === '0', 'ARS debe tener value "0" cuando no hay datos');
+    assert(resultEmpty[1].currency === 'USD' && resultEmpty[1].value === '0', 'USD debe tener value "0" cuando no hay datos');
 
     const resultNull = addValue(null);
     assert(resultNull.length === 2, 'addValue debe retornar 2 filas cuando obj es null');
-    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '-', 'ARS debe tener value "-" cuando obj es null');
-    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '-', 'USD debe tener value "-" cuando obj es null');
+    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '0', 'ARS debe tener value "0" cuando obj es null');
+    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '0', 'USD debe tener value "0" cuando obj es null');
 }
 
 // ===================================================================
@@ -177,13 +180,44 @@ async function testStatsIndicatorsCardOrder() {
     );
 }
 
+// ===================================================================
+// UC12: StatsCard warning — variantes con contraste AA sobre fondo blanco
+// ===================================================================
+async function testStatsCardWarningContrast() {
+    console.log('  UC12: StatsCard warning usa text-warning-emphasis y badge text-bg-warning');
+    const card = StatsCard({ title: 'Pendientes', items: [{ currency: 'ARS', value: '1.000' }], color: 'warning' });
+    const titleEl = card.querySelector('.card-body > div');
+    assert(titleEl.classList.contains('text-warning-emphasis'), 'título warning debe usar text-warning-emphasis');
+    assert(!titleEl.classList.contains('text-warning'), 'título warning no debe usar text-warning (contraste insuficiente)');
+    const valueEl = card.querySelector('h6');
+    assert(valueEl.classList.contains('text-warning-emphasis'), 'valor warning debe usar text-warning-emphasis');
+    const badge = valueEl.querySelector('.badge');
+    assert(badge.classList.contains('text-bg-warning'), 'badge warning debe usar text-bg-warning (texto oscuro)');
+}
+
+// ===================================================================
+// UC13: StatsCard — el monto no se corta y la moneda puede pasar de renglón
+// ===================================================================
+async function testStatsCardValueWraps() {
+    console.log('  UC13: StatsCard permite que la moneda pase de renglón sin cortar el monto');
+    const card = StatsCard({ title: 'Ingresos', items: [{ currency: 'ARS', value: '3.939.584,91' }], color: 'success' });
+    const valueEl = card.querySelector('h6');
+    assert(valueEl.classList.contains('flex-wrap'), 'el contenedor del valor debe permitir wrap');
+    assert(!valueEl.classList.contains('text-nowrap'), 'el contenedor del valor no debe forzar una sola línea');
+    const amount = valueEl.querySelector('span.text-nowrap');
+    assert(amount !== null && amount.textContent === '3.939.584,91', 'el monto debe ir en un span text-nowrap');
+    assert(valueEl.querySelector('.badge').classList.contains('text-bg-success'), 'badge debe usar text-bg-{color}');
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
+    testStatsCardWarningContrast,
+    testStatsCardValueWraps,
     testStatsCardItemClasses,
     testStatsCardEmptyItems,
     testStatsCardDefaultColor,
-    testAddValueZeroDisplaysAsDash,
-    testAddValueNullDisplaysAsDash,
+    testAddValueZeroDisplaysAsZero,
+    testAddValueNullDisplaysAsZero,
     testAddValueAlwaysShowsBothCurrencies,
     testCompactFormatMil,
     testCompactFormatMillones,
