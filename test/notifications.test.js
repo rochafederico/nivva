@@ -437,7 +437,7 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(html.includes('1.500'), 'Incluye monto total del vencido en ARS');
 
     // View link
-    assert(html.includes('Ver cuotas del mes'), 'Incluye link "Ver cuotas del mes"');
+    assert(html.includes('Ver egresos del mes'), 'Incluye link "Ver egresos del mes"');
     assert(html.includes('data-notif-navigate'), 'El link tiene atributo data-notif-navigate');
     assert(html.includes('href="/gastos"'), 'El link apunta a /gastos');
 

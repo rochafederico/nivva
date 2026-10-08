@@ -123,8 +123,8 @@ export const debtTableColumns = [
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
                             message: nextChecked
-                                ? '✅ Cuota marcada como pagada.'
-                                : '⚠️ Cuota marcada como pendiente.',
+                                ? '✅ Monto marcado como pagado.'
+                                : '⚠️ Monto marcado como pendiente.',
                             type: nextChecked ? 'success' : 'warning'
                         }
                     }));

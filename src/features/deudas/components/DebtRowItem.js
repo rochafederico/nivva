@@ -111,8 +111,8 @@ export class DebtRowItem {
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
                             message: nextChecked
-                                ? '✅ Cuota marcada como pagada.'
-                                : '⚠️ Cuota marcada como pendiente.',
+                                ? '✅ Monto marcado como pagado.'
+                                : '⚠️ Monto marcado como pendiente.',
                             type: nextChecked ? 'success' : 'warning'
                         }
                     }));
@@ -238,7 +238,7 @@ export class DebtRowItem {
             const chevronBtn = document.createElement('button');
             chevronBtn.type = 'button';
             chevronBtn.className = 'btn btn-link px-1 py-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
-            chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'esta deuda'}`);
+            chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'este egreso'}`);
             chevronBtn.addEventListener('click', e => {
                 e.stopPropagation();
                 row._onRowClick(row, chevronBtn);
