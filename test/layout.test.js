@@ -1,18 +1,57 @@
 // test/layout.test.js
-// Tests for layout standardization: ResumenHeader dynamic updates,
-// PageSectionLayout structure and navConfig route metadata.
+// Tests de layout: ResumenHeader, rutas (vista única + redirecciones) y montaje de rutas.
 import { assert } from './setup.js';
 import ResumenHeader, { GLOBAL_SCOPE_SUBTITLE } from '../src/layout/ResumenHeader.js';
-import '../src/layout/PageSectionLayout.js';
-import '../src/layout/Sidebar.js';
-import '../src/layout/BottomNav.js';
-import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
+import { DEFAULT_TITLE, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
+import routes, { REDIRECTS, redirectFor } from '../src/routes.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
 import { createRouteRenderer } from '../src/shared/routeRenderer.js';
-import Ingresos from '../src/pages/Ingresos.js';
+import Home from '../src/pages/Home.js';
 
 export const tests = [
+
+    function routes_singleViewWithRedirects() {
+        console.log('  routes: una sola vista (Inicio) y las rutas viejas redirigen a su pestaña');
+        assert(routes.length === 1 && routes[0].path === '/', 'Debe existir una sola ruta: "/"');
+        assert(routes[0].title === DEFAULT_TITLE && routes[0].subtitle === DEFAULT_SUBTITLE, 'La ruta usa el encabezado de Inicio');
+        assert(redirectFor('/ingresos') === '/?vista=ingresos', '/ingresos → pestaña Ingresos');
+        assert(redirectFor('/gastos') === '/?vista=egresos', '/gastos → pestaña Egresos');
+        assert(redirectFor('/gastos/deudas') === '/?vista=acreedores', '/gastos/deudas → pestaña Acreedores');
+        assert(redirectFor('/gastos/') === '/?vista=egresos', 'tolera la barra final');
+        assert(redirectFor('/') === null && redirectFor('/otra') === null, 'Inicio y rutas desconocidas no redirigen');
+        assert(Object.keys(REDIRECTS).length === 3, 'Solo las 3 rutas anteriores redirigen');
+    },
+
+    function navConfig_headerCopy() {
+        console.log('  navConfig: encabezado de Inicio según el glosario');
+        assert(DEFAULT_TITLE === 'Tu panorama financiero', 'Título de Inicio');
+        assert(typeof DEFAULT_SUBTITLE === 'string' && DEFAULT_SUBTITLE.length > 0, 'Subtítulo de Inicio no vacío');
+        assert(!/deuda|gasto/i.test(`${DEFAULT_TITLE} ${DEFAULT_SUBTITLE}`), 'Sin "deudas" ni "gastos" en el encabezado');
+    },
+
+    function routeRenderer_removesHomeListeners() {
+        console.log('  routeRenderer: salir de Inicio saca sus listeners de window');
+        const root = document.createElement('div');
+        document.body.appendChild(root);
+        const mount = createRouteRenderer(root);
+        const removed = [];
+        const originalRemove = window.removeEventListener;
+        window.removeEventListener = function (type, ...rest) {
+            removed.push(type);
+            return originalRemove.call(this, type, ...rest);
+        };
+        try {
+            mount(Home());
+            mount(document.createElement('div'));
+        } finally {
+            window.removeEventListener = originalRemove;
+            root.remove();
+        }
+        assert(removed.includes('popstate'), 'Debe sacar el listener popstate de la vista');
+        assert(removed.includes('deuda:edit'), 'Debe sacar el listener deuda:edit de la vista');
+        assert(removed.includes('ui:month'), 'Debe sacar el listener ui:month de la lista');
+    },
 
     function resumenHeader_hidesMonthSelectorOutsideMonthlyScope() {
         console.log('  ResumenHeader: ui:month-scope oculta el selector de mes y aclara el alcance');
@@ -49,27 +88,6 @@ export const tests = [
         assert(cleaned === 1, 'Una página sin cleanup() no debe fallar');
     },
 
-    function routeRenderer_removesIngresosListeners() {
-        console.log('  routeRenderer: salir de Ingresos saca sus listeners de window');
-        const root = document.createElement('div');
-        document.body.appendChild(root);
-        const mount = createRouteRenderer(root);
-        const removed = [];
-        const originalRemove = window.removeEventListener;
-        window.removeEventListener = function (type, ...rest) {
-            removed.push(type);
-            return originalRemove.call(this, type, ...rest);
-        };
-        try {
-            mount(Ingresos());
-            mount(document.createElement('div'));
-        } finally {
-            window.removeEventListener = originalRemove;
-            root.remove();
-        }
-        assert(removed.includes('ingreso:added'), 'Debe sacar el listener ingreso:added');
-        assert(removed.includes('ui:month'), 'Debe sacar el listener ui:month');
-    },
 
     function createIconButton_usesBootstrapAndAccessibleLabel() {
         console.log('  createIconButton: usa Bootstrap y aria-label');
@@ -147,60 +165,11 @@ export const tests = [
         assert(failed, 'Debe rechazar variant no permitido');
     },
 
-    // ===================================================================
-    // UC1: navConfig provides title and subtitle for each route
-    // ===================================================================
-    async function navConfig_hasPageMetadata() {
-        console.log('  navConfig: all routes have title and subtitle');
-        const requiredPaths = ['/', '/gastos', '/ingresos'];
-        for (const path of requiredPaths) {
-            const item = navItems.find(i => i.path === path);
-            assert(item !== undefined, `navConfig debe tener ruta ${path}`);
-            assert(typeof item.title === 'string' && item.title.length > 0, `ruta ${path} debe tener title`);
-            assert(typeof item.subtitle === 'string' && item.subtitle.length > 0, `ruta ${path} debe tener subtitle`);
-        }
-    },
 
-    async function navConfig_distinctTitles() {
-        console.log('  navConfig: each route has a distinct title');
-        const titles = navItems.map(i => i.title);
-        const unique = new Set(titles);
-        assert(unique.size === titles.length, 'cada ruta debe tener un título único');
-    },
 
-    async function navConfig_subtitlePerPage() {
-        console.log('  navConfig: cada pantalla tiene su propio subtítulo; Egresos usa DEFAULT_SUBTITLE');
-        assert(typeof DEFAULT_SUBTITLE === 'string' && DEFAULT_SUBTITLE.length > 0, 'DEFAULT_SUBTITLE debe ser un string no vacío');
-        const subtitles = navItems.map(i => i.subtitle);
-        assert(new Set(subtitles).size === subtitles.length, 'cada ruta debe tener un subtítulo distinto');
-        const egresos = navItems.find(i => i.path === '/gastos');
-        assert(egresos.subtitle === DEFAULT_SUBTITLE, 'Egresos debe usar DEFAULT_SUBTITLE (pagos y vencimientos)');
-    },
 
-    async function navConfig_glossaryLabels() {
-        console.log('  navConfig: etiquetas según el glosario (Egresos, no Deudas/Gastos)');
-        const labels = navItems.map(i => i.label);
-        assert(labels.includes('Egresos'), 'La navegación debe decir "Egresos"');
-        assert(!labels.some(l => /deuda|gasto/i.test(l)), 'La navegación no debe usar "Deudas" ni "Gastos"');
-    },
 
-    async function navConfig_homeTitle() {
-        console.log('  navConfig: Home title is "Tu panorama financiero"');
-        const home = navItems.find(i => i.path === '/');
-        assert(home.title === 'Tu panorama financiero', 'Home debe tener título "Tu panorama financiero"');
-    },
 
-    async function navConfig_gastosTitle() {
-        console.log('  navConfig: /gastos title is "Egresos"');
-        const gastos = navItems.find(i => i.path === '/gastos');
-        assert(gastos.title === 'Egresos', '/gastos debe tener título "Egresos"');
-    },
-
-    async function navConfig_ingresosTitle() {
-        console.log('  navConfig: Ingresos title is "Ingresos del mes"');
-        const ingresos = navItems.find(i => i.path === '/ingresos');
-        assert(ingresos.title === 'Ingresos del mes', 'Ingresos debe tener título "Ingresos del mes"');
-    },
 
     // ===================================================================
     // UC2: ResumenHeader renders title, subtitle and month selector
@@ -216,7 +185,7 @@ export const tests = [
 
         const subtitleEl = header.querySelector('#resumen-header-subtitle');
         assert(subtitleEl !== null, 'ResumenHeader debe tener #resumen-header-subtitle');
-        assert(subtitleEl.textContent === 'Gestioná tus pagos y vencimientos del período.', 'Subtítulo debe usar la bajada breve');
+        assert(subtitleEl.textContent === DEFAULT_SUBTITLE, 'Subtítulo por defecto debe ser el de Inicio');
 
         const selector = header.querySelector('month-selector');
         assert(selector !== null, 'ResumenHeader debe mostrar el selector de mes');
@@ -332,78 +301,8 @@ export const tests = [
         document.body.removeChild(header);
     },
 
-    // ===================================================================
-    // UC3: PageSectionLayout renders card structure with toolbar slots
-    // ===================================================================
-    async function pageSectionLayout_rendersCardStructure() {
-        console.log('  PageSectionLayout: renders card with toolbar and content slots');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
 
-        const card = layout.querySelector('.card');
-        assert(card !== null, 'PageSectionLayout debe tener .card');
 
-        const cardHeader = layout.querySelector('.card-header');
-        assert(cardHeader !== null, 'PageSectionLayout debe tener .card-header');
-
-        const cardBody = layout.querySelector('.card-body');
-        assert(cardBody !== null, 'PageSectionLayout debe tener .card-body');
-
-        const toolbarStart = layout.querySelector('.psl-toolbar-start');
-        assert(toolbarStart !== null, 'PageSectionLayout debe tener .psl-toolbar-start');
-
-        const toolbarEnd = layout.querySelector('.psl-toolbar-end');
-        assert(toolbarEnd !== null, 'PageSectionLayout debe tener .psl-toolbar-end');
-
-        document.body.removeChild(layout);
-    },
-
-    async function pageSectionLayout_toolbarEndAcceptsElement() {
-        console.log('  PageSectionLayout: toolbarEnd slot accepts an element');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const btn = document.createElement('button');
-        btn.textContent = 'Nueva deuda';
-        btn.id = 'test-btn';
-        layout.toolbarEnd = btn;
-
-        const found = layout.querySelector('#test-btn');
-        assert(found !== null, 'El botón debe estar en el slot toolbarEnd');
-        assert(found.textContent === 'Nueva deuda', 'El botón debe tener el texto correcto');
-
-        document.body.removeChild(layout);
-    },
-
-    async function pageSectionLayout_toolbarStartAcceptsElement() {
-        console.log('  PageSectionLayout: toolbarStart slot accepts an element');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const select = document.createElement('select');
-        select.id = 'test-filter';
-        layout.toolbarStart = select;
-
-        const found = layout.querySelector('#test-filter');
-        assert(found !== null, 'El select debe estar en el slot toolbarStart');
-
-        document.body.removeChild(layout);
-    },
-
-    async function pageSectionLayout_contentSlotAcceptsElement() {
-        console.log('  PageSectionLayout: content slot accepts an element');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const table = document.createElement('app-table');
-        table.id = 'test-table';
-        layout.content = table;
-
-        const found = layout.querySelector('#test-table');
-        assert(found !== null, 'La tabla debe estar en el slot content');
-
-        document.body.removeChild(layout);
-    },
 
     async function resumenHeader_defaultSubtitleMatchesNavConfig() {
         console.log('  ResumenHeader: default subtitle matches navConfig DEFAULT_SUBTITLE');
@@ -432,70 +331,9 @@ export const tests = [
         document.body.removeChild(header);
     },
 
-    async function pageSectionLayout_getContentSlot() {
-        console.log('  PageSectionLayout: getContentSlot() returns the content div');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const slot = layout.getContentSlot();
-        assert(slot !== null, 'getContentSlot() debe devolver el slot de contenido');
-        assert(slot.classList.contains('psl-content'), 'El slot de contenido debe tener clase psl-content');
-
-        document.body.removeChild(layout);
-    },
-
-    async function pageSectionLayout_replacesToolbarEnd() {
-        console.log('  PageSectionLayout: setting toolbarEnd twice replaces the previous element');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const btn1 = document.createElement('button');
-        btn1.id = 'btn1';
-        layout.toolbarEnd = btn1;
-
-        const btn2 = document.createElement('button');
-        btn2.id = 'btn2';
-        layout.toolbarEnd = btn2;
-
-        assert(layout.querySelector('#btn1') === null, 'El primer botón debe ser reemplazado');
-        assert(layout.querySelector('#btn2') !== null, 'El segundo botón debe estar presente');
-
-        document.body.removeChild(layout);
-    },
-
-    async function pageSectionLayout_replacesContent() {
-        console.log('  PageSectionLayout: setting content twice replaces the previous element');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
-
-        const div1 = document.createElement('div');
-        div1.id = 'content1';
-        layout.content = div1;
-
-        const div2 = document.createElement('div');
-        div2.id = 'content2';
-        layout.content = div2;
-
-        assert(layout.querySelector('#content1') === null, 'El primer contenido debe ser reemplazado');
-        assert(layout.querySelector('#content2') !== null, 'El segundo contenido debe estar presente');
-
-        document.body.removeChild(layout);
-    },
 
 
-    async function pageSectionLayout_toolbarIsHorizontal() {
-        console.log('  PageSectionLayout: toolbar is flexbox with space-between');
-        const layout = document.createElement('page-section-layout');
-        document.body.appendChild(layout);
 
-        const cardHeader = layout.querySelector('.card-header');
-        assert(
-            cardHeader.classList.contains('justify-content-between'),
-            'El toolbar debe tener justify-content-between para alinear filtros a la izquierda y CTA a la derecha'
-        );
-
-        document.body.removeChild(layout);
-    },
 
     async function settings_modal_isDedicatedSpaceWithListGroupAndDangerZone() {
         console.log('  Layout: Ajustes abre Configuración dedicada con cards + list-group y Zona peligrosa');
@@ -522,27 +360,6 @@ export const tests = [
         modal.close();
         modal.parentElement?.remove();
         document.body.removeChild(opener);
-    },
-
-    async function settings_actions_areNotMixedInSidebarAndBottomNav() {
-        console.log('  Layout: Sidebar y BottomNav no mezclan Exportar/Importar/Eliminar en menú de Ajustes');
-        const sidebar = document.createElement('app-sidebar');
-        const bottomNav = document.createElement('bottom-nav');
-        document.body.appendChild(sidebar);
-        document.body.appendChild(bottomNav);
-
-        assert(sidebar.querySelector('#sidebar-ajustes-toggle') === null, 'Sidebar no debe mostrar el botón Ajustes en el menú principal');
-        assert(sidebar.querySelector('#sidebar-export') === null, 'Sidebar no debe mostrar Exportar en menú actual');
-        assert(sidebar.querySelector('#sidebar-import') === null, 'Sidebar no debe mostrar Importar en menú actual');
-        assert(sidebar.querySelector('#sidebar-delete') === null, 'Sidebar no debe mezclar Eliminar todo con acciones neutras');
-
-        assert(bottomNav.querySelector('#bottom-nav-ajustes-toggle') === null, 'BottomNav no debe mostrar el botón Ajustes en el menú principal');
-        assert(bottomNav.querySelector('#bottom-nav-export') === null, 'BottomNav no debe mostrar Exportar en menú actual');
-        assert(bottomNav.querySelector('#bottom-nav-import') === null, 'BottomNav no debe mostrar Importar en menú actual');
-        assert(bottomNav.querySelector('#bottom-nav-delete') === null, 'BottomNav no debe mezclar Eliminar todo con acciones neutras');
-
-        document.body.removeChild(sidebar);
-        document.body.removeChild(bottomNav);
     },
 
 ];

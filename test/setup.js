@@ -5,7 +5,6 @@
 import '../src/shared/components/AppButton.js';
 import '../src/shared/components/AppInput.js';
 import '../src/shared/components/AppForm.js';
-import '../src/shared/components/AppTable.js';
 import '../src/shared/components/UiModal.js';
 
 // Track test results

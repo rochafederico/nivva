@@ -12,8 +12,12 @@ let _monthHandler = null;
 let _dataChangedHandler = null;
 const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted', 'monto:updated'];
 
-// Destino de cada dato al tocarlo (Balance no tiene listado propio).
-export const DEFAULT_KPI_LINKS = { ingresos: '/ingresos', egresos: '/gastos', pendientes: '/gastos' };
+// Destino de cada dato al tocarlo: el filtro de Inicio que lo detalla (Balance no tiene listado propio).
+export const DEFAULT_KPI_LINKS = {
+  ingresos: '/?vista=ingresos',
+  egresos: '/?vista=egresos',
+  pendientes: '/?vista=egresos&estado=pendiente',
+};
 
 // Orden y textos del banner. "Por pagar este mes" (antes "Pendientes") deja claro que es del mes,
 // no el saldo total de deuda (eso lo muestra la Deuda total acumulada).

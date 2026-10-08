@@ -1,13 +1,11 @@
 import './DebtDetailModal.js';
 import { DebtRowItem } from './DebtRowItem.js';
-import './DebtListTotals.js';
 import { createIngresoRow } from '../../ingresos/components/IngresoList.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 // Atributos opcionales (vista única del mes):
 //   include-ingresos  → mezcla los ingresos del mes con los montos (pestaña "Todo")
 //   estado="pendiente" → muestra solo montos sin pagar
-//   no-totals          → sin las tarjetas Pendiente/Pagado (los KPIs ya muestran esos datos)
 
 export class DebtList extends HTMLElement {
     constructor() {
@@ -23,7 +21,6 @@ export class DebtList extends HTMLElement {
         this._showDetailAction = this.hasAttribute('show-detail-action');
         this._includeIngresos = this.hasAttribute('include-ingresos');
         this._estado = this.getAttribute('estado') || '';
-        this._noTotals = this.hasAttribute('no-totals');
         this.render();
         this.loadDebts();
         this.addEventListeners();
@@ -72,17 +69,7 @@ export class DebtList extends HTMLElement {
         }
         if (requestId !== this._requestId) return;
         this.debts = debts;
-        console.log('[DebtList] Deudas cargadas:', debts); // Debug: muestra las deudas recuperadas
-        await this.loadTotals();
         this.renderTable();
-    }
-
-    async loadTotals() {
-        // Consulta los montos originales desde el repository y calcula los totales
-        const { countMontosByMes } = await import('../../montos/montoRepository.js');
-        const { totalesPendientes, totalesPagados } = await countMontosByMes({ mes: this.mes });
-        this.totalesPendientes = totalesPendientes;
-        this.totalesPagados = totalesPagados;
     }
 
     async listByMes(mes) {
@@ -124,8 +111,7 @@ export class DebtList extends HTMLElement {
                 ...row,
                 _fmtMoneda: this.fmtMoneda.bind(this),
                 _onDetail: async (monto, opener) => {
-                    const detailModal = document.querySelector('app-shell #debtDetailModal')
-                        || document.getElementById('debtDetailModal');
+                    const detailModal = document.getElementById('debtDetailModal');
                     if (!detailModal) return;
                     const { getDeuda } = await import('../deudaRepository.js');
                     const deudaActualizada = await getDeuda(monto.deudaId);
@@ -161,8 +147,6 @@ export class DebtList extends HTMLElement {
             showDetailAction: this._showDetailAction,
             showPaymentAction: isUngroupedView,
         });
-
-        this._renderTotals();
     }
 
     // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
@@ -236,16 +220,6 @@ export class DebtList extends HTMLElement {
         return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n);
     }
 
-    _renderTotals() {
-        let totalsEl = this._externalTotals || this.querySelector('debt-list-totals');
-        if (!totalsEl) return;
-
-        const pendiente = this.totalesPendientes || {};
-        const pagado = this.totalesPagados || {};
-
-        totalsEl.update(pendiente, pagado, { debts: this.debts || [] });
-    }
-
     _emptyText() {
         if (this._includeIngresos) return 'Todavía no hay movimientos este mes. Agregá un ingreso o un egreso.';
         if (this._estado === 'pendiente') return 'No quedan montos por pagar este mes.';
@@ -253,19 +227,7 @@ export class DebtList extends HTMLElement {
     }
 
     render() {
-        this.innerHTML = this._noTotals
-            ? '<div class="debt-list-container"></div>'
-            : '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
-    }
-
-    /**
-     * Registers an external debt-list-totals element (outside the card) that
-     * _renderTotals() will update instead of the one embedded inside this component.
-     * Called by DebtEntityShell after it moves the element outside the card.
-     * @param {HTMLElement} el - The debt-list-totals element to use
-     */
-    setExternalTotals(el) {
-        this._externalTotals = el;
+        this.innerHTML = '<div class="debt-list-container"></div>';
     }
 
     groupMontos(montos, groupBy) {

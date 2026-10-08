@@ -52,31 +52,19 @@ $info:      #0dcaf0;
 @import "bootstrap-icons/font/bootstrap-icons";
 
 // ─── Componentes propios ──────────────────────────────────────────────────────
-// Botón "+" (única acción de alta). En mobile/tablet queda por encima de la barra inferior.
+// Botón "+" (única acción de alta), abajo a la derecha.
 .add-fab {
-    bottom: 72px;
+    bottom: 24px;
     right: 16px;
     width: 56px;
     height: 56px;
     z-index: $zindex-fixed;
 }
 
-// Mobile y tablet: barra inferior visible; el contenido termina por encima del botón "+"
-// (72px + 56px) para que al final de la página la última fila no quede debajo.
+// El contenido termina por encima del botón "+" (24px + 56px) para que al final de la
+// página la última fila no quede debajo.
 #app-layout > main {
     padding-bottom: 88px;
-}
-
-// En desktop no hay barra inferior: el botón baja a 24px y el contenido deja espacio
-// para que al final de la página la última fila no quede debajo del botón.
-@include media-breakpoint-up(lg) {
-    .add-fab {
-        bottom: 24px;
-    }
-
-    #app-layout > main {
-        padding-bottom: 72px;
-    }
 }
 
 // Bottom sheet: en pantallas chicas el diálogo sale desde abajo y ocupa el ancho.
@@ -109,17 +97,6 @@ $info:      #0dcaf0;
     z-index: $zindex-sticky;
 }
 
-// Sidebar width for desktop navigation (no Bootstrap utility provides a fixed px width).
-// position: sticky + top: 0 keeps it in view while the main content scrolls.
-// overflow-y: auto handles overflow if more nav items are added.
-app-sidebar {
-    width: 220px;
-    min-width: 220px;
-    max-height: 100vh;
-    position: sticky;
-    top: 0;
-    overflow-y: auto;
-}
 
 // Tarjetas KPI: el monto nunca se corta ni se sale de la tarjeta; en tarjetas angostas
 // (p. ej. 2 columnas dentro de otra tarjeta en 360px) achica la fuente según el ancho disponible.
