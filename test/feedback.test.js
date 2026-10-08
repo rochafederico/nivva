@@ -11,8 +11,8 @@ import {
     validateFeedback,
 } from '../src/features/feedback/feedbackService.js';
 
-// Register FeedbackFab / FeedbackModal in happy-dom for DOM tests
-import '../src/features/feedback/FeedbackFab.js';
+// Register FeedbackButton / FeedbackModal in happy-dom for DOM tests
+import '../src/features/feedback/FeedbackButton.js';
 
 export const tests = [
 
@@ -156,17 +156,19 @@ export const tests = [
         }
     },
 
-    // --- FeedbackFab / FeedbackModal DOM ---
-    async function feedbackFab_rendersButton() {
-        console.log('  FeedbackFab: renders the FAB button');
-        const fab = document.createElement('feedback-fab');
-        document.body.appendChild(fab);
-        const btn = fab.querySelector('#feedback-fab-btn');
-        assert(btn !== null, 'Debe existir el botón FAB');
-        assert(btn.classList.contains('btn'), 'El FAB debe usar clase Bootstrap btn');
-        assert(btn.classList.contains('rounded-circle'), 'El FAB debe ser circular con rounded-circle');
-        assert(btn.classList.contains('btn-primary'), 'El FAB debe usar btn-primary');
-        document.body.removeChild(fab);
+    // --- FeedbackButton / FeedbackModal DOM ---
+    async function feedbackButton_rendersInHeader() {
+        console.log('  FeedbackButton: botón de header que abre el modal de feedback');
+        const wrapper = document.createElement('feedback-button');
+        document.body.appendChild(wrapper);
+        const btn = wrapper.querySelector('#feedback-btn');
+        assert(btn !== null, 'Debe existir el botón de feedback');
+        assert(btn.classList.contains('btn') && btn.classList.contains('btn-primary'), 'Usa el mismo estilo que los botones del header');
+        assert(btn.getAttribute('aria-label') === 'Enviar feedback', 'Tiene nombre accesible');
+        assert(btn.querySelector('i.bi-chat-dots') !== null, 'Usa el ícono de chat');
+        assert(!btn.classList.contains('position-fixed'), 'Ya no es un botón flotante');
+        assert(wrapper.querySelector('feedback-modal') !== null, 'Incluye el modal de feedback');
+        document.body.removeChild(wrapper);
     },
 
     async function feedbackModal_rendersForm() {
