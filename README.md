@@ -100,52 +100,42 @@ MIT
 
 ## 🗺️ Mapa del sitio
 
-> Estado relevado del código real. Última revisión: 2026-04-06.
+> Estado relevado del código real. Última revisión: 2026-10-08.
 > Se toma el código como fuente de verdad para lo implementado y las épicas/HU abiertas como referencia del backlog pendiente.
 
-- ✅ **Shell de navegación Bootstrap**
-  - ✅ **Header desktop (`AppHeader`)**
-    - ✅ Marca **Nivva** → redirige a `/`
-    - ✅ Navegación principal: **Egresos**, **Ingresos**
-    - ✅ Acciones secundarias: **⚙️ Config**, **🔔 vencimientos próximos**, **❓ tour**
-  - ✅ **Bottom navbar mobile (`BottomNav`)**
-    - ✅ Secciones primarias visibles: **Egresos** (`/`), **Ingresos** (`/ingresos`)
-    - ✅ Acceso secundario: **⚙️ Config** abre un offcanvas, no una ruta
+- ✅ **Header (`AppHeader`)**
+  - ✅ Marca **Nivva** → vuelve a Inicio (Este mes · Todo)
+  - ✅ Acciones: **🔔 vencimientos próximos**, **💬 feedback**, **❓ tour**, **👤 menú de usuario** (Configuración)
+- ✅ Sin barra inferior ni lateral: toda la app es una sola vista
+- ✅ Un único botón flotante **+** abre un bottom sheet para elegir **Ingreso** o **Egreso**
 
-### Rutas primarias implementadas
+### Vista única: Inicio (`/`)
 
-- ✅ **Egresos** (`/`)
-  - ✅ Vista inicial de la app
-  - ✅ Indicadores globales arriba del contenido
-  - ✅ Encabezado **Resumen** + selector global de mes
-  - ✅ Lista/tablas de cuotas del mes
-  - ✅ Agrupación por acreedor, tipo, moneda o vencimiento
-  - ✅ Alta/edición de deuda en modal
-  - ✅ Detalle de deuda en modal
-  - ✅ Marcar cuotas como pagadas
-  - ✅ Duplicar cuotas / montos
-  - ⏳ Dashboard visual y proyecciones *(Épica #3: HU #34–#38)*
-  - ⏳ Categorización avanzada y filtros persistentes *(Épica #8: HU #57–#60)*
+- ✅ **Deuda total acumulada** fija arriba (todo lo impago de todos los meses, ARS / USD); tocarla lleva a Acreedores
+- ✅ **Este mes** (con selector de mes ‹ mes ›)
+  - ✅ Resumen compacto: **Ingresos**, **Egresos**, **Balance** y **Por pagar este mes** (con alerta de vencidos); cada dato abre su filtro
+  - ✅ Filtros (viven en la URL, funcionan Atrás/Adelante y los links):
+    - ✅ **Todo** (`/`): ingresos y montos del mes en orden de fecha
+    - ✅ **Ingresos** (`/?vista=ingresos`)
+    - ✅ **Egresos** (`/?vista=egresos`, `&estado=pendiente` para ver solo lo que falta pagar)
+  - ✅ Filas con un solo control (switch de pagado), fecha corta ("05 oct") y badge solo para lo vencido; tocar la fila abre el detalle
+- ✅ **Acreedores** (`/?vista=acreedores`): deudas globales, sin selector de mes
+  - ✅ Tocar la fila abre el detalle; **Editar** y **Eliminar** en el menú ⋮
+  - ✅ Avance con barra de progreso "x de y cuotas" y pendiente por acreedor
+- ⏳ Dashboard visual y proyecciones *(Épica #3: HU #34–#38)*
+- ⏳ Categorización avanzada y filtros persistentes *(Épica #8: HU #57–#60)*
+- ⏳ Ingresos recurrentes, proyección y categorización *(Épica #4: HU #39–#43)*
 
-- ✅ **Ingresos** (`/ingresos`)
-  - ✅ Alta de ingreso en modal
-  - ✅ Totales del mes
-  - ✅ Historial/listado en tabla
-  - ✅ Usa el selector global de mes
-  - ⏳ Ingresos recurrentes, proyección y categorización *(Épica #4: HU #39–#43)*
+### Rutas anteriores
 
-### Rutas secundarias
-
-- ✅ No hay rutas secundarias implementadas además de `/` y `/ingresos`
-- 🚧 `src/pages/Dashboard.js` existe como placeholder, pero no está conectado al router ni a la navegación Bootstrap
-- ⏳ No existen rutas dedicadas para configuración, ayuda, notificaciones o reportes
+- ✅ `/ingresos`, `/gastos` y `/gastos/deudas` redirigen a la pestaña correspondiente de Inicio (favoritos y links de notificaciones siguen funcionando)
 
 ### Acciones secundarias y modales (sin ruta propia)
 
-- ✅ **⚙️ Config** *(dropdown en desktop, offcanvas en mobile)*
+- ✅ **⚙️ Configuración** *(desde el menú de usuario 👤)*
   - ✅ Exportar datos
   - ✅ Importar datos
-  - 🚧 Eliminar todo *(la acción existe y borra deudas e ingresos, pero la HU #47 pide doble confirmación y limpieza de localStorage)*
+  - 🚧 Eliminar todo *(la acción existe y borra egresos e ingresos, pero la HU #47 pide doble confirmación y limpieza de localStorage)*
 - ✅ **🔔 Vencimientos próximos**
   - ✅ Popover/panel desde el header
   - ✅ Notificaciones nativas + aviso in-app *(HU #29 implementada)*
@@ -153,12 +143,12 @@ MIT
 - ✅ **❓ Tour guiado**
   - ✅ Inicio automático en primera visita *(HU #21)*
   - ✅ Omitir/cerrar en cualquier momento *(HU #22)*
-  - 🚧 Relanzar manualmente *(existe botón en header, pero la HU #23 lo pide dentro de `src/layout/Menu.js`)*
+  - 🚧 Relanzar manualmente *(botón ❓ en el header; la HU #23 lo ubicaba en `src/layout/Menu.js`, que se eliminó con la vista única)*
   - ⏳ Indicador de progreso *(HU #24)*
   - ✅ Navegación por teclado
 - ✅ **Otros modales implementados**
-  - ✅ Deuda (alta/edición)
-  - ✅ Detalle de deuda
+  - ✅ Egreso (alta/edición)
+  - ✅ Detalle del egreso
   - ✅ Ingreso
   - ✅ Exportación / importación
 
@@ -166,7 +156,7 @@ MIT
 
 - ✅ Persistencia 100 % local en IndexedDB
 - ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
-- ✅ Resumen mensual con KPIs de ingresos, gastos, balance y total a pagar
+- ✅ Resumen mensual compacto (ingresos, egresos, balance y por pagar este mes) y deuda total acumulada
 - ✅ Notificaciones toast (`AppToast`)
 - ⏳ Privacidad, cifrado y acceso con PIN *(Épica #5: HU #44–#47, #67–#72)*
 - ⏳ Importación/exportación CSV, backups automáticos y multi-cuenta *(Épica #7: HU #53–#56)*

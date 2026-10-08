@@ -4,9 +4,7 @@ import { assert, waitFor } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { getDB } from '../src/shared/database/initDB.js';
-import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
 import { getInitials, getAvatarClasses, getTipoIcon, getEstado, formatDate, DebtRowItem } from '../src/features/deudas/components/DebtRowItem.js';
-import { summarizeDebtListTotals } from '../src/features/deudas/components/DebtListTotals.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -14,7 +12,7 @@ import '../src/features/montos/components/DuplicateMontoModal.js';
 import { MONTO_FORM_GENERAL_ERROR_MESSAGE } from '../src/features/montos/components/MontoForm.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/deudas/components/DebtModal.js';
-import '../src/features/deudas/components/DebtEntityShell.js';
+import '../src/features/deudas/components/AcreedoresList.js';
 
 async function cleanup() {
     try { await deleteDeudas(); } catch (e) { /* ignore */ }
@@ -382,121 +380,6 @@ async function testDebtDetailModal() {
 }
 
 // ===================================================================
-// UC7: debtTableColumns acreedor render agrupa Acreedor y Tipo en mobile
-// Verifica que la columna Acreedor renderiza el nombre con fw-semibold
-// y un badge con el tipo de deuda visible solo en mobile (d-md-none).
-// ===================================================================
-async function testAcreedorColumnMobileRender() {
-    console.log('  UC7: acreedor column renderiza badge de tipo para mobile');
-
-    const acreedorCol = debtTableColumns.find(col => col.key === 'acreedor');
-    assert(acreedorCol !== undefined, 'Debe existir columna acreedor');
-    assert(typeof acreedorCol.render === 'function', 'Columna acreedor debe tener render function');
-
-    const row = { acreedor: 'Banco Galicia', tipoDeuda: 'Préstamo' };
-    const node = acreedorCol.render(row);
-    assert(node instanceof Node, 'render debe devolver un nodo DOM');
-
-    const acreedorSpan = node.querySelector('span.fw-semibold');
-    assert(acreedorSpan !== null, 'Debe existir span con clase fw-semibold para el acreedor');
-    assert(acreedorSpan.textContent === 'Banco Galicia', 'El span debe mostrar el nombre del acreedor');
-
-    const badge = node.querySelector('span.badge');
-    assert(badge !== null, 'Debe existir un badge para el tipo de deuda');
-    assert(badge.classList.contains('rounded-pill'), 'Badge debe tener clase rounded-pill');
-    assert(badge.classList.contains('text-bg-light'), 'Badge debe tener clase text-bg-light');
-    assert(badge.classList.contains('d-md-none'), 'Badge debe tener clase d-md-none (solo visible en mobile)');
-    assert(badge.textContent === 'Préstamo', 'Badge debe mostrar el tipo de deuda');
-
-    const tipoCol = debtTableColumns.find(col => col.key === 'tipoDeuda');
-    assert(tipoCol !== undefined, 'Debe existir columna tipoDeuda');
-    assert(tipoCol.opts && typeof tipoCol.opts.classCss === 'string',
-        'Columna Tipo debe definir classCss');
-    assert(tipoCol.opts.classCss.includes('d-none'),
-        'Columna Tipo debe incluir clase d-none para ocultarse en mobile');
-    assert(tipoCol.opts.classCss.includes('d-md-table-cell'),
-        'Columna Tipo debe incluir clase d-md-table-cell para mostrarse desde md');
-
-    // Badge no debe renderizarse cuando tipoDeuda está vacío
-    const rowSinTipo = { acreedor: 'Banco Sin Tipo', tipoDeuda: '' };
-    const nodeSinTipo = acreedorCol.render(rowSinTipo);
-    const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
-    assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
-
-    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
-    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
-    assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
-    assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
-
-    const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
-    const montoNode = montoCol.render(rowConVenc);
-    assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
-
-    // El span del monto debe tener text-nowrap para evitar corte del símbolo de moneda en mobile
-    const montoSpan = montoNode.querySelector('span.text-nowrap');
-    assert(montoSpan !== null, 'El span del monto debe tener clase text-nowrap');
-
-    const vencBadge = montoNode.querySelector('span.d-md-none');
-    assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Monto');
-    assert(vencBadge.classList.contains('d-md-none'), 'Elemento de vencimiento debe ser solo visible en mobile (d-md-none)');
-    // El span de vencimiento también debe tener text-nowrap para evitar corte de fechas ISO en mobile
-    assert(vencBadge.classList.contains('text-nowrap'), 'Elemento de vencimiento debe tener clase text-nowrap');
-    assert(vencBadge.textContent === '2026-06-01', 'Elemento debe mostrar la fecha de vencimiento');
-
-    // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
-    const rowSinVenc = { monto: 500, moneda: 'ARS', vencimiento: '' };
-    const montoNodeSinVenc = montoCol.render(rowSinVenc);
-    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.d-md-none');
-    assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
-
-    const today = new Date();
-    const yyyyMmDd = (date) => date.toISOString().slice(0, 10);
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-
-    const pagadoNode = montoCol.render({
-        monto: 1000,
-        moneda: 'ARS',
-        vencimiento: yyyyMmDd(tomorrow),
-        pagado: true
-    });
-    const pagadoBadge = pagadoNode.querySelector('.badge.text-bg-success');
-    assert(pagadoBadge !== null, 'Debe renderizar badge verde cuando el monto está pagado');
-    assert(pagadoBadge.textContent === 'Pagado', 'Badge verde debe mostrar "Pagado"');
-
-    const vencidoNode = montoCol.render({
-        monto: 1000,
-        moneda: 'ARS',
-        vencimiento: yyyyMmDd(yesterday),
-        pagado: false
-    });
-    const vencidoBadge = vencidoNode.querySelector('.badge.text-bg-danger');
-    assert(vencidoBadge !== null, 'Debe renderizar badge rojo cuando está vencido y pendiente');
-    assert(vencidoBadge.textContent === 'Vencido', 'Badge rojo debe mostrar "Vencido"');
-
-    const venceHoyNode = montoCol.render({
-        monto: 1000,
-        moneda: 'ARS',
-        vencimiento: yyyyMmDd(today),
-        pagado: false
-    });
-    const venceHoyBadge = venceHoyNode.querySelector('.badge.text-bg-warning');
-    assert(venceHoyBadge !== null, 'Debe renderizar badge amarillo cuando vence hoy y está pendiente');
-    assert(venceHoyBadge.textContent === 'Vence hoy', 'Badge amarillo debe mostrar "Vence hoy"');
-
-    const pendienteNode = montoCol.render({
-        monto: 1000,
-        moneda: 'ARS',
-        vencimiento: yyyyMmDd(tomorrow),
-        pagado: false
-    });
-    const pendienteBadge = pendienteNode.querySelector('.badge.text-bg-success, .badge.text-bg-danger, .badge.text-bg-warning');
-    assert(pendienteBadge === null, 'No debe renderizar badge para pendiente sin vencer');
-}
-
-// ===================================================================
 // UC7b: toggle pagado actualiza badge y muestra toast de feedback
 // ===================================================================
 async function testPagoToggleVisualFeedback() {
@@ -516,16 +399,14 @@ async function testPagoToggleVisualFeedback() {
     const [monto] = await listMontos({ mes: futureYmd.slice(0, 7) });
     assert(monto, 'Debe existir un monto para probar el toggle de pagado');
 
-    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
-    const accionesCol = debtTableColumns.find(col => col.key === 'acciones');
-    const row = { ...monto };
+    const row = { ...monto, acreedor: 'Toggle Test' };
     let reloadCalls = 0;
     row._reload = () => { reloadCalls += 1; };
 
-    const montoNode = montoCol.render(row);
-    const accionesNode = accionesCol.render(row);
+    // Fila real de la lista (DebtRowItem): el badge y el switch viven en el mismo <tr>
+    const montoNode = new DebtRowItem(row, { showPaymentAction: true }).element;
+    const accionesNode = montoNode;
     document.body.appendChild(montoNode);
-    document.body.appendChild(accionesNode);
 
     const notifications = [];
     const onNotify = (event) => notifications.push(event.detail);
@@ -539,14 +420,14 @@ async function testPagoToggleVisualFeedback() {
         input.dispatchEvent(new Event('change', { bubbles: true }));
         await new Promise(resolve => setTimeout(resolve, 50));
 
-        assert(montoNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
+        assert(input.checked && montoNode.querySelector('.badge:not(.rounded-pill)') === null, 'Al marcar pago lo indica el switch, sin badge redundante');
         assert(notifications.some(n => n.type === 'success'), 'Al marcar pago debe mostrarse toast verde');
 
         input.checked = false;
         input.dispatchEvent(new Event('change', { bubbles: true }));
         await new Promise(resolve => setTimeout(resolve, 50));
 
-        assert(montoNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
+        assert(!input.checked && montoNode.querySelector('.badge:not(.rounded-pill)') === null, 'Al desmarcar pago el switch vuelve a pendiente, sin badge');
         const pendingStateBadge = montoNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
         assert(pendingStateBadge === null, 'Pendiente sin vencer no debe mostrar badge');
         assert(notifications.some(n => n.type === 'warning'), 'Al desmarcar pago debe mostrarse toast amarillo');
@@ -554,7 +435,6 @@ async function testPagoToggleVisualFeedback() {
     } finally {
         window.removeEventListener('app:notify', onNotify);
         if (montoNode.parentNode) document.body.removeChild(montoNode);
-        if (accionesNode.parentNode) document.body.removeChild(accionesNode);
         await cleanup();
     }
 }
@@ -1199,19 +1079,18 @@ async function testDebtModalReopenClearsValidationState() {
 }
 
 // ===================================================================
-// UC-DS1: DebtEntityShell – render vacío
+// UC-DS1: AcreedoresList – render vacío
 // ===================================================================
-async function testDebtEntityShellRenderVacio() {
-    console.log('  DebtEntityShell: muestra mensaje cuando no hay deudas');
+async function testAcreedoresListRenderVacio() {
+    console.log('  AcreedoresList: muestra mensaje cuando no hay deudas');
     await cleanup();
 
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
+    const shell = document.createElement('acreedores-list');
     document.body.appendChild(shell);
-    await shell.loadEntities();
+    await shell.load();
 
     const container = shell.querySelector('#entity-table-container');
-    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
+    assert(container !== null, 'AcreedoresList debe tener #entity-table-container');
     assert(container.textContent.includes('Todavía no cargaste egresos'), 'Debe mostrar mensaje vacío cuando no hay egresos');
 
     document.body.removeChild(shell);
@@ -1220,10 +1099,10 @@ async function testDebtEntityShellRenderVacio() {
 }
 
 // ===================================================================
-// UC-DS2: DebtEntityShell – render con entidades
+// UC-DS2: AcreedoresList – render con entidades
 // ===================================================================
-async function testDebtEntityShellRenderConEntidades() {
-    console.log('  DebtEntityShell: muestra tabla con filas al haber deudas');
+async function testAcreedoresListRenderConEntidades() {
+    console.log('  AcreedoresList: muestra tabla con filas al haber deudas');
     await cleanup();
 
     // Crear una deuda directamente usando el formulario
@@ -1233,13 +1112,12 @@ async function testDebtEntityShellRenderConEntidades() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Test', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
+    const shell = document.createElement('acreedores-list');
     document.body.appendChild(shell);
-    await shell.loadEntities();
+    await shell.load();
 
     const container = shell.querySelector('#entity-table-container');
-    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
+    assert(container !== null, 'AcreedoresList debe tener #entity-table-container');
     const row = container.querySelector('tbody tr');
     assert(row !== null, 'Debe haber al menos una fila en la tabla');
     assert(row.textContent.includes('Banco Test'), 'La fila debe contener el acreedor');
@@ -1250,10 +1128,10 @@ async function testDebtEntityShellRenderConEntidades() {
 }
 
 // ===================================================================
-// UC-DS4: DebtEntityShell – formato de columna Cuotas pagado/total
+// UC-DS4: AcreedoresList – formato de columna Cuotas pagado/total
 // ===================================================================
-async function testDebtEntityShellCuotasFormato() {
-    console.log('  DebtEntityShell: columna Cuotas muestra formato pagado/total');
+async function testAcreedoresListCuotasFormato() {
+    console.log('  AcreedoresList: columna Cuotas muestra formato pagado/total');
     await cleanup();
 
     const form = document.createElement('debt-form');
@@ -1266,10 +1144,9 @@ async function testDebtEntityShellCuotasFormato() {
     await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
     document.body.removeChild(form);
 
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
+    const shell = document.createElement('acreedores-list');
     document.body.appendChild(shell);
-    await shell.loadEntities();
+    await shell.load();
 
     const container = shell.querySelector('#entity-table-container');
     const row = container.querySelector('tbody tr');
@@ -1296,17 +1173,16 @@ async function testDebtEntityShellCuotasFormato() {
 }
 
 // ===================================================================
-// UC-DS3: DebtEntityShell – recarga al evento deuda:saved (vista deudas)
+// UC-DS3: AcreedoresList – recarga al evento deuda:saved (vista deudas)
 // ===================================================================
-async function testDebtEntityShellRecargaAlGuardar() {
-    console.log('  DebtEntityShell: recarga la tabla al recibir deuda:saved');
+async function testAcreedoresListRecargaAlGuardar() {
+    console.log('  AcreedoresList: recarga la tabla al recibir deuda:saved');
     await cleanup();
 
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
+    const shell = document.createElement('acreedores-list');
     document.body.appendChild(shell);
     // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
-    await shell.loadEntities();
+    await shell.load();
 
     // Inicialmente vacío
     let container = shell.querySelector('#entity-table-container');
@@ -1330,213 +1206,6 @@ async function testDebtEntityShellRecargaAlGuardar() {
     document.body.removeChild(shell);
     window.history.pushState({}, '', '/');
     await cleanup();
-}
-
-// ===================================================================
-// UC-DS5: DebtEntityShell – renderiza tabs de navegación con links reales
-// ===================================================================
-async function testDebtEntityShellNavTabsRender() {
-    console.log('  DebtEntityShell: renderiza tabs de navegación con links reales');
-    await cleanup();
-
-    const shell = document.createElement('debt-entity-shell');
-    document.body.appendChild(shell);
-
-    const tabs = shell.querySelector('.nav-underline');
-    assert(tabs !== null, 'Debe existir .nav-underline');
-
-    const tabLinks = shell.querySelectorAll('.nav-underline .nav-link');
-    assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
-
-    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/deudas');
-    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos/deudas"');
-
-    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
-    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos"');
-
-    // Son links a rutas: nav con nombre accesible, sin roles ARIA de tablist incompletos
-    const nav = tabs.closest('nav');
-    assert(nav !== null && nav.getAttribute('aria-label') === 'Vistas de egresos', 'Las pestañas deben estar en un <nav> con aria-label');
-    assert(!tabs.hasAttribute('role'), 'La lista no debe declarar role="tablist" sin role="tab" en sus hijos');
-    assert(shell.querySelector('.nav-underline [role="presentation"]') === null, 'Los ítems no deben usar role="presentation"');
-
-    document.body.removeChild(shell);
-    await cleanup();
-}
-
-// ===================================================================
-// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos
-// ===================================================================
-async function testDebtEntityShellCuotasView() {
-    console.log('  DebtEntityShell: la vista cuotas (path /gastos) muestra debt-list sin columna Tipo');
-    await cleanup();
-
-    window.history.pushState({}, '', '/gastos');
-    const shell = document.createElement('debt-entity-shell');
-    document.body.appendChild(shell);
-
-    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos');
-    assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
-    assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
-
-    const debtList = shell.querySelector('debt-list');
-    assert(debtList !== null, 'debt-list debe existir');
-    assert(debtList.getAttribute('exclude-columns') === 'tipoDeuda', 'debt-list debe tener exclude-columns="tipoDeuda"');
-
-    document.body.removeChild(shell);
-    window.history.pushState({}, '', '/');
-    await cleanup();
-}
-
-// ===================================================================
-// UC-DL1: DebtList._renderTotals — barra con pendiente y pagado por moneda
-// ===================================================================
-async function testDebtListRenderTotalsPendienteYPagado() {
-    console.log('  DebtList._renderTotals: muestra 1 card pendiente y 1 card pagado agrupando monedas');
-
-    const list = document.createElement('debt-list');
-    document.body.appendChild(list);
-    list.render();
-
-    list.totalesPendientes = { ARS: 15000, USD: 100 };
-    list.totalesPagados = { ARS: 5000 };
-    list._renderTotals();
-
-    const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl !== null, 'Debe existir debt-list-totals');
-
-    // New: one card per state (not per currency)
-    const pendienteItems = totalsEl.querySelectorAll('.bg-warning-subtle');
-    assert(pendienteItems.length === 1, 'Debe mostrar 1 card de pendiente (todas las monedas agrupadas)');
-
-    const pagadoItems = totalsEl.querySelectorAll('.bg-success-subtle');
-    assert(pagadoItems.length === 1, 'Debe mostrar 1 card de pagado');
-
-    // Amount text must contain both currencies joined with /
-    const amountEl = totalsEl.querySelector('.bg-warning-subtle .fw-bold');
-    assert(amountEl !== null, 'Debe existir el elemento de monto pendiente');
-    const secondaryEl = amountEl.querySelector('small');
-    assert(secondaryEl !== null, 'Monto pendiente con multi-moneda debe tener elemento small para moneda secundaria');
-
-    const pendienteLabel = totalsEl.querySelector('.text-warning-emphasis');
-    assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
-
-    document.body.removeChild(list);
-}
-
-// ===================================================================
-// UC-DL2: DebtList._renderTotals — no renderiza barra cuando todos los totales son 0
-// ===================================================================
-async function testDebtListRenderTotalsVacioSiTodosCero() {
-    console.log('  DebtList._renderTotals: no renderiza barra cuando todos los totales son 0');
-
-    const list = document.createElement('debt-list');
-    document.body.appendChild(list);
-    list.render();
-
-    // First confirm it renders when there is a non-zero value
-    list.totalesPendientes = { ARS: 500 };
-    list.totalesPagados = {};
-    list._renderTotals();
-
-    const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.innerHTML.trim() !== '', 'Debe tener contenido cuando hay totales no-cero');
-
-    // All zero: bar must be cleared
-    list.totalesPendientes = { ARS: 0 };
-    list.totalesPagados = { ARS: 0 };
-    list._renderTotals();
-
-    assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando todos los totales son 0');
-
-    document.body.removeChild(list);
-}
-
-// ===================================================================
-// UC-DL3: DebtList._renderTotals — actualiza la barra al cambiar totales
-// ===================================================================
-async function testDebtListRenderTotalsActualizaTrasRefresh() {
-    console.log('  DebtList._renderTotals: actualiza la barra al setear nuevos totales');
-
-    const list = document.createElement('debt-list');
-    document.body.appendChild(list);
-    list.render();
-
-    // Initial render: only pendiente USD
-    list.totalesPendientes = { USD: 200 };
-    list.totalesPagados = {};
-    list._renderTotals();
-
-    const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Inicial: 1 card pendiente');
-    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 0, 'Inicial: sin cards pagado');
-
-    // Update: two currencies pending, one pagado — still 1 card per state
-    list.totalesPendientes = { USD: 200, ARS: 8000 };
-    list.totalesPagados = { ARS: 3000 };
-    list._renderTotals();
-
-    assert(totalsEl.querySelectorAll('.bg-warning-subtle').length === 1, 'Tras update: 1 card pendiente (multi-moneda agrupada)');
-    assert(totalsEl.querySelectorAll('.bg-success-subtle').length === 1, 'Tras update: 1 card pagado');
-
-    document.body.removeChild(list);
-}
-
-// ===================================================================
-// UC-DL4: DebtList._renderTotals — barra vacía cuando currencies están ausentes
-// ===================================================================
-async function testDebtListRenderTotalsNoCurrencies() {
-    console.log('  DebtList._renderTotals: no renderiza barra sin monedas');
-
-    const list = document.createElement('debt-list');
-    document.body.appendChild(list);
-    list.render();
-
-    list.totalesPendientes = {};
-    list.totalesPagados = {};
-    list._renderTotals();
-
-    const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando no hay monedas');
-
-    document.body.removeChild(list);
-}
-
-// ===================================================================
-// UC-DL5: DebtList._renderTotals — ignora vencimientos vacíos o inválidos
-// ===================================================================
-async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
-    console.log('  DebtList._renderTotals: ignora vencimientos vacíos o inválidos');
-
-    const list = document.createElement('debt-list');
-    document.body.appendChild(list);
-    list.render();
-
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    const yesterday = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-    list.totalesPendientes = { ARS: 1500 };
-    list.totalesPagados = {};
-    list.debts = [{
-        montos: [
-            { pagado: false, vencimiento: yesterday },
-            { pagado: false, vencimiento: '' },
-            { pagado: false, vencimiento: 'sin-fecha' },
-            { pagado: true, vencimiento: yesterday }
-        ]
-    }];
-    list._renderTotals();
-
-    const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.textContent.includes('1 monto vencido'), 'Debe contar solo el vencimiento válido no pagado');
-    assert(!totalsEl.textContent.includes('2 montos vencidos'), 'No debe contar vencimientos vacíos o inválidos');
-
-    const summary = summarizeDebtListTotals(list.debts, '2999-01-01');
-    assert(summary.vencidas === 1, 'DebtListTotals debe calcular vencidas ignorando fechas inválidas');
-    assert(summary.pagadosCount === 1, 'DebtListTotals debe calcular cantidad de pagos realizados');
-
-    document.body.removeChild(list);
 }
 
 // ===================================================================
@@ -1715,7 +1384,6 @@ export const tests = [
     testDeleteDeudasWaitsForTransactionComplete,
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
-    testAcreedorColumnMobileRender,
     testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
     testAltaInlineValidacionErrores,
@@ -1735,17 +1403,10 @@ export const tests = [
     testDebtModalInlineMontoCancelDoesNotCloseModal,
     testDebtModalFooterUxValidacionConsistente,
     testDebtModalReopenClearsValidationState,
-    testDebtEntityShellRenderVacio,
-    testDebtEntityShellRenderConEntidades,
-    testDebtEntityShellRecargaAlGuardar,
-    testDebtEntityShellCuotasFormato,
-    testDebtEntityShellNavTabsRender,
-    testDebtEntityShellCuotasView,
-    testDebtListRenderTotalsPendienteYPagado,
-    testDebtListRenderTotalsVacioSiTodosCero,
-    testDebtListRenderTotalsActualizaTrasRefresh,
-    testDebtListRenderTotalsNoCurrencies,
-    testDebtListRenderTotalsIgnoraVencimientosInvalidos,
+    testAcreedoresListRenderVacio,
+    testAcreedoresListRenderConEntidades,
+    testAcreedoresListRecargaAlGuardar,
+    testAcreedoresListCuotasFormato,
     testDebtListGroupedUsesDebtRowItemLayout,
     testDebtRowItem
 ];
