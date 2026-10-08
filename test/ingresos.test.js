@@ -12,6 +12,7 @@ import { getSelectedMonth, setSelectedMonth } from '../src/shared/MonthFilter.js
 // Import ingresos UI components (registers custom elements)
 import '../src/features/ingresos/components/IngresoForm.js';
 import '../src/features/ingresos/components/IngresoModal.js';
+import { ingresosColumns } from '../src/shared/config/tables/debtTableColumns.js';
 
 // Helper: delete all ingresos (no deleteAll in repo, so we clear via DB directly)
 import { getDB } from '../src/shared/database/initDB.js';
@@ -449,7 +450,39 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
     }
 }
 
+// ===================================================================
+// Tabla de ingresos: fecha DD/MM/AAAA, monto sin cortes y datos como texto
+// ===================================================================
+async function testTablaIngresosFormatoYTextoPlano() {
+    console.log('  Tabla de ingresos: fecha DD/MM/AAAA, monto en una línea y descripción como texto');
+    const table = document.createElement('app-table');
+    document.body.appendChild(table);
+    table.columnsConfig = ingresosColumns;
+    table.tableData = [{ id: 1, fecha: '2026-10-01', descripcion: '<img src=x onerror="window.__xss=1">Sueldo', monto: 934480.8, moneda: 'ARS' }];
+
+    const row = table.querySelector('tbody tr');
+    assert(row !== null, 'Debe renderizar una fila');
+    assert(row.textContent.includes('01/10/2026'), 'La fecha debe mostrarse como DD/MM/AAAA');
+    assert(!row.textContent.includes('2026-10-01'), 'No debe mostrar la fecha en formato ISO');
+    assert(row.querySelector('img') === null, 'La descripción no debe interpretarse como HTML');
+    assert(row.textContent.includes('<img'), 'La descripción debe mostrarse como texto literal');
+    const monto = [...row.querySelectorAll('span.text-nowrap')].find(el => el.textContent === '$ 934.480,80');
+    assert(monto !== undefined, 'El monto debe ir en un span text-nowrap');
+
+    const fechaHeader = table.querySelector('thead th');
+    assert(fechaHeader.classList.contains('d-none') && fechaHeader.classList.contains('d-md-table-cell'),
+        'La columna Fecha se oculta en mobile (la fecha va debajo de la descripción)');
+
+    // Columnas sin render: AppTable también muestra el valor como texto
+    table.columnsConfig = [{ key: 'descripcion', label: 'Descripción' }];
+    const plainCell = table.querySelector('tbody td');
+    assert(plainCell.querySelector('img') === null, 'AppTable no debe interpretar como HTML un valor sin render');
+    assert(plainCell.textContent.startsWith('<img'), 'AppTable debe mostrar el valor literal');
+    table.remove();
+}
+
 export const tests = [
+    testTablaIngresosFormatoYTextoPlano,
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
     testIngresoFormLayoutMobileFirst,

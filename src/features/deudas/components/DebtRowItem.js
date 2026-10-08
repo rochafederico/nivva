@@ -4,6 +4,7 @@
 
 import '../../../shared/components/AppCheckbox.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
+import { formatFecha } from '../../../shared/utils/fechas.js';
 
 // ── Helpers exportados (usados también en tests) ──────────────────────────────
 
@@ -28,9 +29,7 @@ export function getAvatarClasses(name) {
 }
 
 export function formatDate(isoDate) {
-    if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(String(isoDate))) return String(isoDate || '');
-    const [y, m, d] = String(isoDate).split('-');
-    return `${d}/${m}/${y}`;
+    return formatFecha(isoDate);
 }
 
 export function getTipoIcon(tipo) {
@@ -210,7 +209,7 @@ export class DebtRowItem {
 
         // Estado: monto + badge alineados a la derecha; badge puede pasar al siguiente renglón en mobile
         const estadoCol = document.createElement('div');
-        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-4';
+        estadoCol.className = 'd-flex flex-grow-1 justify-content-end me-1 me-sm-4';
 
         // Monto y badge: flex-wrap permite que el badge pase al renglón siguiente cuando no hay espacio
         const amountRow = document.createElement('div');
@@ -228,7 +227,7 @@ export class DebtRowItem {
         // Switch: columna flex-shrink-0 con padding para zona táctil adecuada
         if (cb) {
             const switchCol = document.createElement('div');
-            switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-2';
+            switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0 px-1 px-sm-2';
             switchCol.addEventListener('click', e => e.stopPropagation());
             switchCol.appendChild(cb);
             actWrap.appendChild(switchCol);
@@ -238,7 +237,7 @@ export class DebtRowItem {
         if (this._showDetailAction && typeof row._onRowClick === 'function') {
             const chevronBtn = document.createElement('button');
             chevronBtn.type = 'button';
-            chevronBtn.className = 'btn btn-link p-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
+            chevronBtn.className = 'btn btn-link px-1 py-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
             chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'esta deuda'}`);
             chevronBtn.addEventListener('click', e => {
                 e.stopPropagation();
