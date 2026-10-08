@@ -52,16 +52,61 @@ $info:      #0dcaf0;
 @import "bootstrap-icons/font/bootstrap-icons";
 
 // ─── Componentes propios ──────────────────────────────────────────────────────
-.feedback-fab {
-    bottom: 80px;
+// Botón "+" (única acción de alta). En mobile/tablet queda por encima de la barra inferior.
+.add-fab {
+    bottom: 72px;
     right: 16px;
-    width: 48px;
-    height: 48px;
-    z-index: $zindex-toast;
+    width: 56px;
+    height: 56px;
+    z-index: $zindex-fixed;
 }
 
-body.feedback-modal-open .feedback-fab {
-    display: none !important;
+// Mobile y tablet: barra inferior visible; el contenido termina por encima del botón "+"
+// (72px + 56px) para que al final de la página la última fila no quede debajo.
+#app-layout > main {
+    padding-bottom: 88px;
+}
+
+// En desktop no hay barra inferior: el botón baja a 24px y el contenido deja espacio
+// para que al final de la página la última fila no quede debajo del botón.
+@include media-breakpoint-up(lg) {
+    .add-fab {
+        bottom: 24px;
+    }
+
+    #app-layout > main {
+        padding-bottom: 72px;
+    }
+}
+
+// Bottom sheet: en pantallas chicas el diálogo sale desde abajo y ocupa el ancho.
+@include media-breakpoint-down(sm) {
+    .modal-dialog.modal-sheet {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        max-width: none;
+        margin: 0;
+
+        .modal-content {
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .modal.fade .modal-dialog.modal-sheet {
+        transform: translate(0, 100%);
+    }
+
+    .modal.show .modal-dialog.modal-sheet {
+        transform: none;
+    }
+}
+
+// Deuda total acumulada: queda fija arriba al scrollear.
+.deuda-total {
+    z-index: $zindex-sticky;
 }
 
 // Sidebar width for desktop navigation (no Bootstrap utility provides a fixed px width).
@@ -86,18 +131,11 @@ app-sidebar {
     font-size: min(1rem, 11cqi);
 }
 
-// El título (p. ej. "PENDIENTES") tampoco puede salirse de la tarjeta angosta.
-.kpi-title {
-    font-size: min(.875rem, 9cqi);
-}
-
-// Tarjetas KPI clickeables (stretched-link): realce al pasar el mouse y foco visible en toda la tarjeta.
-.kpi-card-link {
-    transition: box-shadow .15s ease-in-out;
-
-    &:hover {
-        box-shadow: $box-shadow !important;
-    }
+// Banner compacto del mes: cada dato es un container query para que el monto
+// achique su fuente si la columna es angosta, y toda la celda es clickeable (stretched-link).
+.kpi-banner .kpi-cell {
+    container-type: inline-size;
+    border-radius: $border-radius;
 
     &:has(.stretched-link:focus-visible) {
         outline: 3px solid rgba($primary, .5);
@@ -107,6 +145,15 @@ app-sidebar {
     .stretched-link:focus-visible {
         outline: none;
     }
+
+    .kpi-amount {
+        font-size: min(1.125rem, 11cqi);
+    }
+}
+
+// Barra de avance "x de y cuotas" en Acreedores
+.acreedor-progress {
+    height: 6px;
 }
 
 // Título de fila que abre el detalle: se ve como texto, se usa como botón (teclado incluido).

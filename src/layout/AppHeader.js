@@ -3,6 +3,7 @@ import './NotificationsButton.js';
 import './TourButton.js';
 import './UserMenuButton.js';
 import '../shared/components/AppToast.js';
+import '../features/feedback/FeedbackButton.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {
@@ -31,6 +32,7 @@ export class AppHeader extends HTMLElement {
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
           <div class="ms-auto d-flex align-items-center gap-2">
             <notifications-button></notifications-button>
+            <feedback-button></feedback-button>
             <tour-button></tour-button>
             <user-menu-button></user-menu-button>
           </div>

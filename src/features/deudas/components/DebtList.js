@@ -1,7 +1,13 @@
 import './DebtDetailModal.js';
 import { DebtRowItem } from './DebtRowItem.js';
 import './DebtListTotals.js';
+import { createIngresoRow } from '../../ingresos/components/IngresoList.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
+
+// Atributos opcionales (vista única del mes):
+//   include-ingresos  → mezcla los ingresos del mes con los montos (pestaña "Todo")
+//   estado="pendiente" → muestra solo montos sin pagar
+//   no-totals          → sin las tarjetas Pendiente/Pagado (los KPIs ya muestran esos datos)
 
 export class DebtList extends HTMLElement {
     constructor() {
@@ -15,6 +21,9 @@ export class DebtList extends HTMLElement {
         this.classList.add('d-block');
         this._excludeColumns = (this.getAttribute('exclude-columns') || '').split(',').filter(Boolean);
         this._showDetailAction = this.hasAttribute('show-detail-action');
+        this._includeIngresos = this.hasAttribute('include-ingresos');
+        this._estado = this.getAttribute('estado') || '';
+        this._noTotals = this.hasAttribute('no-totals');
         this.render();
         this.loadDebts();
         this.addEventListeners();
@@ -27,7 +36,7 @@ export class DebtList extends HTMLElement {
         window.removeEventListener('deuda:updated', this._onLoad);
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
-        window.removeEventListener('deuda:edit', this._onEdit);
+        window.removeEventListener('ingreso:added', this._onLoad);
     }
 
     addEventListeners() {
@@ -40,7 +49,6 @@ export class DebtList extends HTMLElement {
             this.renderTable();
         };
         this._onLoad = () => this.loadDebts();
-        this._onEdit = (e) => this.editDebt(e.detail);
 
         window.addEventListener('ui:month', this._onMonth);
         window.addEventListener('ui:group', this._onGroup);
@@ -48,12 +56,21 @@ export class DebtList extends HTMLElement {
         window.addEventListener('deuda:updated', this._onLoad);
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
-        window.addEventListener('deuda:edit', this._onEdit);
+        if (this._includeIngresos) window.addEventListener('ingreso:added', this._onLoad);
     }
 
     async loadDebts() {
         if (!this.mes) this.mes = new Date().toISOString().slice(0, 7);
+        // Si llegan dos cargas seguidas (p. ej. navegación rápida de meses) solo vale la última.
+        const requestId = (this._requestId = (this._requestId || 0) + 1);
         const debts = await this.listByMes(this.mes);
+        if (this._includeIngresos) {
+            const { listIngresos } = await import('../../ingresos/ingresoRepository.js');
+            const ingresos = await listIngresos({ mes: this.mes });
+            if (requestId !== this._requestId) return;
+            this.ingresos = ingresos;
+        }
+        if (requestId !== this._requestId) return;
         this.debts = debts;
         console.log('[DebtList] Deudas cargadas:', debts); // Debug: muestra las deudas recuperadas
         await this.loadTotals();
@@ -129,7 +146,18 @@ export class DebtList extends HTMLElement {
         const container = this.querySelector('.debt-list-container');
         const isUngroupedView = this.groupBy === 'none';
 
-        this._renderRowTable(container, tableData, {
+        let rows = tableData;
+        if (this._estado === 'pendiente') {
+            rows = rows.filter(row => !row.pagado);
+        }
+        if (this._includeIngresos) {
+            // Ingresos y montos en orden cronológico; a igual fecha, primero los ingresos.
+            const ingresoRows = (this.ingresos || []).map(ingreso => ({ _kind: 'ingreso', ingreso }));
+            const dateOf = row => String(row._kind === 'ingreso' ? row.ingreso.fecha : row.vencimiento);
+            rows = [...ingresoRows, ...rows].sort((a, b) => dateOf(a).localeCompare(dateOf(b)));
+        }
+
+        this._renderRowTable(container, rows, {
             showDetailAction: this._showDetailAction,
             showPaymentAction: isUngroupedView,
         });
@@ -167,13 +195,17 @@ export class DebtList extends HTMLElement {
             const td = document.createElement('td');
             td.colSpan = 99;
             td.className = 'text-muted text-center py-4';
-            td.textContent = 'Todavía no hay egresos este mes. Agregá el primero.';
+            td.textContent = this._emptyText();
             tr.appendChild(td);
             tbody.appendChild(tr);
             return;
         }
 
         tableData.forEach(row => {
+            if (row._kind === 'ingreso') {
+                tbody.appendChild(createIngresoRow(row.ingreso));
+                return;
+            }
             const rowItem = new DebtRowItem(row, {
                 excludeColumns: this._excludeColumns || [],
                 showDetailAction: options.showDetailAction ?? this._showDetailAction,
@@ -188,14 +220,6 @@ export class DebtList extends HTMLElement {
         debt.estadoPagada = !debt.estadoPagada;
         window.db.updateDeuda(debt);
         this.renderTable();
-    }
-
-    async editDebt(deuda) {
-        const editModal = document.querySelector('app-shell #debtModal')
-            || document.getElementById('debtModal');
-        if (!editModal || !deuda) return;
-        editModal.openEdit(deuda);
-        editModal.attachOpener();
     }
 
     deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
@@ -222,8 +246,16 @@ export class DebtList extends HTMLElement {
         totalsEl.update(pendiente, pagado, { debts: this.debts || [] });
     }
 
+    _emptyText() {
+        if (this._includeIngresos) return 'Todavía no hay movimientos este mes. Agregá un ingreso o un egreso.';
+        if (this._estado === 'pendiente') return 'No quedan montos por pagar este mes.';
+        return 'Todavía no hay egresos este mes. Agregá el primero.';
+    }
+
     render() {
-        this.innerHTML = '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
+        this.innerHTML = this._noTotals
+            ? '<div class="debt-list-container"></div>'
+            : '<div class="debt-list-container"></div><debt-list-totals></debt-list-totals>';
     }
 
     /**

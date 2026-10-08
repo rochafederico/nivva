@@ -11,7 +11,6 @@ import { navItems } from './layout/navConfig.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
-import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
 import { createRouteRenderer } from './shared/routeRenderer.js';
 
 function shouldRegisterServiceWorker() {
@@ -67,7 +66,6 @@ layoutContainer.appendChild(mainArea);
 
 document.body.appendChild(layoutContainer);
 document.body.appendChild(BottomNav());
-document.body.appendChild(FeedbackFabComponent());
 
 // Initialize the IndexedDB and only after DB is ready render the initial route
 initDB().then(async (db) => {
@@ -108,7 +106,11 @@ initDB().then(async (db) => {
 });
 
 
+// Ruta montada: los cambios de query string (?vista=) los maneja la propia página.
+let currentPath = null;
+
 function renderRoute(path) {
+  currentPath = path;
   const route = routes.find(r => r.path === path)
     || routes.find(r => r.path === '/')
     || routes[0];
@@ -124,7 +126,9 @@ function renderRoute(path) {
 }
 
 window.addEventListener('popstate', () => {
-  renderRoute(window.location.pathname);
+  if (window.location.pathname !== currentPath) {
+    renderRoute(window.location.pathname);
+  }
 });
 
 // Note: initial renderRoute is triggered after DB init above
