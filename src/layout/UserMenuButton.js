@@ -65,11 +65,14 @@ export class UserMenuButton extends HTMLElement {
   }
 
   render() {
-    this.replaceChildren(createIconButton({
+    const button = createIconButton({
       id: 'user-menu-btn',
       icon: 'bi-person-circle',
       label: 'Abrir menú de usuario',
-    }));
+    });
+    // Ajustes (exportar / importar) viven en este menú: el tour lo señala
+    button.dataset.tourStep = 'config';
+    this.replaceChildren(button);
   }
 }
 

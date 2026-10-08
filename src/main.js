@@ -2,12 +2,9 @@
 import './styles/main.scss';
 import './styles/mobile-pwa.css';
 import { initDB } from './shared/database/initDB.js';
-import routes from './routes.js';
+import routes, { redirectFor } from './routes.js';
 import AppHeader from './layout/AppHeader.js';
-import BottomNav from './layout/BottomNav.js';
-import Sidebar from './layout/Sidebar.js';
 import ResumenHeader from './layout/ResumenHeader.js';
-import { navItems } from './layout/navConfig.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
@@ -30,20 +27,13 @@ if ('serviceWorker' in navigator && shouldRegisterServiceWorker()) {
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
 document.body.classList.add('bg-body-tertiary');
-// Add bottom padding on mobile so content is not hidden behind the fixed bottom nav
-document.body.classList.add('pb-5', 'pb-lg-0');
 
-// Layout container: flex row for sidebar (desktop) + main content
+// Vista única: sin barra inferior ni lateral, el contenido ocupa todo el ancho
 const layoutContainer = document.createElement('div');
 layoutContainer.id = 'app-layout';
-layoutContainer.className = 'd-lg-flex min-vh-100';
+layoutContainer.className = 'min-vh-100';
 
-// Sidebar (visible only on desktop)
-layoutContainer.appendChild(Sidebar());
-
-// Main content area
 const mainArea = document.createElement('main');
-mainArea.className = 'flex-grow-1';
 
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
@@ -65,7 +55,6 @@ mainArea.appendChild(wrapper);
 layoutContainer.appendChild(mainArea);
 
 document.body.appendChild(layoutContainer);
-document.body.appendChild(BottomNav());
 
 // Initialize the IndexedDB and only after DB is ready render the initial route
 initDB().then(async (db) => {
@@ -110,15 +99,20 @@ initDB().then(async (db) => {
 let currentPath = null;
 
 function renderRoute(path) {
+  // Rutas anteriores (/ingresos, /gastos, /gastos/deudas) → pestaña de la vista única
+  const redirect = redirectFor(path);
+  if (redirect) {
+    window.history.replaceState({}, '', redirect);
+    path = window.location.pathname;
+  }
+
   currentPath = path;
   const route = routes.find(r => r.path === path)
     || routes.find(r => r.path === '/')
     || routes[0];
 
-  // Update page header using navItem if available, otherwise use route meta
-  const navItem = navItems.find(item => item.path === route.path) || route;
-  if (navItem && pageHeader.update) {
-    pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle, hideMonthSelector: !!navItem.hideMonthSelector });
+  if (pageHeader.update) {
+    pageHeader.update({ title: route.title, subtitle: route.subtitle });
   }
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;

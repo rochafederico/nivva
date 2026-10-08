@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { assert } from './setup.js';
 
-import '../src/layout/HeaderBar.js';
 import '../src/layout/DarkToggle.js';
 import '../src/shared/components/AppLink.js';
 import '../src/shared/components/AppCheckbox.js';
@@ -28,7 +27,6 @@ export const tests = [
     async function bootstrapStyles_componentsRenderWithoutInlineStyles() {
         console.log('  bootstrap styles: componentes principales sin style inline');
         const cases = [
-            { tag: 'header-bar', selector: '.card-header' },
             { tag: 'dark-toggle', selector: '.btn.btn-outline-secondary.rounded-pill' },
             { tag: 'app-link', selector: 'a.link-body-emphasis.d-inline-block' },
             { tag: 'app-checkbox', selector: '.form-check.form-switch .form-check-input' },

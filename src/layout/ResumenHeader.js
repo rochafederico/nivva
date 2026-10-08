@@ -1,11 +1,11 @@
 // src/layout/ResumenHeader.js
 // Global page header: page title + global month selector + subtitle
 import './MonthSelector.js';
-import { DEFAULT_SUBTITLE } from './navConfig.js';
+import { DEFAULT_TITLE, DEFAULT_SUBTITLE } from './navConfig.js';
 
 export const GLOBAL_SCOPE_SUBTITLE = 'Todas tus deudas, sin importar el mes.';
 
-export default function ResumenHeader({ title = 'Tu panorama financiero', subtitle = DEFAULT_SUBTITLE } = {}) {
+export default function ResumenHeader({ title = DEFAULT_TITLE, subtitle = DEFAULT_SUBTITLE } = {}) {
     const el = document.createElement('div');
     el.className = 'mb-3';
     el.id = 'resumen-header';

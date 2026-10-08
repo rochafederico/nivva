@@ -14,7 +14,7 @@ import '../features/deudas/components/DebtDetailModal.js';
 import '../features/deudas/components/DebtList.js';
 import '../features/deudas/components/AcreedoresList.js';
 import '../features/deudas/components/DeudaTotal.js';
-import StatsIndicators from '../features/stats/components/StatsIndicators.js';
+import StatsIndicators, { DEFAULT_KPI_LINKS } from '../features/stats/components/StatsIndicators.js';
 
 // Filtros de la sección "Este mes"
 export const VISTAS = [
@@ -30,11 +30,7 @@ export const SECCIONES = [
 ];
 
 // Tocar un dato del resumen abre el filtro que lo detalla.
-export const KPI_LINKS = {
-    ingresos: '/?vista=ingresos',
-    egresos: '/?vista=egresos',
-    pendientes: '/?vista=egresos&estado=pendiente',
-};
+export const KPI_LINKS = DEFAULT_KPI_LINKS;
 
 const VISTA_IDS = [...VISTAS.map(v => v.id), 'acreedores'];
 
@@ -282,7 +278,6 @@ export class ResumenMes extends HTMLElement {
         const list = document.createElement('debt-list');
         list.setAttribute('exclude-columns', 'tipoDeuda');
         list.setAttribute('show-detail-action', '');
-        list.setAttribute('no-totals', '');
         if (vista === 'todo') list.setAttribute('include-ingresos', '');
         if (estado) list.setAttribute('estado', estado);
         if (!estado) return [list];

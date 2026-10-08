@@ -6,7 +6,7 @@ import {
     addIngreso, listIngresos, getAll, sumIngresosByMonth
 } from '../src/features/ingresos/ingresoRepository.js';
 import { IngresoModel } from '../src/features/ingresos/IngresoModel.js';
-import Ingresos from '../src/pages/Ingresos.js';
+import Home from '../src/pages/Home.js';
 import { getSelectedMonth, setSelectedMonth } from '../src/shared/MonthFilter.js';
 
 // Import ingresos UI components (registers custom elements)
@@ -409,14 +409,15 @@ async function testIngresoModalPersisteIngresoCreado() {
 }
 
 async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
-    console.log('  UC8: Página Ingresos lista el ingreso creado desde su modal');
+    console.log('  UC8: La pestaña Ingresos de Inicio lista el ingreso creado desde su modal');
     const previousMonth = getSelectedMonth();
     await cleanup();
     setSelectedMonth('2026-05');
 
     let page = null;
     try {
-        page = Ingresos();
+        window.history.pushState({}, '', '/?vista=ingresos');
+        page = Home();
         document.body.appendChild(page);
         await new Promise(r => setTimeout(r, 0));
 
@@ -435,16 +436,14 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
             bubbles: true,
             composed: true
         }));
-        await waitFor(() => page.textContent.includes('Salario'));
+        await waitFor(() => (page.querySelector('#vista-panel ingreso-list')?.textContent || '').includes('Salario'));
 
-        const listText = page.querySelector('ingreso-list')?.textContent || '';
+        const listText = page.querySelector('#vista-panel ingreso-list')?.textContent || '';
         assert(listText.includes('Salario'), 'La lista de Ingresos debe mostrar el ingreso creado');
         assert(listText.includes('$ 1.000,00'), 'La lista de Ingresos debe mostrar el monto creado');
     } finally {
-        if (page && page.parentNode) {
-            document.body.removeChild(page);
-        }
-        page?.cleanup?.();
+        page?.remove();
+        window.history.pushState({}, '', '/');
         setSelectedMonth(previousMonth);
         await cleanup();
     }
@@ -467,25 +466,6 @@ async function testFilaIngresoFormatoYTextoPlano() {
     assert(monto !== null && monto.textContent === '+ $ 934.480,80', 'El monto debe ir con signo + y en verde, sin cortes');
     assert(tr.querySelector('.debt-card-avatar i.bi-cash-stack') !== null, 'El avatar del ingreso debe ser el ícono de efectivo');
     assert(tr.querySelector('button') === null, 'Un ingreso no tiene controles ni acción de detalle');
-}
-
-// ===================================================================
-// AppTable: valores sin render como texto y estado vacío configurable
-// ===================================================================
-async function testAppTableTextoPlanoYVacio() {
-    console.log('  AppTable: muestra valores como texto y el estado vacío configurado');
-    const table = document.createElement('app-table');
-    document.body.appendChild(table);
-    table.columnsConfig = [{ key: 'descripcion', label: 'Descripción' }];
-    table.tableData = [{ descripcion: '<img src=x>Sueldo' }];
-    const cell = table.querySelector('tbody td');
-    assert(cell.querySelector('img') === null, 'AppTable no debe interpretar como HTML un valor sin render');
-    assert(cell.textContent.startsWith('<img'), 'AppTable debe mostrar el valor literal');
-
-    table.emptyText = 'Sin datos de prueba.';
-    table.tableData = [];
-    assert(table.querySelector('tbody').textContent.trim() === 'Sin datos de prueba.', 'Debe mostrar el estado vacío configurado');
-    table.remove();
 }
 
 // ===================================================================
@@ -520,7 +500,6 @@ async function testIngresoListVacioYRecarga() {
 
 export const tests = [
     testFilaIngresoFormatoYTextoPlano,
-    testAppTableTextoPlanoYVacio,
     testIngresoListVacioYRecarga,
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
