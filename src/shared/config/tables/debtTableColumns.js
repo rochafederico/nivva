@@ -2,7 +2,6 @@
 // Configuración de columnas para la tabla de deudas
 
 import { formatMoneda } from '../monedas.js';
-import { formatFecha } from '../../utils/fechas.js';
 import '../../components/AppCheckbox.js';
 
 function getTodayYmd() {
@@ -151,42 +150,4 @@ export const debtTableColumns = [
             return container;
         }
     }
-];
-
-function nowrap(text) {
-    const span = document.createElement('span');
-    span.className = 'text-nowrap';
-    span.textContent = text;
-    return span;
-}
-
-// En mobile la fecha pasa debajo de la descripción para que el monto no quede fuera de pantalla.
-export const ingresosColumns = [
-    {
-        key: 'fecha',
-        label: 'Fecha',
-        opts: { classCss: 'd-none d-md-table-cell' },
-        render: row => nowrap(formatFecha(row.fecha))
-    },
-    {
-        key: 'descripcion',
-        label: 'Descripción',
-        render: row => {
-            const wrapper = document.createElement('div');
-            const descripcion = document.createElement('div');
-            descripcion.className = 'text-break';
-            descripcion.textContent = row.descripcion ?? '';
-            const fecha = document.createElement('small');
-            fecha.className = 'd-md-none text-body-secondary';
-            fecha.textContent = formatFecha(row.fecha);
-            wrapper.append(descripcion, fecha);
-            return wrapper;
-        }
-    },
-    {
-        key: 'monto',
-        label: 'Monto',
-        opts: { classCss: 'text-end' },
-        render: row => nowrap(formatMoneda(row.monto, row.moneda))
-    },
 ];
