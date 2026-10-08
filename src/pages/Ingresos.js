@@ -1,12 +1,9 @@
 // src/pages/Ingresos.js
 import '../layout/PageSectionLayout.js';
 import '../features/ingresos/components/IngresoModal.js';
+import '../features/ingresos/components/IngresoList.js';
 import '../shared/components/AppButton.js';
-import '../shared/components/AppTable.js';
 import StatsIndicators from '../features/stats/components/StatsIndicators.js';
-import { listIngresos } from '../features/ingresos/ingresoRepository.js';
-import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
-import { getSelectedMonth } from '../shared/MonthFilter.js';
 
 export default function Ingresos() {
     const container = document.createElement('div');
@@ -30,42 +27,16 @@ export default function Ingresos() {
 
     layout.toolbarEnd = addBtn;
 
-    // Content: stats card + table
+    // Content: indicadores + lista de ingresos
     const contentSlot = document.createElement('div');
     contentSlot.className = 'd-flex flex-column gap-3';
 
     contentSlot.appendChild(StatsIndicators());
+    // Lista de ingresos del mes: se actualiza sola (mes, alta, importación)
+    contentSlot.appendChild(document.createElement('ingreso-list'));
 
     layout.content = contentSlot;
     container.appendChild(layout);
-
-    // Cargar y mostrar totales
-    const loadTotals = async () => {
-        const ingresos = await listIngresos({ mes: getSelectedMonth() });
-        let table = contentSlot.querySelector('app-table');
-        if (!table) {
-            table = document.createElement('app-table');
-            contentSlot.appendChild(table);
-        }
-        table.emptyText = 'No tenés ingresos registrados para este período.';
-        table.columnsConfig = ingresosColumns;
-        table.tableData = ingresos;
-    };
-
-    // Cargar totales iniciales
-    loadTotals();
-
-    // Escuchar eventos de cambios en ingresos y filtro global de mes
-    const handleIngresoAdded = () => loadTotals();
-    const handleMonthChange = () => loadTotals();
-    window.addEventListener('ingreso:added', handleIngresoAdded);
-    window.addEventListener('ui:month', handleMonthChange);
-
-    // Cleanup function para remover event listeners
-    container.cleanup = () => {
-        window.removeEventListener('ingreso:added', handleIngresoAdded);
-        window.removeEventListener('ui:month', handleMonthChange);
-    };
 
     return container;
 }

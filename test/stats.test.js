@@ -2,7 +2,8 @@
 // Tests for StatsCard and StatsIndicators components
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
-import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
+import StatsIndicators, { kpiDetails } from '../src/features/stats/components/StatsIndicators.js';
+import { countMonthly } from '../src/features/stats/statsService.js';
 import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
@@ -209,8 +210,95 @@ async function testStatsCardValueWraps() {
     assert(valueEl.querySelector('.badge').classList.contains('text-bg-success'), 'badge debe usar text-bg-{color}');
 }
 
+// ===================================================================
+// UC14: countMonthly — cantidades del mes para los textos de detalle
+// ===================================================================
+async function testCountMonthly() {
+    console.log('  UC14: countMonthly cuenta pagados, pendientes y vencidos (impagos con fecha pasada)');
+    const montos = [
+        { pagado: true, vencimiento: '2026-10-01' },
+        { pagado: false, vencimiento: '2026-10-05' },
+        { pagado: false, vencimiento: '2026-10-15' },
+        { pagado: false, vencimiento: '2026-10-20' },
+        { pagado: false, vencimiento: '' },
+    ];
+    const counts = countMonthly(montos, 3, '2026-10-15');
+    assert(counts.ingresos === 3, 'debe informar la cantidad de ingresos');
+    assert(counts.montos === 5 && counts.pagados === 1 && counts.pendientes === 4, 'debe contar montos, pagados y pendientes');
+    assert(counts.vencidos === 1, 'solo vence un impago con fecha anterior a hoy (hoy no está vencido)');
+    const empty = countMonthly();
+    assert(empty.montos === 0 && empty.vencidos === 0 && empty.ingresos === 0, 'sin datos todo en 0');
+}
+
+// ===================================================================
+// UC15: kpiDetails — textos de detalle de cada tarjeta
+// ===================================================================
+async function testKpiDetails() {
+    console.log('  UC15: kpiDetails arma los textos de detalle (plural, vencidos, todo pagado)');
+    const d = kpiDetails({ ingresos: 1, montos: 4, pagados: 2, pendientes: 2, vencidos: 1 });
+    assert(d.ingresos.text === '1 ingreso', 'singular de ingresos');
+    assert(d.egresos.text === '2 de 4 pagados', 'egresos muestra pagados sobre total');
+    assert(d.pendientes.text === '1 vencido' && d.pendientes.className.includes('text-danger-emphasis'), 'vencidos se destacan en rojo');
+    const sinVencidos = kpiDetails({ ingresos: 2, montos: 3, pagados: 1, pendientes: 2, vencidos: 0 });
+    assert(sinVencidos.ingresos.text === '2 ingresos', 'plural de ingresos');
+    assert(sinVencidos.pendientes.text === '2 por pagar', 'sin vencidos muestra cuántos quedan por pagar');
+    const vacio = kpiDetails({});
+    assert(vacio.ingresos.text === 'Sin ingresos' && vacio.egresos.text === 'Sin egresos' && vacio.pendientes.text === 'Todo pagado',
+        'sin datos muestra textos de estado vacío');
+}
+
+// ===================================================================
+// UC16: StatsCard — detalle y tarjeta clickeable con stretched-link
+// ===================================================================
+async function testStatsCardDetailAndLink() {
+    console.log('  UC16: StatsCard muestra el detalle y, con href, toda la tarjeta es un link');
+    const card = StatsCard({
+        title: 'Egresos', items: [{ currency: 'ARS', value: '1.000' }], color: 'danger',
+        detail: { text: '2 de 4 pagados' }, href: '/gastos'
+    });
+    assert(card.querySelector('.kpi-detail')?.textContent === '2 de 4 pagados', 'debe mostrar el texto de detalle');
+    const link = card.querySelector('a.stretched-link');
+    assert(link !== null && link.getAttribute('href') === '/gastos', 'el título debe ser un stretched-link al listado');
+    assert(link.textContent === 'Egresos', 'el nombre del link es el título visible');
+    assert(card.classList.contains('position-relative') && card.classList.contains('kpi-card-link'), 'la tarjeta contiene al stretched-link');
+
+    const plain = StatsCard({ title: 'Balance', items: [{ currency: 'ARS', value: '0' }], color: 'primary' });
+    assert(plain.querySelector('a') === null, 'sin href la tarjeta no es un link');
+    assert(plain.querySelector('.kpi-detail') === null, 'sin detalle no agrega la línea');
+}
+
+// ===================================================================
+// UC17: StatsIndicators — tocar una tarjeta navega sin recargar
+// ===================================================================
+async function testStatsIndicatorsLinksNavigate() {
+    console.log('  UC17: StatsIndicators navega (pushState) al tocar una tarjeta con link');
+    const previous = window.location.pathname;
+    window.history.pushState({}, '', '/');
+    const indicators = StatsIndicators({ mes: '2030-01', links: { ingresos: '/ingresos', egresos: '/gastos' } });
+    document.body.appendChild(indicators);
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const links = [...indicators.querySelectorAll('a.stretched-link')].map(a => a.getAttribute('href'));
+    assert(JSON.stringify(links) === JSON.stringify(['/ingresos', '/gastos']), 'solo las tarjetas con destino son links');
+
+    let popstates = 0;
+    const onPop = () => { popstates++; };
+    window.addEventListener('popstate', onPop);
+    indicators.querySelector('a[href="/gastos"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+    window.removeEventListener('popstate', onPop);
+    assert(window.location.pathname === '/gastos', 'debe navegar al listado de egresos');
+    assert(popstates === 1, 'debe avisar al router con popstate');
+
+    indicators.remove();
+    window.history.pushState({}, '', previous);
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
+    testCountMonthly,
+    testKpiDetails,
+    testStatsCardDetailAndLink,
+    testStatsIndicatorsLinksNavigate,
     testStatsCardWarningContrast,
     testStatsCardValueWraps,
     testStatsCardItemClasses,
