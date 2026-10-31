@@ -1,91 +1,49 @@
-# Guía de contribución — Flujo de ramas y CI
+# Guía de contribución
 
-Este documento describe el flujo de ramas que sigue el repositorio y cómo interactúa con GitHub Actions.
+Nivva se construye con desarrollo guiado por specs. Las reglas completas
+están en [`AGENTS.md`](../AGENTS.md) y el ciclo de trabajo en
+[`docs/sdd/flujo.md`](./sdd/flujo.md). Este documento resume ramas, CI y
+la configuración de GitHub.
 
----
+## Ramas
 
-## Flujo de ramas
-
-```
-main ← develop ← feat/nombre-rama
-```
-
-| Rama | Propósito |
-|------|-----------|
-| `main` | Código en producción. Solo recibe merges desde `develop` vía release. |
-| `develop` | Integración continua de features. Base de todos los PRs de desarrollo. |
-| `feat/nombre-rama` | Rama de trabajo para una feature o fix específico. |
-
-### Secuencia de trabajo
-
-1. Crear rama desde `develop`:
-   ```bash
-   git switch develop
-   git pull origin develop
-   git switch -c feat/mi-feature
-   ```
-
-2. Desarrollar y hacer commits en `feat/mi-feature`.
-
-3. Abrir un **Pull Request** hacia `develop`.
-
-4. La CI valida automáticamente el PR (lint + tests).
-
-5. El PR pasa **code review** de al menos un responsable.
-
-6. Merge a `develop` una vez aprobado y con CI en verde.
-
-7. Cuando `develop` está estable y listo para producción, se abre un PR de `develop` → `main` (release).
-
-8. Merge a `main` luego de aprobación. La CI también valida este PR.
-
----
-
-## GitHub Actions — CI (`ci.yml`)
-
-El workflow de CI corre automáticamente en estos eventos:
-
-| Evento | Ramas cubiertas |
-|--------|-----------------|
-| `push` | `main`, `develop` |
-| `pull_request` | PRs hacia `main` o `develop` |
-
-El workflow corre dos jobs en paralelo:
-
-- **`lint`** — ejecuta `npm run lint` para validar estilo y calidad de código.
-- **`test`** — ejecuta `npm test` para correr la suite de tests.
-
-Ambos jobs corren de forma independiente: si lint falla, los tests igualmente se ejecutan y se reportan por separado.
-
-### Pasos de cada job
-
-1. **Checkout** — descarga el código del repo.
-2. **Setup Node.js 20** — instala Node con caché de npm para acelerar instalaciones.
-3. **Install dependencies** — ejecuta `npm ci` para instalación limpia y reproducible.
-4. **Lint** / **Test** — valida calidad o ejecuta la suite de tests.
-
----
-
-## Configuración manual recomendada en GitHub
-
-Las siguientes opciones **no se pueden configurar por archivos del repo** y deben activarse manualmente en _Settings > Branches_:
-
-### Branch protection para `main` y `develop`
-
-- **Require a pull request before merging** — evita pushes directos.
-- **Require status checks to pass before merging** — marcar `lint` y `test` como required checks.
-- **Require branches to be up to date before merging** — evita que se mergee código desactualizado.
-- **Dismiss stale pull request approvals when new commits are pushed** — obliga a re-aprobar si hay cambios.
-
-> Para `main` se recomienda además activar **Require linear history** o **Restrict who can push** para mayor control del historial de producción.
-
----
-
-## Convenciones de nombres de rama
+`main` es la única rama base. Cada PR sale de `main` o se apila sobre
+otro PR abierto.
 
 | Tipo | Patrón |
 |------|--------|
-| Feature | `feat/descripcion-corta` |
-| Fix | `fix/descripcion-corta` |
+| Iteración (spec, plan, tareas, retro) | `it/NNN-descripcion` |
+| Cambios al flujo | `sdd/NN-descripcion` |
 | Hotfix en producción | `hotfix/descripcion-corta` |
-| Release | `release/vX.Y.Z` |
+
+Un PR apilado se cambia de base a `main` cuando se mergea el anterior.
+
+## Checks de CI
+
+| Workflow | Job | Qué valida |
+|----------|-----|------------|
+| `ci.yml` | `lint` | `npm run lint` |
+| `ci.yml` | `test` | `npm test` |
+| `pr-size.yml` | `pr-size` | Límites de `.sdd/limits.json`: 10 archivos, 200 líneas por PR y 100 líneas por archivo de código. Además, un PR que cambia reglas (`.sdd/`, el script o los workflows) no puede tocar otros archivos |
+| `validacion-humana.yml` | `validado` | Que un humano haya puesto la etiqueta `validado` |
+
+Para verificar el tamaño antes de abrir el PR:
+
+```bash
+node scripts/check-pr-size.mjs                    # contra origin/main
+SDD_BASE=otra-rama node scripts/check-pr-size.mjs # PR apilado
+```
+
+## Configuración manual en GitHub
+
+Esto no se puede definir desde archivos del repo. Se hace una vez.
+
+1. **Etiqueta**: crear la etiqueta `validado` en _Issues > Labels_.
+2. **Protección de `main`** en _Settings > Branches_ (o _Rules_):
+   - Require a pull request before merging.
+   - Require status checks to pass: `lint`, `test`, `pr-size`, `validado`.
+   - Require branches to be up to date before merging.
+   - Block force pushes.
+
+Con una sola persona en el repo, GitHub no deja aprobar los propios PRs:
+por eso la validación humana es la etiqueta y no una aprobación de review.

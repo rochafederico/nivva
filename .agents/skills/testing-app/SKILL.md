@@ -2,14 +2,16 @@
 
 ## Local Setup
 
-The app is vanilla JS with no build step. Serve it locally:
+The app is vanilla JS built with Vite. From the repo root:
 
 ```bash
-cd /home/ubuntu/repos/deudas-app
-python3 -m http.server 8080
+npm ci
+npm run dev
 ```
 
-Then open `http://localhost:8080` in the browser.
+Then open the URL Vite prints (usually `http://localhost:5173`).
+
+Before changing code, read `AGENTS.md`: behavior comes from approved specs in `specs/` and every PR must fit the limits in `.sdd/limits.json`.
 
 ## Running Automated Tests
 
@@ -49,9 +51,8 @@ Each step finds its element through a `data-tour-step` attribute (`findTourTarge
 
 - The app uses Web Components with Shadow DOM extensively. When inspecting elements, you may need to expand shadow roots in DevTools.
 - IndexedDB stores: `deudas`, `montos`, `ingresos`, `inversiones`
-- Port 8080 may be occupied from previous sessions. Kill with `fuser -k 8080/tcp` or use a different port.
 - The app has no backend — all data is local (IndexedDB + localStorage).
-- Netlify preview deploys are available for PRs targeting `main`. PRs targeting other branches (e.g., stacked PRs) may not get preview deploys.
+- Vercel preview deploys may be available for PRs; stacked PRs may not get one.
 
 ## Devin Secrets Needed
 

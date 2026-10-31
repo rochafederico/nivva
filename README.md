@@ -54,16 +54,15 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - [x] Agrupamiento de montos en la lista por acreedor, tipo, moneda o vencimiento
 
 ## Arquitectura y estructura
-El proyecto está organizado en carpetas según responsabilidad:
-- **components/**: Web Components para UI y lógica de interacción.
-- **models/**: Modelos de datos para deudas y montos.
-- **entity/**: Entidades para la persistencia en IndexedDB.
-- **database/**: Inicialización, esquema y datos demo de la base de datos.
-- **repository/**: Acceso y operaciones sobre los datos.
-- **utils/**: Utilidades para DOM y validaciones.
-- **styles/**: Estilos globales.
+El código está organizado por feature:
+- **src/features/<feature>/**: entidad, modelo, repositorio, componentes y casos de uso de cada funcionalidad (deudas, montos, ingresos, stats, tour, etc.).
+- **src/layout/**: header, selector de mes y acciones globales.
+- **src/pages/**: vistas principales.
+- **src/shared/**: base de datos IndexedDB, componentes UI reutilizables, Bootstrap encapsulado y utilidades.
+- **src/styles/**: estilos globales.
 
-Cada componente y módulo está pensado para ser reutilizable y fácil de mantener.
+## Cómo se trabaja
+El comportamiento de Nivva lo definen las specs en `specs/`, y cada cambio pasa por PRs chicos validados por un humano. Ver [`AGENTS.md`](./AGENTS.md), [`docs/sdd/flujo.md`](./docs/sdd/flujo.md) y [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md).
 
 ## Cómo usar
 1. Clona el repositorio.
@@ -85,7 +84,7 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 - Navegador moderno compatible con Web Components y IndexedDB.
 
 ## Notas técnicas
-- No se usan frameworks ni librerías externas.
+- No se usan frameworks: JavaScript puro con Bootstrap para estilos y componentes base.
 - Los datos se guardan localmente en el navegador.
 - El código está modularizado y es fácil de mantener.
 
