@@ -33,6 +33,8 @@ Definidos en `.sdd/limits.json`:
 - Máximo **100 líneas** por archivo de código (`.js`/`.mjs` en `src/`,
   `test/`, `scripts/` y `.claude/`).
 - Los archivos que ya superan 100 líneas pueden achicarse, nunca crecer.
+- Un PR que cambia reglas (`.sdd/`, `scripts/check-pr-size.mjs` o
+  `.github/workflows/`) no puede tocar ningún otro archivo.
 
 Antes de abrir un PR: `node scripts/check-pr-size.mjs`.
 Si no entra, se parte en PRs apilados más chicos. No se pide excepción.

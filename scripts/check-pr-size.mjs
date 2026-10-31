@@ -65,6 +65,18 @@ for (const [archivo, { lineas, borrado }] of cambios) {
   }
 }
 
+// Los cambios a las reglas van en un PR solo, para que nunca queden escondidos.
+// No aplica al PR que crea las reglas (la base todavía no tiene limits.json).
+const esRegla = (f) => /^(\.sdd\/|scripts\/check-pr-size\.mjs$|\.github\/workflows\/)/.test(f);
+const reglas = [...cambios.keys()].filter(esRegla);
+if (reglas.length && lineasEnBase('.sdd/limits.json') !== null) {
+  console.log(`⚠ Este PR cambia reglas: ${reglas.join(', ')}`);
+  const otros = [...cambios.keys()].filter((f) => !esRegla(f) && !esIgnorado(f));
+  if (otros.length) {
+    errores.push(`Cambia reglas y además otros archivos (${otros.join(', ')}). Las reglas van en un PR solo.`);
+  }
+}
+
 if (totalArchivos > limites.maxArchivosPorPR) {
   errores.push(`El cambio toca ${totalArchivos} archivos (máximo ${limites.maxArchivosPorPR}).`);
 }
