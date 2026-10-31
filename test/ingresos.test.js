@@ -1,7 +1,7 @@
 // test/ingresos.test.js
 // E2E tests for ingresos feature: UI components (IngresoForm, IngresoModal)
 // → IngresoModel/IngresoEntity → ingresoRepository → IndexedDB
-import { assert } from './setup.js';
+import { assert, waitFor } from './setup.js';
 import {
     addIngreso, listIngresos, getAll, sumIngresosByMonth
 } from '../src/features/ingresos/ingresoRepository.js';
@@ -434,7 +434,7 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
             bubbles: true,
             composed: true
         }));
-        await new Promise(r => setTimeout(r, 50));
+        await waitFor(() => page.textContent.includes('Salario'));
 
         const tableText = page.querySelector('app-table')?.textContent || '';
         assert(tableText.includes('Salario'), 'La tabla de Ingresos debe mostrar el ingreso creado');

@@ -22,6 +22,20 @@ export function assert(condition, message) {
     return true;
 }
 
+/**
+ * Espera hasta que check() devuelva un valor truthy (o se agote el tiempo) y lo retorna.
+ * Evita sleeps fijos que fallan en máquinas lentas (p. ej. fake-indexeddb en Windows).
+ */
+export async function waitFor(check, { timeout = 2000, interval = 10 } = {}) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+        const value = check();
+        if (value) return value;
+        await new Promise(resolve => setTimeout(resolve, interval));
+    }
+    return check();
+}
+
 export function getResults() {
     return { passed, failed };
 }

@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [main, develop]
+  # Todos los PRs, incluidos los apilados sobre otra rama de feature.
   pull_request:
-    branches: [main, develop]
 
 permissions:
   contents: read

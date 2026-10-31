@@ -1,6 +1,6 @@
 // test/deudas.test.js
 // E2E tests for deudas feature: UI component (DebtForm) → Model → Repository → IndexedDB
-import { assert } from './setup.js';
+import { assert, waitFor } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { getDB } from '../src/shared/database/initDB.js';
@@ -1309,7 +1309,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
     document.body.removeChild(form);
 
     // Esperar a que loadEntities() complete tras el evento deuda:saved
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await waitFor(() => shell.querySelector('#entity-table-container tbody tr'));
 
     container = shell.querySelector('#entity-table-container');
     const row = container.querySelector('tbody tr');
