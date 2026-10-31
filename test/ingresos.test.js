@@ -12,7 +12,7 @@ import { getSelectedMonth, setSelectedMonth } from '../src/shared/MonthFilter.js
 // Import ingresos UI components (registers custom elements)
 import '../src/features/ingresos/components/IngresoForm.js';
 import '../src/features/ingresos/components/IngresoModal.js';
-import { ingresosColumns } from '../src/shared/config/tables/debtTableColumns.js';
+import { createIngresoRow, INGRESOS_EMPTY_TEXT } from '../src/features/ingresos/components/IngresoList.js';
 
 // Helper: delete all ingresos (no deleteAll in repo, so we clear via DB directly)
 import { getDB } from '../src/shared/database/initDB.js';
@@ -437,9 +437,9 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
         }));
         await waitFor(() => page.textContent.includes('Salario'));
 
-        const tableText = page.querySelector('app-table')?.textContent || '';
-        assert(tableText.includes('Salario'), 'La tabla de Ingresos debe mostrar el ingreso creado');
-        assert(tableText.includes('$ 1.000,00'), 'La tabla de Ingresos debe mostrar el monto creado');
+        const listText = page.querySelector('ingreso-list')?.textContent || '';
+        assert(listText.includes('Salario'), 'La lista de Ingresos debe mostrar el ingreso creado');
+        assert(listText.includes('$ 1.000,00'), 'La lista de Ingresos debe mostrar el monto creado');
     } finally {
         if (page && page.parentNode) {
             document.body.removeChild(page);
@@ -451,45 +451,77 @@ async function testPaginaIngresosListaIngresoCreadoDesdeModal() {
 }
 
 // ===================================================================
-// Tabla de ingresos: fecha DD/MM/AAAA, monto sin cortes y datos como texto
+// Fila de ingreso (ListRow): fecha DD/MM/AAAA, monto con signo y datos como texto
 // ===================================================================
-async function testTablaIngresosFormatoYTextoPlano() {
-    console.log('  Tabla de ingresos: fecha DD/MM/AAAA, monto en una línea y descripción como texto');
+async function testFilaIngresoFormatoYTextoPlano() {
+    console.log('  Fila de ingreso: fecha corta, monto + en verde y descripción como texto');
+    const tr = createIngresoRow({ id: 1, fecha: '2026-10-01', descripcion: '<img src=x onerror="window.__xss=1">Sueldo', monto: 934480.8, moneda: 'ARS' });
+
+    assert(tr.tagName === 'TR', 'Debe construir un <tr>');
+    assert(tr.querySelectorAll('td.d-table-cell').length === 2, 'Debe tener las 2 celdas del diseño compartido');
+    assert(tr.textContent.includes('01 oct'), 'La fecha debe mostrarse corta: "01 oct"');
+    assert(!tr.textContent.includes('2026-10-01') && !tr.textContent.includes('01/10/2026'), 'Sin año ni formato ISO');
+    assert(tr.querySelector('img') === null, 'La descripción no debe interpretarse como HTML');
+    assert(tr.querySelector('h6').textContent.startsWith('<img'), 'La descripción debe mostrarse como texto literal');
+    const monto = tr.querySelector('span.text-nowrap.text-success-emphasis');
+    assert(monto !== null && monto.textContent === '+ $ 934.480,80', 'El monto debe ir con signo + y en verde, sin cortes');
+    assert(tr.querySelector('.debt-card-avatar i.bi-cash-stack') !== null, 'El avatar del ingreso debe ser el ícono de efectivo');
+    assert(tr.querySelector('button') === null, 'Un ingreso no tiene controles ni acción de detalle');
+}
+
+// ===================================================================
+// AppTable: valores sin render como texto y estado vacío configurable
+// ===================================================================
+async function testAppTableTextoPlanoYVacio() {
+    console.log('  AppTable: muestra valores como texto y el estado vacío configurado');
     const table = document.createElement('app-table');
     document.body.appendChild(table);
-    table.columnsConfig = ingresosColumns;
-    table.tableData = [{ id: 1, fecha: '2026-10-01', descripcion: '<img src=x onerror="window.__xss=1">Sueldo', monto: 934480.8, moneda: 'ARS' }];
-
-    const row = table.querySelector('tbody tr');
-    assert(row !== null, 'Debe renderizar una fila');
-    assert(row.textContent.includes('01/10/2026'), 'La fecha debe mostrarse como DD/MM/AAAA');
-    assert(!row.textContent.includes('2026-10-01'), 'No debe mostrar la fecha en formato ISO');
-    assert(row.querySelector('img') === null, 'La descripción no debe interpretarse como HTML');
-    assert(row.textContent.includes('<img'), 'La descripción debe mostrarse como texto literal');
-    const monto = [...row.querySelectorAll('span.text-nowrap')].find(el => el.textContent === '$ 934.480,80');
-    assert(monto !== undefined, 'El monto debe ir en un span text-nowrap');
-
-    const fechaHeader = table.querySelector('thead th');
-    assert(fechaHeader.classList.contains('d-none') && fechaHeader.classList.contains('d-md-table-cell'),
-        'La columna Fecha se oculta en mobile (la fecha va debajo de la descripción)');
-
-    // Estado vacío configurable
-    table.emptyText = 'No tenés ingresos registrados para este período.';
-    table.tableData = [];
-    assert(table.querySelector('tbody').textContent.trim() === 'No tenés ingresos registrados para este período.',
-        'Sin ingresos debe mostrar el estado vacío configurado');
-    table.tableData = [{ id: 1, fecha: '2026-10-01', descripcion: '<img src=x onerror="window.__xss=1">Sueldo', monto: 934480.8, moneda: 'ARS' }];
-
-    // Columnas sin render: AppTable también muestra el valor como texto
     table.columnsConfig = [{ key: 'descripcion', label: 'Descripción' }];
-    const plainCell = table.querySelector('tbody td');
-    assert(plainCell.querySelector('img') === null, 'AppTable no debe interpretar como HTML un valor sin render');
-    assert(plainCell.textContent.startsWith('<img'), 'AppTable debe mostrar el valor literal');
+    table.tableData = [{ descripcion: '<img src=x>Sueldo' }];
+    const cell = table.querySelector('tbody td');
+    assert(cell.querySelector('img') === null, 'AppTable no debe interpretar como HTML un valor sin render');
+    assert(cell.textContent.startsWith('<img'), 'AppTable debe mostrar el valor literal');
+
+    table.emptyText = 'Sin datos de prueba.';
+    table.tableData = [];
+    assert(table.querySelector('tbody').textContent.trim() === 'Sin datos de prueba.', 'Debe mostrar el estado vacío configurado');
     table.remove();
 }
 
+// ===================================================================
+// <ingreso-list>: estado vacío y recarga al agregar un ingreso
+// ===================================================================
+async function testIngresoListVacioYRecarga() {
+    console.log('  ingreso-list: muestra el estado vacío y se recarga con ingreso:added');
+    const previousMonth = getSelectedMonth();
+    await cleanup();
+    setSelectedMonth('2026-07');
+    const list = document.createElement('ingreso-list');
+    try {
+        document.body.appendChild(list);
+        await waitFor(() => list.textContent.includes(INGRESOS_EMPTY_TEXT));
+        assert(list.textContent.includes(INGRESOS_EMPTY_TEXT), 'Sin ingresos debe mostrar el estado vacío de 07-Plantillas');
+
+        await addIngreso(new IngresoModel({ fecha: '2026-07-10', descripcion: 'Aguinaldo', monto: 500, moneda: 'ARS' }));
+        window.dispatchEvent(new CustomEvent('ingreso:added'));
+        await waitFor(() => list.textContent.includes('Aguinaldo'));
+        const rows = list.querySelectorAll('tbody tr');
+        assert(rows.length === 1 && rows[0].textContent.includes('Aguinaldo'), 'Debe recargar y mostrar el ingreso nuevo');
+
+        setSelectedMonth('2026-08');
+        await waitFor(() => list.textContent.includes(INGRESOS_EMPTY_TEXT));
+        assert(list.textContent.includes(INGRESOS_EMPTY_TEXT), 'Al cambiar de mes debe mostrar solo los ingresos de ese mes');
+    } finally {
+        list.remove();
+        setSelectedMonth(previousMonth);
+        await cleanup();
+    }
+}
+
 export const tests = [
-    testTablaIngresosFormatoYTextoPlano,
+    testFilaIngresoFormatoYTextoPlano,
+    testAppTableTextoPlanoYVacio,
+    testIngresoListVacioYRecarga,
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
     testIngresoFormLayoutMobileFirst,
