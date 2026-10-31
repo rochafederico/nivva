@@ -37,7 +37,7 @@ async function testStatsCardBootstrapClasses() {
 // ===================================================================
 async function testStatsCardItemClasses() {
     console.log('  UC2: StatsCard renderiza items con clases de tipografía modernas');
-    const card = StatsCard({ title: 'Gastos', items: [{ currency: 'ARS', value: '$ 500,00' }, { currency: 'USD', value: '-' }], color: 'danger' });
+    const card = StatsCard({ title: 'Egresos', items: [{ currency: 'ARS', value: '$ 500,00' }, { currency: 'USD', value: '-' }], color: 'danger' });
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
@@ -175,7 +175,7 @@ async function testStatsIndicatorsCardOrder() {
 
     const titles = [...indicators.querySelectorAll('.card-body > div:first-child')].map((el) => el.textContent);
     assert(
-        JSON.stringify(titles) === JSON.stringify(['Ingresos', 'Gastos', 'Balance', 'Pendientes']),
+        JSON.stringify(titles) === JSON.stringify(['Ingresos', 'Egresos', 'Balance', 'Pendientes']),
         'las tarjetas deben renderizar ingresos, gastos, balance y pendientes en ese orden'
     );
 }

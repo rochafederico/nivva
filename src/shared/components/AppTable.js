@@ -61,7 +61,7 @@ export class AppTable extends HTMLElement {
             const tr = document.createElement('tr');
             const td = document.createElement('td');
             td.colSpan = this.columns.length;
-            td.textContent = 'No hay datos.';
+            td.textContent = this.emptyText || 'No hay datos.';
             tr.appendChild(td);
             tbody.appendChild(tr);
             return;

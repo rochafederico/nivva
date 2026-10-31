@@ -91,7 +91,7 @@ export class DebtEntityShell extends HTMLElement {
         if (!container) return;
 
         if (this.entities.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center py-4">No hay deudas registradas. Usá el botón <strong>Agregar deuda</strong> para comenzar.</p>';
+            container.innerHTML = '<p class="text-muted text-center py-4">Todavía no cargaste egresos. Usá <strong>Agregar egreso</strong> para empezar.</p>';
             return;
         }
 
@@ -111,7 +111,7 @@ export class DebtEntityShell extends HTMLElement {
                 <tr>
                     <td>
                         <div class="fw-semibold text-break">${escapeHtml(deuda.acreedor)}</div>
-                        <div class="small text-body-secondary d-md-none">${tipo} · ${cuotasStr} pagadas</div>
+                        <div class="small text-body-secondary d-md-none">${tipo} · ${cuotasStr} montos pagados</div>
                         <div class="small d-md-none">Pendiente: <span class="text-nowrap">${escapeHtml(pendienteStr)}</span></div>
                     </td>
                     <td class="d-none d-md-table-cell">${tipo}</td>
@@ -145,7 +145,7 @@ export class DebtEntityShell extends HTMLElement {
                         <tr>
                             <th>Acreedor</th>
                             <th class="d-none d-md-table-cell">Tipo</th>
-                            <th class="text-center d-none d-md-table-cell">Cuotas</th>
+                            <th class="text-center d-none d-md-table-cell">Pagados</th>
                             <th class="d-none d-md-table-cell">Pendiente total</th>
                             <th><span class="visually-hidden">Acciones</span></th>
                         </tr>
@@ -185,7 +185,7 @@ export class DebtEntityShell extends HTMLElement {
             btn.addEventListener('click', () => {
                 const id = Number(btn.dataset.deleteId);
                 const acreedor = btn.dataset.acreedor;
-                if (!confirm(`¿Eliminar la deuda con "${acreedor}" y todos sus montos?`)) return;
+                if (!confirm(`Vas a eliminar el egreso de "${acreedor}" y todos sus montos. No se puede recuperar. ¿Continuás?`)) return;
                 import('../use-cases/deleteDeudaWithTrackingUseCase.js').then(({ deleteDeudaWithTrackingUseCase }) => {
                     deleteDeudaWithTrackingUseCase(id).then(() => {
                         window.dispatchEvent(new CustomEvent('deuda:deleted'));
@@ -233,11 +233,10 @@ export class DebtEntityShell extends HTMLElement {
         // 2. Card layout with CTA only in toolbar
         const layout = document.createElement('page-section-layout');
 
-        // Toolbar end: CTA fixed to "Agregar deuda"
+        // Toolbar end: CTA fijo "Agregar egreso"
         const ctaBtn = document.createElement('app-button');
         ctaBtn.id = 'add-debt';
-        ctaBtn.setAttribute('aria-label', 'Agregar deuda');
-        ctaBtn.textContent = 'Agregar deuda';
+        ctaBtn.textContent = 'Agregar egreso';
         ctaBtn.addEventListener('click', () => {
             const modal = this.querySelector('#debtModal');
             if (!modal) return;
@@ -296,11 +295,11 @@ export class DebtEntityShell extends HTMLElement {
     // Las pestañas son links a rutas (no un tablist ARIA): nav + lista + aria-current.
     _renderTabs() {
         const nav = document.createElement('nav');
-        nav.setAttribute('aria-label', 'Vistas de deudas');
+        nav.setAttribute('aria-label', 'Vistas de egresos');
         const list = document.createElement('ul');
         list.className = 'nav nav-underline mb-3';
-        list.appendChild(this._createTabItem('Cuotas del mes', '/gastos', this.currentView === 'cuotas'));
-        list.appendChild(this._createTabItem('Deudas', '/gastos/deudas', this.currentView === 'deudas'));
+        list.appendChild(this._createTabItem('Montos del mes', '/gastos', this.currentView === 'cuotas'));
+        list.appendChild(this._createTabItem('Acreedores', '/gastos/deudas', this.currentView === 'deudas'));
         nav.appendChild(list);
         return nav;
     }

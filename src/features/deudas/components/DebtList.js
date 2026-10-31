@@ -167,7 +167,7 @@ export class DebtList extends HTMLElement {
             const td = document.createElement('td');
             td.colSpan = 99;
             td.className = 'text-muted text-center py-4';
-            td.textContent = 'No hay cuotas para este mes.';
+            td.textContent = 'Todavía no hay egresos este mes. Agregá el primero.';
             tr.appendChild(td);
             tbody.appendChild(tr);
             return;

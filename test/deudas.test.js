@@ -1212,7 +1212,7 @@ async function testDebtEntityShellRenderVacio() {
 
     const container = shell.querySelector('#entity-table-container');
     assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
-    assert(container.textContent.includes('No hay deudas registradas'), 'Debe mostrar mensaje vacío cuando no hay deudas');
+    assert(container.textContent.includes('Todavía no cargaste egresos'), 'Debe mostrar mensaje vacío cuando no hay egresos');
 
     document.body.removeChild(shell);
     window.history.pushState({}, '', '/');
@@ -1299,7 +1299,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
 
     // Inicialmente vacío
     let container = shell.querySelector('#entity-table-container');
-    assert(container.textContent.includes('No hay deudas registradas'), 'Debe empezar vacío');
+    assert(container.textContent.includes('Todavía no cargaste egresos'), 'Debe empezar vacío');
 
     // Agregar una deuda y disparar el evento deuda:saved
     const form = document.createElement('debt-form');
@@ -1345,7 +1345,7 @@ async function testDebtEntityShellNavTabsRender() {
 
     // Son links a rutas: nav con nombre accesible, sin roles ARIA de tablist incompletos
     const nav = tabs.closest('nav');
-    assert(nav !== null && nav.getAttribute('aria-label') === 'Vistas de deudas', 'Las pestañas deben estar en un <nav> con aria-label');
+    assert(nav !== null && nav.getAttribute('aria-label') === 'Vistas de egresos', 'Las pestañas deben estar en un <nav> con aria-label');
     assert(!tabs.hasAttribute('role'), 'La lista no debe declarar role="tablist" sin role="tab" en sus hijos');
     assert(shell.querySelector('.nav-underline [role="presentation"]') === null, 'Los ítems no deben usar role="presentation"');
 
@@ -1518,8 +1518,8 @@ async function testDebtListRenderTotalsIgnoraVencimientosInvalidos() {
     list._renderTotals();
 
     const totalsEl = list.querySelector('debt-list-totals');
-    assert(totalsEl.textContent.includes('1 cuota vencida'), 'Debe contar solo el vencimiento válido no pagado');
-    assert(!totalsEl.textContent.includes('2 cuotas vencidas'), 'No debe contar vencimientos vacíos o inválidos');
+    assert(totalsEl.textContent.includes('1 monto vencido'), 'Debe contar solo el vencimiento válido no pagado');
+    assert(!totalsEl.textContent.includes('2 montos vencidos'), 'No debe contar vencimientos vacíos o inválidos');
 
     const summary = summarizeDebtListTotals(list.debts, '2999-01-01');
     assert(summary.vencidas === 1, 'DebtListTotals debe calcular vencidas ignorando fechas inválidas');

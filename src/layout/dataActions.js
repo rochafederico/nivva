@@ -50,7 +50,7 @@ export async function deleteAllData() {
     const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
     const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
     stores = [
-      { name: 'Deudas', list: listDeudas, del: deleteDeudas },
+      { name: 'Egresos', list: listDeudas, del: deleteDeudas },
       { name: 'Ingresos', list: getAll, del: deleteAllIngresos },
     ];
   } catch (error) {
