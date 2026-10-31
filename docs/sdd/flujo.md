@@ -17,7 +17,7 @@ Carpeta: `specs/NNN-descripcion/`. Rama base de cada PR: `it/NNN-descripcion`
 | Paso | Comando | Archivo | Equivale a | Se aprueba cuando |
 |---|---|---|---|---|
 | 1. Spec | `/spec` | `spec.md` | Historia + escenarios + DoR | se mergea el PR |
-| 2. Plan y tareas | `/plan`, `/tareas` | `plan.md`, `tareas.md` | Tareas | se mergea el PR |
+| 2. Plan y tareas | `/plan` | `plan.md`, `tareas.md` | Tareas | se mergea el PR |
 | 3. Implementación | `/implementar` | código y tests | — | se mergea cada PR |
 | 4. Cierre | `/retro` | `retro.md`, `docs/sdd/learnings.md` | DoD + aprendizaje | se mergea el PR |
 
