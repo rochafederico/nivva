@@ -16,16 +16,15 @@ function compactFormat(n) {
 /**
  * Given a { ARS: number, USD: number } object, returns an array of
  * { currency, value } objects for every currency in CURRENCIES.
- * Missing or zero values render value as "-".
- * Amounts are shown in compact Spanish format (mil / M). No currency sign is included.
+ * Missing or zero values render value as "0" so the KPI reads as an amount.
+ * Amounts are shown in full es-AR format. No currency sign is included.
  * @param {Object|null} obj
  * @returns {{ currency: string, value: string }[]}
  */
 export function addValue(obj) {
     return CURRENCIES.map(moneda => {
         const monto = obj ? obj[moneda] : undefined;
-        const value = (monto == null || monto === 0) ? '-' : compactFormat(monto);
-        return { currency: moneda, value };
+        return { currency: moneda, value: compactFormat(Number(monto) || 0) };
     });
 }
 

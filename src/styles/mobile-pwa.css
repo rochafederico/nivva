@@ -26,6 +26,17 @@
         min-height: var(--touch-target-size);
     }
 
+    /* Switch de "pagado": 44×24px para que se pueda tocar sin errar */
+    .form-switch {
+        padding-left: 2.75em;
+    }
+
+    .form-switch .form-check-input {
+        width: 2.75em;
+        height: 1.5em;
+        margin-top: 0;
+        margin-left: -2.75em;
+    }
 }
 
 @media (max-width: 479.98px) {
@@ -39,8 +50,10 @@
     }
 
     #app-wrapper {
+        /* .container-xl usa width: 100%; con margen lateral se saldría de la pantalla */
+        width: auto;
         margin: 0.75rem 0.5rem 5rem !important;
-        padding: 1rem !important;
+        padding: 0.75rem !important;
         border-radius: 1rem !important;
     }
 

@@ -12,6 +12,7 @@ import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
 import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
+import { createRouteRenderer } from './shared/routeRenderer.js';
 
 function shouldRegisterServiceWorker() {
     const { protocol, hostname } = window.location;
@@ -58,6 +59,8 @@ const app = document.createElement('div');
 app.id = 'app';
 app.className = 'mt-3';
 wrapper.appendChild(app);
+
+const mountRoute = createRouteRenderer(app);
 
 mainArea.appendChild(wrapper);
 layoutContainer.appendChild(mainArea);
@@ -106,10 +109,6 @@ initDB().then(async (db) => {
 
 
 function renderRoute(path) {
-  const root = document.getElementById('app');
-  if (!root) return;
-  root.innerHTML = '';
-
   const route = routes.find(r => r.path === path)
     || routes.find(r => r.path === '/')
     || routes[0];
@@ -121,7 +120,7 @@ function renderRoute(path) {
   }
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;
-  root.appendChild(node);
+  mountRoute(node);
 }
 
 window.addEventListener('popstate', () => {
