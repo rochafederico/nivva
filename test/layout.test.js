@@ -1,19 +1,35 @@
 // test/layout.test.js
 // Tests for layout standardization: ResumenHeader dynamic updates,
-// PageSectionLayout structure, navConfig route metadata, and Home quick actions.
+// PageSectionLayout structure and navConfig route metadata.
 import { assert } from './setup.js';
-import ResumenHeader from '../src/layout/ResumenHeader.js';
+import ResumenHeader, { GLOBAL_SCOPE_SUBTITLE } from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
 import '../src/layout/Sidebar.js';
 import '../src/layout/BottomNav.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import { openSettingsModal } from '../src/layout/dataActions.js';
-import Home from '../src/pages/Home.js';
 import { createIconButton } from '../src/shared/components/createIconButton.js';
 import { createRouteRenderer } from '../src/shared/routeRenderer.js';
 import Ingresos from '../src/pages/Ingresos.js';
 
 export const tests = [
+
+    function resumenHeader_hidesMonthSelectorOutsideMonthlyScope() {
+        console.log('  ResumenHeader: ui:month-scope oculta el selector de mes y aclara el alcance');
+        const header = ResumenHeader({ subtitle: 'Subtítulo mensual.' });
+        document.body.appendChild(header);
+        const selector = header.querySelector('month-selector');
+        const subtitle = header.querySelector('#resumen-header-subtitle');
+
+        window.dispatchEvent(new CustomEvent('ui:month-scope', { detail: { visible: false } }));
+        assert(selector.classList.contains('d-none'), 'Fuera del mes se oculta el selector');
+        assert(subtitle.textContent === GLOBAL_SCOPE_SUBTITLE, 'El subtítulo aclara que no depende del mes');
+
+        window.dispatchEvent(new CustomEvent('ui:month-scope', { detail: { visible: true } }));
+        assert(!selector.classList.contains('d-none'), 'Al volver al mes el selector reaparece');
+        assert(subtitle.textContent === 'Subtítulo mensual.', 'Y vuelve el subtítulo original');
+        header.remove();
+    },
 
     function routeRenderer_cleansUpPreviousPage() {
         console.log('  routeRenderer: al cambiar de ruta llama cleanup() de la página anterior');
@@ -479,51 +495,6 @@ export const tests = [
         );
 
         document.body.removeChild(layout);
-    },
-
-    // ===================================================================
-    // UC Home: Home quick-actions use Bootstrap Icons and approved CTAs
-    // ===================================================================
-    async function home_quickActions_usesBootstrapIconsInTitle() {
-        console.log('  Home: título Acciones rápidas usa Bootstrap Icon (bi-lightning-charge)');
-        const container = Home();
-        const card = Array.from(container.querySelectorAll('.card')).find(c => {
-            const title = c.querySelector('h5.card-title');
-            return title !== null && title.textContent.includes('Acciones rápidas');
-        });
-        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
-        const title = card.querySelector('h5.card-title');
-        assert(title !== null, 'El card de Acciones rápidas debe tener un h5.card-title');
-        const icon = title.querySelector('i.bi.bi-lightning-charge');
-        assert(icon !== null, 'El título debe tener <i class="bi bi-lightning-charge">');
-    },
-
-    async function home_quickActions_ctaAgregarIngreso() {
-        console.log('  Home: CTA "Agregar ingreso" apunta a /ingresos con Bootstrap Icon');
-        const container = Home();
-        const card = Array.from(container.querySelectorAll('.card')).find(c => {
-            const title = c.querySelector('h5.card-title');
-            return title !== null && title.textContent.includes('Acciones rápidas');
-        });
-        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
-        const ingreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/ingresos');
-        assert(ingreso !== null, 'Debe existir un enlace a /ingresos');
-        assert(ingreso.textContent.includes('Agregar ingreso'), 'CTA debe decir "Agregar ingreso"');
-        assert(ingreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA ingreso debe tener bi-plus-circle');
-    },
-
-    async function home_quickActions_ctaAgregarEgreso() {
-        console.log('  Home: CTA "Agregar egreso" apunta a /gastos con Bootstrap Icon');
-        const container = Home();
-        const card = Array.from(container.querySelectorAll('.card')).find(c => {
-            const title = c.querySelector('h5.card-title');
-            return title !== null && title.textContent.includes('Acciones rápidas');
-        });
-        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
-        const egreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/gastos');
-        assert(egreso !== null, 'Debe existir un enlace a /gastos');
-        assert(egreso.textContent.includes('Agregar egreso'), 'CTA debe decir "Agregar egreso"');
-        assert(egreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA egreso debe tener bi-plus-circle');
     },
 
     async function settings_modal_isDedicatedSpaceWithListGroupAndDangerZone() {

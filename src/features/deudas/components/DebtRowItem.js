@@ -110,6 +110,8 @@ export class DebtRowItem {
                 try {
                     const { setPagado } = await import('../../montos/montoRepository.js');
                     await setPagado(row.id, nextChecked);
+                    // Avisar a quien muestre totales (KPIs, acreedores) que cambió un monto
+                    window.dispatchEvent(new CustomEvent('monto:updated', { detail: { id: row.id, pagado: nextChecked } }));
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
                             message: nextChecked

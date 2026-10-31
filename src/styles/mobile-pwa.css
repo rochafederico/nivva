@@ -40,9 +40,11 @@
 }
 
 @media (max-width: 479.98px) {
+    /* clip (no hidden): recorta el desborde horizontal sin convertir html/body en
+       contenedores de scroll, así position: sticky (deuda total) sigue funcionando */
     html,
     body {
-        overflow-x: hidden;
+        overflow-x: clip;
     }
 
     #app-layout {

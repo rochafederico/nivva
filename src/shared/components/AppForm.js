@@ -81,6 +81,9 @@ export class AppForm extends HTMLElement {
             wrapper.className = 'mb-2';
             wrapper.dataset.fieldName = field.name;
             const name = field.name;
+            // id único por formulario: en la vista única conviven varios formularios con
+            // campos del mismo name (p. ej. "monto") y cada label debe apuntar al suyo.
+            const inputId = `${this._formId}-${name}`;
             const label = field.label || '';
             const required = field.required;
             let value = field.value !== undefined ? field.value : '';
@@ -88,7 +91,7 @@ export class AppForm extends HTMLElement {
 
             if (label) {
                 const lbl = document.createElement('label');
-                lbl.setAttribute('for', name);
+                lbl.setAttribute('for', inputId);
                 lbl.className = 'form-label';
                 lbl.textContent = label;
                 if (required) {
@@ -105,14 +108,14 @@ export class AppForm extends HTMLElement {
             if (field.type === 'textarea') {
                 input = document.createElement('textarea');
                 input.className = 'form-control';
-                input.id = name;
+                input.id = inputId;
                 input.name = name;
                 if (required) input.required = true;
                 if (value !== '' && value != null) input.value = value;
             } else if (field.type === 'select') {
                 input = document.createElement('select');
                 input.className = 'form-select';
-                input.id = name;
+                input.id = inputId;
                 input.name = name;
                 if (required) input.required = true;
                 if (field.placeholder) {
@@ -136,7 +139,7 @@ export class AppForm extends HTMLElement {
                 input = document.createElement('input');
                 input.type = field.type || 'text';
                 input.className = 'form-control';
-                input.id = name;
+                input.id = inputId;
                 input.name = name;
                 if (required) input.required = true;
                 if (value !== '' && value != null) input.value = value;

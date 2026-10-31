@@ -1,6 +1,25 @@
 import { assert } from './setup.js';
 
 export const tests = [
+    async function appForm_fieldIdsAreUniquePerForm() {
+        console.log('  AppForm: dos formularios con el mismo campo tienen ids distintos y cada label apunta al suyo');
+        const make = () => {
+            const f = document.createElement('app-form');
+            f.fields = [{ name: 'monto', type: 'number', label: 'Monto', required: true }];
+            document.body.appendChild(f);
+            return f;
+        };
+        const a = make();
+        const b = make();
+        const inputA = a.querySelector('input[name="monto"]');
+        const inputB = b.querySelector('input[name="monto"]');
+        assert(inputA.id !== inputB.id, 'los inputs deben tener ids distintos');
+        assert(a.querySelector('label').getAttribute('for') === inputA.id, 'el label del primer formulario apunta a su input');
+        assert(b.querySelector('label').getAttribute('for') === inputB.id, 'el label del segundo formulario apunta a su input');
+        a.remove();
+        b.remove();
+    },
+
     async function appForm_buttonNamesMatchVisibleText() {
         console.log('  AppForm: el nombre accesible de los botones coincide con el texto visible');
         const appForm = document.createElement('app-form');

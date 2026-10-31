@@ -1274,10 +1274,21 @@ async function testDebtEntityShellCuotasFormato() {
     const container = shell.querySelector('#entity-table-container');
     const row = container.querySelector('tbody tr');
     assert(row !== null, 'Debe haber una fila en la tabla');
-    // The cuotas cell is the 3rd <td> (index 2)
-    const cuotasCell = row.querySelectorAll('td')[2];
-    assert(cuotasCell !== null, 'Debe existir la celda de Cuotas');
-    assert(cuotasCell.textContent.trim() === '2/3', `Cuotas debe mostrar "2/3" (2 pagadas, 3 total), obtuvo "${cuotasCell.textContent.trim()}"`);
+    // Avance como barra de progreso "x de y cuotas"
+    const progress = row.querySelector('.progress[role="progressbar"]');
+    assert(progress !== null, 'Debe mostrar una barra de progreso');
+    assert(progress.getAttribute('aria-valuenow') === '2' && progress.getAttribute('aria-valuemax') === '3', 'La barra informa 2 de 3');
+    assert(progress.querySelector('.progress-bar').style.width === '67%', 'La barra avanza al 67%');
+    const texto = row.querySelector('.acreedor-progress-text').textContent.trim();
+    assert(texto === '2 de 3 cuotas', `Debe decir "2 de 3 cuotas", obtuvo "${texto}"`);
+
+    // Sin botones visibles por fila: la fila abre el detalle y Editar/Eliminar van en el menú "⋮"
+    assert(row.querySelector('.btn-outline-secondary, .btn-outline-danger') === null, 'Sin el grupo de 3 botones por fila');
+    const menuBtn = row.querySelector('.acreedor-menu-btn');
+    assert(menuBtn?.getAttribute('aria-label') === 'Más acciones para Test Cuotas', 'Menú "⋮" con nombre accesible');
+    const items = [...row.querySelectorAll('.dropdown-menu .dropdown-item')].map(b => b.textContent.trim());
+    assert(JSON.stringify(items) === JSON.stringify(['Editar', 'Eliminar']), 'El menú ofrece Editar y Eliminar');
+    assert(row.classList.contains('cursor-pointer') && row.querySelector('button.list-row-title') !== null, 'La fila (y su título) abre el detalle');
 
     document.body.removeChild(shell);
     window.history.pushState({}, '', '/');
@@ -1563,103 +1574,6 @@ async function testDebtListGroupedUsesDebtRowItemLayout() {
 }
 
 // ===================================================================
-// UC-DS7: DebtEntityShell._renderTotalesBar — agrega pendiente por moneda
-// ===================================================================
-async function testDebtEntityShellTotalesBarPorMoneda() {
-    console.log('  DebtEntityShell._renderTotalesBar: muestra pendiente total agregado por moneda');
-    await cleanup();
-
-    const form = document.createElement('debt-form');
-    document.body.appendChild(form);
-    form.montos = [
-        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false },
-        { monto: 5000,  moneda: 'ARS', vencimiento: '2026-07-01', pagado: false },
-        { monto: 50,    moneda: 'USD', vencimiento: '2026-06-01', pagado: false }
-    ];
-    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Multi', tipoDeuda: 'Prestamo', notas: '' } });
-    document.body.removeChild(form);
-
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
-    document.body.appendChild(shell);
-    await shell.loadEntities();
-
-    const container = shell.querySelector('#entity-table-container');
-    const badges = container.querySelectorAll('.badge.text-bg-warning');
-    assert(badges.length === 2, 'Debe mostrar 2 badges de pendiente (ARS y USD)');
-
-    const totalsBar = container.querySelector('.border-top');
-    assert(totalsBar !== null, 'Debe existir la barra de totales con borde superior');
-    assert(totalsBar.textContent.includes('Pendiente total'), 'Barra debe mostrar etiqueta "Pendiente total"');
-
-    document.body.removeChild(shell);
-    window.history.pushState({}, '', '/');
-    await cleanup();
-}
-
-// ===================================================================
-// UC-DS8: DebtEntityShell._renderTotalesBar — sin barra cuando todo está pagado
-// ===================================================================
-async function testDebtEntityShellTotalesBarSinPendiente() {
-    console.log('  DebtEntityShell._renderTotalesBar: no muestra barra cuando no hay pendiente');
-    await cleanup();
-
-    const form = document.createElement('debt-form');
-    document.body.appendChild(form);
-    form.montos = [
-        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: true }
-    ];
-    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Pagado', tipoDeuda: 'Prestamo', notas: '' } });
-    document.body.removeChild(form);
-
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
-    document.body.appendChild(shell);
-    await shell.loadEntities();
-
-    const container = shell.querySelector('#entity-table-container');
-    const totalsBar = container.querySelector('.border-top');
-    assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos los montos están pagados');
-
-    document.body.removeChild(shell);
-    window.history.pushState({}, '', '/');
-    await cleanup();
-}
-
-// ===================================================================
-// UC-DS9: DebtEntityShell._renderTotalesBar — varias entidades se agregan
-// ===================================================================
-async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
-    console.log('  DebtEntityShell._renderTotalesBar: agrega pendiente de varias entidades por moneda');
-    await cleanup();
-
-    const form = document.createElement('debt-form');
-    document.body.appendChild(form);
-
-    form.montos = [{ monto: 20000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
-    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad A', tipoDeuda: 'Prestamo', notas: '' } });
-    form.reset();
-
-    form.montos = [{ monto: 8000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }];
-    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad B', tipoDeuda: 'Tarjeta', notas: '' } });
-    document.body.removeChild(form);
-
-    window.history.pushState({}, '', '/gastos/deudas');
-    const shell = document.createElement('debt-entity-shell');
-    document.body.appendChild(shell);
-    await shell.loadEntities();
-
-    const container = shell.querySelector('#entity-table-container');
-    // One ARS badge aggregating both entities (20000 + 8000 = 28000)
-    const badges = container.querySelectorAll('.badge.text-bg-warning');
-    assert(badges.length === 1, 'Debe mostrar 1 badge ARS aggregando ambas entidades');
-
-    document.body.removeChild(shell);
-    window.history.pushState({}, '', '/');
-    await cleanup();
-}
-
-// ===================================================================
 // UC-ML1: DebtRowItem (clase JS) — renderiza <tr> + <td> responsivos Bootstrap
 // ===================================================================
 async function testDebtRowItem() {
@@ -1833,8 +1747,5 @@ export const tests = [
     testDebtListRenderTotalsNoCurrencies,
     testDebtListRenderTotalsIgnoraVencimientosInvalidos,
     testDebtListGroupedUsesDebtRowItemLayout,
-    testDebtEntityShellTotalesBarPorMoneda,
-    testDebtEntityShellTotalesBarSinPendiente,
-    testDebtEntityShellTotalesBarAgregaVariasEntidades,
     testDebtRowItem
 ];
