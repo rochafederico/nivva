@@ -1,31 +1,28 @@
 // src/routes.js
+// La app es una sola vista (Inicio). Las rutas anteriores redirigen a su pestaña
+// para no romper favoritos, links de notificaciones ni accesos directos.
 
-import { navItems, DEFAULT_SUBTITLE } from './layout/navConfig.js';
+import { DEFAULT_TITLE, DEFAULT_SUBTITLE } from './layout/navConfig.js';
 import Home from './pages/Home.js';
-import Gastos from './pages/Gastos.js';
-import GastosMensual from './pages/GastosMensual.js';
-import Ingresos from './pages/Ingresos.js';
 
-const componentMap = {
-  '/': Home,
-  '/gastos': Gastos,
-  '/ingresos': Ingresos,
+export const REDIRECTS = {
+  '/ingresos': '/?vista=ingresos',
+  '/gastos': '/?vista=egresos',
+  '/gastos/deudas': '/?vista=acreedores',
 };
 
+/** Destino al que hay que redirigir una ruta vieja (o null si no es una ruta vieja). */
+export function redirectFor(pathname) {
+  return REDIRECTS[pathname.replace(/\/+$/, '') || '/'] || null;
+}
+
 const routes = [
-  ...navItems.map(item => ({
-    path: item.path,
-    label: item.label,
-    title: item.title,
-    subtitle: item.subtitle,
-    component: componentMap[item.path],
-  })),
   {
-    path: '/gastos/deudas',
-    label: 'Acreedores',
-    title: 'Egresos',
+    path: '/',
+    label: 'Inicio',
+    title: DEFAULT_TITLE,
     subtitle: DEFAULT_SUBTITLE,
-    component: GastosMensual,
+    component: Home,
   },
 ];
 

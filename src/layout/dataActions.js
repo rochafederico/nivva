@@ -1,4 +1,4 @@
-// Shared data action helpers — used by AppHeader (desktop) and BottomNav (mobile)
+// Shared data action helpers — used by the user menu (AppHeader) and the settings modal
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
 import { openSettingsDataModal } from './SettingsDataModal.js';

@@ -42,8 +42,8 @@ localStorage.removeItem('nivva_tour_completed');
 location.reload();
 ```
 
-### Shadow DOM considerations:
-Tour targets are inside nested Shadow DOMs (e.g., `app-shell > shadowRoot > header-bar > shadowRoot > [data-tour-step]`). The `findTourTarget()` helper in `tourConfig.js` handles traversal. If a target element is not found, the step shows centered without highlight — this may indicate a component restructure broke the selector path.
+### Tour targets:
+Each step finds its element through a `data-tour-step` attribute (`findTourTarget()` / `findVisibleTourTarget()` in `tourConfig.js`): the brand in `app-header`, the month summary banner, the month selector, the "+" button and the section tabs of the single view, and the user menu button. If a target is not found, the step shows centered without highlight — this may indicate a component restructure broke the selector.
 
 ## General App Testing Notes
 
