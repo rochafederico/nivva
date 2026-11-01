@@ -60,8 +60,8 @@ for (const [archivo, { lineas, borrado }] of cambios) {
   const previas = lineasEnBase(archivo);
   if (previas === null) {
     errores.push(`${archivo}: archivo nuevo con ${actuales} líneas (máximo ${max}).`);
-  } else if (actuales > previas) {
-    errores.push(`${archivo}: ya excedía ${max} líneas y creció de ${previas} a ${actuales}. Solo puede achicarse.`);
+  } else if (actuales >= previas) {
+    errores.push(`${archivo}: excede ${max} líneas y se tocó sin achicarlo (${previas} → ${actuales}). Refactorizalo para bajar líneas.`);
   }
 }
 
