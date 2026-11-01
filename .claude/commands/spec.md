@@ -10,7 +10,8 @@ Escribí la spec de una iteración para: $ARGUMENTS
    `docs/sdd/accesibilidad.md` y las specs relacionadas en `specs/`
    (incluida la baseline del área). Podés leer el código para entender
    cómo funciona hoy, pero lo describís en palabras de la persona.
-3. Si hay un issue, leelo con `gh issue view`.
+3. Si hay un issue, leelo con `gh issue view`. Si no hay, lo creás en
+   el paso 10: toda spec nueva tiene su issue.
 4. Elegí el próximo número libre `NNN` y creá la rama `it/NNN-descripcion`.
 5. Antes de escribir, hacé las preguntas necesarias para que no queden
    criterios ambiguos. No inventes comportamiento: si no sabés, preguntá.
@@ -28,6 +29,11 @@ Escribí la spec de una iteración para: $ARGUMENTS
 7. Si los criterios no entran en 8 tareas, proponé partir la spec.
 8. Solo ese archivo cambia en este PR. Corré `node scripts/check-pr-size.mjs`.
 9. Abrí el PR hacia `main` con la plantilla. No lo mergees.
+10. Si la spec no salió de un issue, creá uno con `gh issue create`:
+    título igual al de la spec y cuerpo **solo con el link** a
+    `specs/NNN-descripcion/spec.md` en `main`. No copies la spec al
+    issue: el detalle vive en el repo. Enlazá el issue en la descripción
+    del PR.
 
 Terminá diciendo qué tiene que validar el humano y que, cuando mergee,
 el siguiente paso es `/plan NNN`.

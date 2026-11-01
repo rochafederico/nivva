@@ -22,6 +22,9 @@ implementa specs; nunca al revés.
    un caso, se para y se pregunta. No se inventa comportamiento.
 4. Si durante la implementación algo contradice la spec, se frena y se
    propone un cambio a la spec en su propio PR.
+5. Toda spec nueva tiene un issue en GitHub. Si no existe, se crea al
+   abrir el PR de la spec, con el link a la spec como único contenido.
+   La spec se detalla en el repo, nunca en el issue.
 
 ## Límites (los verifica la CI en cada PR)
 
