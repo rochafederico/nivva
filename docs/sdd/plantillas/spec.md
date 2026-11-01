@@ -31,7 +31,15 @@ Cada uno se puede probar con un test.
 - Error: …
 - Vacío: …
 - Mobile: …
-- Teclado y lectores de pantalla: …
+
+## Accesibilidad (WCAG 2.2 AA)
+
+Criterios que toca esta funcionalidad y cómo se verifica cada uno.
+Ver `docs/sdd/accesibilidad.md`.
+
+| Criterio | Cómo se cumple | Cómo se verifica |
+|---|---|---|
+| … | … | test · manual |
 
 ## Textos de UI
 
@@ -49,4 +57,5 @@ Deben quedar vacías antes de aprobar.
 - [ ] El alcance entra en una iteración (8 tareas o menos)
 - [ ] No hay preguntas abiertas
 - [ ] Textos revisados contra voz y tono y glosario
+- [ ] Criterios de accesibilidad identificados
 - [ ] Se leyó `docs/sdd/learnings.md`

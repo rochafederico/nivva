@@ -15,7 +15,8 @@ valide si es lo que quiere.
    `estado: baseline`, y criterios en forma Dado/Cuando/Entonces que
    describan el comportamiento real, incluidos casos borde.
 4. Por cada criterio, anotá qué test lo cubre o "sin test".
-5. Agregá una sección **Divergencias** con lo que parezca un error, no
+5. Agregá una sección **Divergencias** con lo que parezca un error, no cumpla
+   WCAG 2.2 AA (con el número de criterio, ver `docs/sdd/accesibilidad.md`), no
    coincida con la documentación o con la constitución. No lo corrijas.
 6. Sumá el área al índice `specs/000-baseline/README.md`.
 7. Si el área no entra en 200 líneas, partila en varias baselines.
