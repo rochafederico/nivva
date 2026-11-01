@@ -15,7 +15,9 @@ Implementá una sola tarea de la iteración $ARGUMENTS.
 4. Primero los tests de los criterios que cubre la tarea; después el código.
 5. Si algo de la spec no cierra, pará y explicá qué falta. No lo resuelvas
    inventando comportamiento.
-6. Si el hook de límites avisa, revertí y proponé partir la tarea.
+6. Si tocás un archivo que pasa de 100 líneas, refactorizalo en la misma
+   tarea para que quede con menos líneas que antes. Si el hook de límites
+   avisa, revertí y proponé partir la tarea.
 7. Marcá la tarea `en PR` en `tareas.md`.
 8. `npm run lint`, `npm test` y `node scripts/check-pr-size.mjs` en verde.
 9. Abrí el PR con la plantilla, con pasos concretos para validar. No mergees.

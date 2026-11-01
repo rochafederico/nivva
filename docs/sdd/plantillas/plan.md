@@ -12,8 +12,9 @@ Cómo se resuelve, en pocas frases.
 |---|---|---|---|
 | `src/features/…` | … | … | … |
 
-Si un archivo que cambia ya pasa de 100 líneas, el plan dice cómo se
-achica o qué parte se extrae primero.
+Si un archivo que cambia ya pasa de 100 líneas, el plan dice qué se
+extrae para refactorizarlo y en qué tarea. Cada tarea que lo toca lo deja
+con menos líneas que antes.
 
 ## Datos
 
