@@ -59,7 +59,10 @@ en la lista ordenada, empezando en 1.
    importe se ve con `formatMoneda` usando la moneda del monto, sin el
    código de moneda aparte (`15000` `ARS` → `$ 15.000,00`; `15000` `USD` →
    `US$ 15.000,00`), y el vencimiento como `Vence 10/11/2026` (mismo
-   formato que `formatFecha`).
+   formato que `formatFecha`). El importe visible tiene
+   `aria-hidden="true"` y al lado hay un texto oculto visualmente
+   (`visually-hidden`) con la forma hablada: `15.000,00 pesos` (ARS) o
+   `15.000,00 dólares` (USD).
 3. **Dado** un monto, **cuando** se muestra su fila, **entonces** tiene una
    casilla con la etiqueta visible "Pagado", marcada según `pagado`, que es
    el único indicador del estado (no hay otro texto "Pagado" o
@@ -100,8 +103,8 @@ en la lista ordenada, empezando en 1.
    **entonces** el foco pasa al botón "Editar" del monto nuevo.
 10. **Dado** un monto, **cuando** se elige "Eliminar" en su menú,
     **entonces** se pide confirmación con `confirm()` y el texto
-    `¿Eliminar el monto de $ 15.000,00 que vence el 10/11/2026?` (importe
-    con `formatMoneda` y la moneda del monto); si se acepta, el monto sale
+    `¿Eliminar el monto de 15.000,00 pesos que vence el 10/11/2026?`
+    (importe en forma hablada, criterio 2); si se acepta, el monto sale
     de la lista; si se cancela, no cambia nada y el foco vuelve al botón
     "Más acciones".
 11. **Dado** que se eliminó un monto, **cuando** la lista se actualiza,
@@ -117,10 +120,12 @@ en la lista ordenada, empezando en 1.
 14. **Dado** cualquier cantidad de montos, **cuando** se muestra la lista,
     **entonces** no tiene altura máxima ni scroll propio: crece dentro del
     cuerpo del modal.
-15. **Dado** el monto 3 de la lista, de `$ 15.000,00`, **cuando** se leen
+15. **Dado** el monto 3 de la lista, de `15000` `ARS`, **cuando** se leen
     los nombres accesibles de su fila, **entonces** son `Editar monto 3 de
-    $ 15.000,00`, `Más acciones para el monto 3 de $ 15.000,00` y
-    `Pagado: monto 3 de $ 15.000,00`.
+    15.000,00 pesos`, `Más acciones para el monto 3 de 15.000,00 pesos` y
+    `Pagado: monto 3 de 15.000,00 pesos` (importe en forma hablada; nunca
+    con `$` ni `US$`, porque los lectores de pantalla en español leen `$`
+    como "dólares").
 
 ## Escenarios
 
@@ -138,7 +143,7 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Cómo se cumple | Cómo se verifica |
 |---|---|---|
-| 1.3.1 Info y relaciones | Lista `<ul>`/`<li>` con nombre "Montos"; la casilla "Pagado" con `<label>` asociado | test |
+| 1.3.1 Info y relaciones | Lista `<ul>`/`<li>` con nombre "Montos"; la casilla "Pagado" con `<label>` asociado; la moneda se anuncia por su nombre (criterio 2) | test |
 | 1.4.3 Contraste mínimo | Importe, vencimiento y textos de la fila a 4.5:1 | manual |
 | 1.4.10 Reflow | Sin tabla ni scroll interno; filas que se acomodan a 320 px | manual |
 | 1.4.11 Contraste no textual | Borde de la fila, casilla y foco a 3:1 | manual |
@@ -155,15 +160,16 @@ Ver `docs/sdd/accesibilidad.md`.
 | Lugar | Texto |
 |---|---|
 | Nombre de la lista | `Montos` |
-| Importe | `$ 15.000,00` · `US$ 15.000,00` |
+| Importe visible | `$ 15.000,00` · `US$ 15.000,00` |
+| Importe hablado (oculto, nombres accesibles y confirmación) | `15.000,00 pesos` · `15.000,00 dólares` |
 | Vencimiento en la fila | `Vence 10/11/2026` |
 | Casilla | `Pagado` |
 | Botón de la fila | `Editar` |
 | Botón del menú | `Más acciones` |
 | Opciones del menú | `Duplicar` · `Eliminar` |
-| Nombres accesibles | `Editar monto 3 de $ 15.000,00` · `Más acciones para el monto 3 de $ 15.000,00` · `Pagado: monto 3 de $ 15.000,00` |
+| Nombres accesibles | `Editar monto 3 de 15.000,00 pesos` · `Más acciones para el monto 3 de 15.000,00 pesos` · `Pagado: monto 3 de 15.000,00 pesos` |
 | Error al duplicar | `No se puede duplicar un monto sin un vencimiento válido. Editalo y probá de nuevo.` |
-| Confirmación al eliminar | `¿Eliminar el monto de $ 15.000,00 que vence el 10/11/2026?` |
+| Confirmación al eliminar | `¿Eliminar el monto de 15.000,00 pesos que vence el 10/11/2026?` |
 | Anuncio al duplicar | `Monto duplicado. Vence el 10/01/2027.` |
 | Anuncio al eliminar | `Monto eliminado.` |
 | Estado vacío | `Todavía no agregaste montos.` |
