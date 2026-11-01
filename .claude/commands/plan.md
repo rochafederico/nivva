@@ -19,8 +19,10 @@ Prepará el plan y las tareas de la iteración $ARGUMENTS.
 5. Completá `plan.md` y `tareas.md` desde `docs/sdd/plantillas/`.
    - Cada tarea entra en un PR: 10 archivos, 200 líneas, archivos de
      código de 100 líneas o menos.
-   - Si hay que tocar un archivo que ya pasa de 100 líneas, la primera
-     tarea lo achica o extrae la parte que se va a cambiar.
+   - Si hay que tocar un archivo que ya pasa de 100 líneas, las primeras
+     tareas lo refactorizan: extraen la parte que se va a cambiar a
+     archivos nuevos de 100 líneas o menos, sin cambiar comportamiento.
+     Cada tarea que toque ese archivo lo deja con menos líneas que antes.
    - Cada criterio de aceptación queda cubierto por al menos una tarea,
      citado con el número que tiene en la spec mergeada.
    - Para cada criterio de accesibilidad, elegí la técnica del W3C (ver

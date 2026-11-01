@@ -32,7 +32,9 @@ Definidos en `.sdd/limits.json`:
   Borrar un archivo entero cuenta como archivo, no como líneas.
 - Máximo **100 líneas** por archivo de código (`.js`/`.mjs` en `src/`,
   `test/`, `scripts/` y `.claude/`).
-- Los archivos que ya superan 100 líneas pueden achicarse, nunca crecer.
+- Si una tarea toca un archivo que ya supera 100 líneas, se refactoriza
+  para que quede con menos líneas que antes (extraer funciones o
+  componentes a archivos nuevos). No alcanza con no hacerlo crecer.
 - Un PR que cambia reglas (`.sdd/`, `scripts/check-pr-size.mjs` o
   `.github/workflows/`) no puede tocar ningún otro archivo.
 
