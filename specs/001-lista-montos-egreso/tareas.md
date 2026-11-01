@@ -10,7 +10,7 @@ Cada tarea suma su test en `test/` y lo registra en `test/run-repo-tests.js`.
 | ID | Tarea | Criterios que cubre | Archivos | Líneas estimadas | Estado |
 |---|---|---|---|---|---|
 | T01 | Forma hablada del monto y la fecha, y cálculo del monto duplicado (funciones puras) | 3, 6, 7 | `montos/utils/montoHablado.js`, `montos/utils/duplicarMonto.js`, `test/montos-formato.test.js`, `test/run-repo-tests.js` | 170 | en PR |
-| T02 | Botón de menú: abrir y cerrar con `Enter`, `Espacio` y clic, `Escape`, `Tab`, clic afuera, un solo menú abierto, estado para el lector | 8 | `shared/components/MenuButton.js`, `test/menu-button.test.js`, `test/run-repo-tests.js` | 180 | pendiente |
+| T02 | Botón de menú: abrir y cerrar con `Enter`, `Espacio` y clic, `Escape`, `Tab`, clic afuera, un solo menú abierto, estado para el lector | 8 | `shared/components/MenuButton.js`, `test/menu-button.test.js`, `test/run-repo-tests.js` | 180 | en PR |
 | T03 | Botón de menú: flecha abajo y arriba para abrir y moverse, vuelta en las puntas, `Inicio` y `Fin` | 8 | `shared/components/menuButtonTeclas.js`, `shared/components/MenuButton.js`, `test/menu-button-teclas.test.js`, `test/run-repo-tests.js` | 140 | pendiente |
 | T04 | Fila de monto: cifra y vencimiento visibles y hablados, casilla "Pagado", "Editar" y "Más acciones" con sus nombres | 2, 3, 4, 14 | `montos/components/MontoRow.js`, `test/monto-row.test.js`, `test/run-repo-tests.js` | 185 | pendiente |
 | T05 | Lista "Montos": orden, texto de orden, anuncio como lista, lista vacía, sin scroll propio | 1, 12, 13 | `montos/components/MontosList.js`, `test/montos-list.test.js`, `test/run-repo-tests.js` | 180 | pendiente |
