@@ -1,8 +1,10 @@
 // src/features/montos/components/MontosList.js
 // Lista "Montos" del egreso (spec 001). Uso: <montos-list labelledby="id-del-nombre">, y
 // lista.montos = [...]. Ordena en el mismo arreglo, del vencimiento más antiguo al más reciente.
-// Avisa 'montos:edit' con detail { monto, idx } cuando se toca "Editar" en una fila.
+// Avisa 'montos:edit' con detail { monto, idx } cuando se toca "Editar" en una fila, y
+// 'montos:duplicated' y 'montos:empty' desde las acciones (montosListaAcciones.js).
 import { crearFilaMonto } from './MontoRow.js';
+import { conectarAcciones } from './montosListaAcciones.js';
 
 let contador = 0;
 
@@ -46,6 +48,7 @@ export class MontosList extends HTMLElement {
         estado.setAttribute('role', 'status');
         this.replaceChildren(orden, lista, vacio, estado);
         this._estructura = { orden, lista, vacio, estado };
+        conectarAcciones(this);
         lista.addEventListener('monto:edit', (e) => {
             e.stopPropagation();
             const { monto } = e.detail;
