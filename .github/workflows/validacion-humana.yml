@@ -2,9 +2,13 @@ name: Validación humana
 
 # El PR solo pasa cuando un humano le pone la etiqueta "validado".
 # Si llegan commits nuevos después, la etiqueta se quita y hay que revisar de nuevo.
+#
+# Usa pull_request_target: corre la versión de la rama base (un PR no puede
+# alterar su propio gate) y con permiso de escritura también en PRs de forks.
+# Es seguro porque no hace checkout ni ejecuta código del PR: solo lee etiquetas.
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
