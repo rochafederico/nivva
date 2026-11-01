@@ -18,6 +18,7 @@
 - [ ] `npm run lint` y `npm test` en verde
 - [ ] Tests nuevos o actualizados para el comportamiento cambiado
 - [ ] Probado en mobile si toca UI
+- [ ] Si toca UI: teclado, lector de pantalla, zoom 200 % y contraste (WCAG 2.2 AA)
 - [ ] Textos según voz y tono y glosario
 - [ ] Spec actualizada si algo cambió durante la implementación
 - [ ] Dentro de los límites (`node scripts/check-pr-size.mjs`)
