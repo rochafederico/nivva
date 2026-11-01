@@ -1,0 +1,41 @@
+name: Validación humana
+
+# El PR solo pasa cuando un humano le pone la etiqueta "validado".
+# Si llegan commits nuevos después, la etiqueta se quita y hay que revisar de nuevo.
+#
+# Usa pull_request_target: corre la versión de la rama base (un PR no puede
+# alterar su propio gate) y con permiso de escritura también en PRs de forks.
+# Es seguro porque no hace checkout ni ejecuta código del PR: solo lee etiquetas.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  validado:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Quitar la validación si hubo commits nuevos
+        if: github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'validado')
+        run: |
+          gh pr edit "$PR" --repo "$REPO" --remove-label validado
+          echo "::error::Hubo commits nuevos después de validar. Revisá y volvé a poner la etiqueta."
+          exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+
+      - name: Exigir la etiqueta "validado"
+        if: github.event.action != 'synchronize' || !contains(github.event.pull_request.labels.*.name, 'validado')
+        run: |
+          if [ "$VALIDADO" != "true" ]; then
+            echo "::error::Falta la etiqueta 'validado'. La pone un humano después de revisar el PR."
+            exit 1
+          fi
+          echo "✓ Validado por un humano."
+        env:
+          VALIDADO: ${{ contains(github.event.pull_request.labels.*.name, 'validado') }}
