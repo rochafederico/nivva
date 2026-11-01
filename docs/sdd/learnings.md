@@ -10,7 +10,11 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
 
 ## Activos
 
-_Todavía no hay aprendizajes._
+- [1] Defecto del flujo, ya corregido: la spec incluía detalles técnicos
+  (HTML, ARIA, funciones, campos de datos) porque la plantilla pedía
+  "Cómo se cumple" en accesibilidad y nada lo prohibía. Ahora la spec es
+  solo funcional y la técnica va al plan. Evaluar en la retro si alcanzó
+  o hace falta un check automático. (001)
 
 ## Promovidos
 

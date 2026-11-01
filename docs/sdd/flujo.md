@@ -64,4 +64,12 @@ aprendizaje aparece **dos veces**, se promueve a regla: en la constitución,
 en una plantilla, en `AGENTS.md` o en un hook. Esa promoción es su propio PR
 chico y, una vez hecha, el aprendizaje se borra de `learnings.md`.
 
+Hay dos tipos de hallazgo, y se tratan distinto:
+
+- **Defecto del flujo:** una plantilla, un comando o una regla produce un
+  error con causa clara. Se corrige enseguida en un PR `sdd/`, sin esperar
+  la retro, y se registra en `learnings.md` para evaluarlo en la retro.
+- **Patrón a observar:** un comportamiento que todavía no se sabe si se
+  repite. Va a `learnings.md` con contador y se promueve al llegar a 2.
+
 Los límites también se ajustan así: con evidencia de las retros, por PR.
