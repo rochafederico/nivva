@@ -1,0 +1,10 @@
+{
+  "maxArchivosPorPR": 10,
+  "maxLineasCambiadasPorPR": 200,
+  "maxLineasPorArchivoDeCodigo": 100,
+  "archivosDeCodigo": "^(src|test|scripts|\\.claude)/.*\\.(js|mjs)$",
+  "ignorados": [
+    "^package-lock\\.json$",
+    "^src/styles/bootstrap\\.css$"
+  ]
+}
