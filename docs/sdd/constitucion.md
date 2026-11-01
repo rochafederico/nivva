@@ -12,8 +12,8 @@ un PR propio que solo modifique este archivo.
    debo, cuánto entra y qué vence. Lo que no ayuda a eso necesita una
    spec que lo justifique.
 3. **Mobile primero.** Toda UI se diseña y prueba primero en pantalla chica.
-4. **Accesible.** Navegable con teclado, etiquetas y `aria-*` correctos,
-   contraste suficiente.
+4. **Accesible: WCAG 2.2 nivel AA.** Toda UI nueva o modificada lo
+   cumple. Cómo verificarlo en `docs/sdd/accesibilidad.md`.
 5. **Copy con la voz de Nivva.** Textos según `docs/wiki/04-Voz-y-tono.md`,
    `05-Glosario.md` y `06-CTAs.md`. Se usa "cuota", no "monto".
 
