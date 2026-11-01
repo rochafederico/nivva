@@ -139,19 +139,19 @@ la lista (criterios 6 y 7).
 
 Ver `docs/sdd/accesibilidad.md`.
 
-| Criterio | Cómo se cumple | Cómo se verifica |
+| Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Lista `<ul>`/`<li>` con nombre "Montos"; la casilla "Pagado" con `<label>` asociado; la moneda se anuncia por su nombre (criterio 2) | test |
-| 1.4.3 Contraste mínimo | Importe, vencimiento y textos de la fila a 4.5:1 | manual |
-| 1.4.10 Reflow | Sin tabla ni scroll interno; filas que se acomodan a 320 px | manual |
-| 1.4.11 Contraste no textual | Borde de la fila, casilla y foco a 3:1 | manual |
-| 2.1.1 Teclado | Editar, Más acciones, menú y casilla operables con teclado (criterio 5) | test · manual |
-| 2.4.3 Orden del foco | Foco según criterios 5, 8, 9, 10 y 11 | test |
-| 2.4.7 Foco visible | El foco se ve en botones, opciones del menú y casilla | manual |
-| 2.5.3 Etiqueta en el nombre | Nombres accesibles que empiezan con el texto visible (criterio 15) | test |
-| 2.5.8 Tamaño del objetivo | Botones y casilla de al menos 24×24 px | manual |
-| 4.1.2 Nombre, función, valor | Botón del menú con `aria-haspopup` y `aria-expanded`; menú con `role="menu"` y opciones con `role="menuitem"` | test |
-| 4.1.3 Mensajes de estado | Anuncios del criterio 12 en región `aria-live="polite"` | test |
+| 1.3.1 Info y relaciones | Escuchar los montos como una lista llamada "Montos", la casilla con su etiqueta y la moneda por su nombre (criterios 1 y 3) | Recorrer la lista con lector de pantalla |
+| 1.4.3 Contraste mínimo | Leer importe, vencimiento y textos de la fila sobre su fondo | Revisar el contraste a mano |
+| 1.4.10 Reflow | Usar la lista a 320 px sin scroll horizontal ni scroll interno | Achicar la ventana a 320 px o usar zoom al 400 % |
+| 1.4.11 Contraste no textual | Distinguir el borde de la fila, la casilla y el foco | Revisar el contraste a mano |
+| 2.1.1 Teclado | Editar, abrir el menú, elegir una opción y marcar "Pagado" sin mouse (criterio 8) | Recorrer la fila solo con teclado |
+| 2.4.3 Orden del foco | Saber dónde queda el foco después de cada acción (criterios 4, 8, 9, 10 y 11) | Duplicar, eliminar y cancelar con teclado |
+| 2.4.7 Foco visible | Ver dónde está el foco en botones, opciones del menú y casilla | Recorrer la fila con `Tab` |
+| 2.5.3 Etiqueta en el nombre | Activar cada control por voz diciendo el texto que ve (criterio 14) | Escuchar los nombres con lector de pantalla |
+| 2.5.8 Tamaño del objetivo | Tocar botones y casilla sin errar | Usar la lista con el dedo en un teléfono |
+| 4.1.2 Nombre, función, valor | Saber qué es cada control, cómo se llama y su estado, incluido si el menú está abierto (criterio 8) | Escuchar los controles con lector de pantalla |
+| 4.1.3 Mensajes de estado | Enterarse de que un monto se duplicó o se eliminó sin perder el foco (criterios 9 y 11) | Duplicar y eliminar con lector de pantalla |
 
 ## Textos de UI
 
@@ -159,28 +159,31 @@ Ver `docs/sdd/accesibilidad.md`.
 |---|---|
 | Nombre de la lista | `Montos` |
 | Importe visible | `$ 15.000,00` · `US$ 15.000,00` |
-| Importe hablado (oculto, nombres accesibles y confirmación) | `15.000,00 pesos` · `15.000,00 dólares` |
+| Importe hablado (lector de pantalla y confirmación) | `15000 pesos` · `15000,50 pesos` · `1200 dólares` |
 | Vencimiento en la fila | `Vence 10/11/2026` |
 | Casilla | `Pagado` |
 | Botón de la fila | `Editar` |
 | Botón del menú | `Más acciones` |
 | Opciones del menú | `Duplicar` · `Eliminar` |
-| Nombres accesibles | `Editar monto 3 de 15.000,00 pesos` · `Más acciones para el monto 3 de 15.000,00 pesos` · `Pagado: monto 3 de 15.000,00 pesos` |
-| Error al duplicar | `No se puede duplicar un monto sin un vencimiento válido. Editalo y probá de nuevo.` |
-| Confirmación al eliminar | `¿Eliminar el monto de 15.000,00 pesos que vence el 10/11/2026?` |
+| Nombres que anuncia el lector | `Editar monto 3 de 15000 pesos` · `Más acciones para el monto 3 de 15000 pesos` · `Pagado: monto 3 de 15000 pesos` |
+| Confirmación al eliminar | `¿Eliminar el monto de 15000 pesos que vence el 10/11/2026?` |
 | Anuncio al duplicar | `Monto duplicado. Vence el 10/01/2027.` |
 | Anuncio al eliminar | `Monto eliminado.` |
-| Estado vacío | `Todavía no agregaste montos.` |
+| Lista vacía | `Todavía no agregaste montos.` |
 
 ## Preguntas abiertas
 
 Deben quedar vacías antes de aprobar.
 
+- Un monto sin vencimiento válido que no aparece en la lista (criterio
+  15): al guardar el egreso, ¿se conserva tal cual o se borra?
+
 ## Definition of Ready
 
-- [x] Los criterios se pueden testear sin interpretar
-- [x] El alcance entra en una iteración (8 tareas o menos)
-- [x] No hay preguntas abiertas
-- [x] Textos revisados contra voz y tono y glosario
-- [x] Criterios de accesibilidad identificados
-- [x] Se leyó `docs/sdd/learnings.md`
+- [ ] Los criterios se pueden testear sin interpretar
+- [ ] El alcance entra en una iteración (8 tareas o menos)
+- [ ] No hay preguntas abiertas
+- [ ] Textos revisados contra voz y tono y glosario
+- [ ] Criterios de accesibilidad identificados
+- [ ] Sin referencias a código, componentes, HTML, ARIA, funciones ni datos internos
+- [ ] Se leyó `docs/sdd/learnings.md`
