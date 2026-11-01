@@ -24,6 +24,15 @@ cómo se migran los datos existentes.
 
 Eventos nuevos o que cambian, quién los emite y quién escucha.
 
+## Accesibilidad
+
+Para cada criterio WCAG de la spec, la técnica del W3C que se usa
+(`https://www.w3.org/WAI/WCAG22/Techniques/...`) y cómo se prueba.
+
+| Criterio | Técnica | Test |
+|---|---|---|
+| … | … | … |
+
 ## Riesgos
 
 Qué se puede romper y cómo lo detectan los tests.

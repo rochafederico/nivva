@@ -19,27 +19,30 @@ criterio que aplica y abrí solo su página Understanding y sus técnicas.
 
 ## Cómo se aplica en el flujo
 
-- **Spec:** la sección *Accesibilidad* nombra los criterios que toca la
-  funcionalidad (número y nombre) y cómo se va a verificar cada uno.
-- **Plan:** dice qué técnica del W3C se usa para cada criterio.
+- **Spec (qué):** nombra los criterios que toca la funcionalidad (número
+  y nombre) y describe lo que la persona tiene que poder hacer: qué
+  escucha con lector de pantalla, qué teclas usa, dónde queda el foco.
+  Sin HTML, ARIA ni nombres de código.
+- **Plan (cómo):** para cada criterio, la técnica del W3C que se usa
+  (roles, atributos `aria-*`, estructura HTML) y el test que la cubre.
 - **PR:** el DoD pide revisar teclado, lector de pantalla, contraste y zoom.
 - **Baseline:** lo que hoy no cumple AA se anota como divergencia, con el
   número de criterio. No se corrige en la baseline.
 
 ## Criterios que más aparecen en Nivva
 
-| Criterio | Qué significa acá |
-|---|---|
-| 1.3.1 Info y relaciones | Formularios con `<label>`, tablas y listas semánticas |
-| 1.4.3 Contraste mínimo | 4.5:1 en texto, 3:1 en texto grande; montos incluidos |
-| 1.4.10 Reflow | Usable a 320 px de ancho sin scroll horizontal |
-| 1.4.11 Contraste no textual | Switches, bordes de inputs y foco a 3:1 |
-| 2.1.1 Teclado | Todo se puede hacer sin mouse, incluido el bottom sheet del + |
-| 2.4.7 y 2.4.11 Foco visible y no tapado | El foco se ve y no queda bajo el header fijo |
-| 2.5.8 Tamaño del objetivo | Controles de al menos 24×24 px |
-| 3.3.1 y 3.3.3 Errores | Mensaje por campo, que diga cómo corregirlo |
-| 4.1.2 Nombre, función, valor | Web Components con rol y nombre accesible correctos |
-| 4.1.3 Mensajes de estado | Toasts anunciados con `role="status"` o `aria-live` |
+| Criterio | En la spec (lo que percibe la persona) | En el plan (técnica habitual) |
+|---|---|---|
+| 1.3.1 Info y relaciones | El lector anuncia cada campo con su nombre y las listas como listas | `<label>` asociado, `<ul>`/`<table>` semánticos |
+| 1.4.3 Contraste mínimo | Textos e importes legibles sobre su fondo | 4.5:1 en texto, 3:1 en texto grande |
+| 1.4.10 Reflow | Se usa a 320 px de ancho sin scroll horizontal | Layout fluido, sin anchos fijos |
+| 1.4.11 Contraste no textual | Switches, bordes de campos y foco se distinguen | 3:1 contra el fondo |
+| 2.1.1 Teclado | Todo se hace sin mouse, incluido el bottom sheet del + | Elementos nativos o manejo de teclas |
+| 2.4.7 y 2.4.11 Foco visible y no tapado | Se ve dónde está el foco y no queda bajo el header | `:focus-visible`, `scroll-margin` |
+| 2.5.8 Tamaño del objetivo | Los controles se tocan sin errar | Al menos 24×24 px |
+| 3.3.1 y 3.3.3 Errores | Cada campo dice qué está mal y cómo corregirlo | `aria-describedby`, `aria-invalid` |
+| 4.1.2 Nombre, función, valor | El lector dice qué es cada control, cómo se llama y su estado | Rol y nombre accesible en los Web Components |
+| 4.1.3 Mensajes de estado | El lector anuncia avisos sin mover el foco | `role="status"` o `aria-live` |
 
 La tabla no reemplaza la norma: es por dónde empezar a revisar.
 
