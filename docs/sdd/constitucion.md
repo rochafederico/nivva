@@ -15,7 +15,9 @@ un PR propio que solo modifique este archivo.
 4. **Accesible: WCAG 2.2 nivel AA.** Toda UI nueva o modificada lo
    cumple. Cómo verificarlo en `docs/sdd/accesibilidad.md`.
 5. **Copy con la voz de Nivva.** Textos según `docs/wiki/04-Voz-y-tono.md`,
-   `05-Glosario.md` y `06-CTAs.md`. Se usa "cuota", no "monto".
+   `05-Glosario.md` y `06-CTAs.md`. "Monto" es la cifra de un pago
+   dentro de un egreso; "cuota" se usa solo para pagos en cuotas de
+   un crédito, nunca como sinónimo de monto.
 
 ## Técnica
 
