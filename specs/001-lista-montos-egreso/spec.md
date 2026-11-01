@@ -142,8 +142,10 @@ eliminar usa estas formas, distintas de lo que se ve en la fila:
 
 ## Escenarios
 
-- Error: no aplica en esta lista. El formulario de monto no deja agregar
-  uno sin cifra, moneda o vencimiento (como hoy).
+- Error: no aplica en esta lista. Todo monto tiene vencimiento: el
+  formulario de monto lo exige (como hoy) y la copia de seguridad lo
+  conserva al exportar e importar. Un archivo editado a mano o dañado se
+  resuelve en la validación al importar, que no es parte de esta spec.
 - Vacío: criterio 12.
 - Mobile: a 320 px de ancho cada fila se lee completa (monto,
   vencimiento, casilla y acciones) sin scroll horizontal; las acciones
