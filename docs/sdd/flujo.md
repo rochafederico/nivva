@@ -51,8 +51,10 @@ iteración nueva; la spec baseline no se corrige.
 
 ## Backlog
 
-Los issues de GitHub siguen siendo el backlog (épicas e historias). Cada
-spec enlaza el issue que resuelve. El refinamiento (DoR, escenarios, DoD)
+Los issues de GitHub siguen siendo el backlog (épicas e historias). Toda
+spec nueva tiene un issue: si no salió de uno, `/spec` lo crea. El cuerpo
+del issue es solo el link a la spec; el detalle vive en `specs/` y nunca
+se copia al issue. El refinamiento (DoR, escenarios, DoD)
 que antes vivía en los prompts de la wiki ahora está en las plantillas
 de `docs/sdd/plantillas/`.
 
