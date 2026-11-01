@@ -5,6 +5,10 @@ argument-hint: <NNN>
 
 Prepará el plan y las tareas de la iteración $ARGUMENTS.
 
+**Confirmación (ver `AGENTS.md`):** antes de crear o modificar archivos,
+mostrá qué vas a cambiar y esperá un "sí". Antes de commitear, pushear,
+abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
+
 1. `git fetch origin`. Verificá que `specs/$ARGUMENTS-*/spec.md` exista en
    `origin/main`. Si no está, pará: la spec no está aprobada. Trabajá
    siempre sobre la última versión de `origin/main`: si se mergeó un cambio

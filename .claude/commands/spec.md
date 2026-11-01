@@ -5,6 +5,10 @@ argument-hint: <issue o descripción>
 
 Escribí la spec de una iteración para: $ARGUMENTS
 
+**Confirmación (ver `AGENTS.md`):** antes de crear o modificar archivos,
+mostrá qué vas a cambiar y esperá un "sí". Antes de commitear, pushear,
+abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
+
 1. `git fetch origin` y partí de `origin/main` actualizado.
 2. Leé `docs/sdd/learnings.md`, `docs/sdd/constitucion.md`,
    `docs/sdd/accesibilidad.md` y las specs relacionadas en `specs/`

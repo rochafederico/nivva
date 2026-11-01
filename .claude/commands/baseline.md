@@ -5,6 +5,10 @@ argument-hint: <área>
 
 Documentá el comportamiento actual del área: $ARGUMENTS
 
+**Confirmación (ver `AGENTS.md`):** antes de crear o modificar archivos,
+mostrá qué vas a cambiar y esperá un "sí". Antes de commitear, pushear,
+abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
+
 Esto no cambia código. Describe lo que la app hace hoy para que un humano
 valide si es lo que quiere.
 
