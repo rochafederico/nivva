@@ -5,6 +5,10 @@ argument-hint: <NNN>
 
 Cerrá la iteración $ARGUMENTS.
 
+**Confirmación (ver `AGENTS.md`):** antes de crear o modificar archivos,
+mostrá qué vas a cambiar y esperá un "sí". Antes de commitear, pushear,
+abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
+
 1. `git fetch origin`. Verificá que todas las tareas estén mergeadas en
    `origin/main`. Si falta alguna, listala y pará.
 2. Revisá los PRs de la iteración con `gh pr list --search "NNN" --state merged`

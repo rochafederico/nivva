@@ -5,6 +5,10 @@ argument-hint: <NNN> [T0N]
 
 Implementá una sola tarea de la iteración $ARGUMENTS.
 
+**Confirmación (ver `AGENTS.md`):** antes de crear o modificar archivos,
+mostrá qué vas a cambiar y esperá un "sí". Antes de commitear, pushear,
+abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
+
 1. `git fetch origin`. Verificá que `spec.md` y `tareas.md` de la iteración
    estén en `origin/main`. Si no, pará.
 2. Tomá la tarea indicada o la primera `pendiente` cuyas dependencias estén

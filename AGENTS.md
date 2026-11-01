@@ -44,6 +44,17 @@ Definidos en `.sdd/limits.json`:
 Antes de abrir un PR: `node scripts/check-pr-size.mjs`.
 Si no entra, se parte en PRs apilados más chicos. No se pide excepción.
 
+## Confirmación antes de actuar
+
+- **Analizar o revisar es solo leer.** Se reporta lo encontrado y se
+  propone; no se modifica nada.
+- **Antes de modificar**, el agente dice qué va a cambiar: archivos, qué
+  cambia en cada uno y líneas aproximadas. Espera un "sí" explícito. Si
+  el alcance cambia en el medio, vuelve a preguntar.
+- **Antes de subir** (commit, push, PR, issue o comentario en GitHub),
+  muestra un resumen y espera confirmación.
+- Sin respuesta no hay confirmación: si nadie contesta, se para.
+
 ## Validación humana
 
 - Los agentes abren PRs. **Nunca mergean**, nunca pushean a `main`
