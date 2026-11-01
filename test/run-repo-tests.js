@@ -22,6 +22,7 @@ import { tests as resumenTests } from './resumen.test.js';
 import { tests as montosFormatoTests } from './montos-formato.test.js';
 import { tests as menuButtonTests } from './menu-button.test.js';
 import { tests as menuButtonTeclasTests } from './menu-button-teclas.test.js';
+import { tests as montoRowTests } from './monto-row.test.js';
 
 async function run() {
     try {
@@ -77,6 +78,7 @@ async function run() {
         for (const test of montosFormatoTests) { await test(); }
         for (const test of menuButtonTests) { await test(); }
         for (const test of menuButtonTeclasTests) { await test(); }
+        for (const test of montoRowTests) { await test(); }
 
         printResults();
         process.exit(0);
