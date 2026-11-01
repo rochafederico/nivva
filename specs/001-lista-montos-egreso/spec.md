@@ -1,6 +1,6 @@
 ---
 id: 001-lista-montos-egreso
-estado: borrador   # borrador | aprobada | implementada | baseline
+estado: aprobada   # borrador | aprobada | implementada | baseline
 issue: "—"
 ---
 
