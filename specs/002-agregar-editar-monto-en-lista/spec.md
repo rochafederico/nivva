@@ -29,20 +29,14 @@ para esta iteración.
     la lista visible.
   - Editar un monto en su misma fila, con la lista visible.
   - Botones de la fila abierta: "Listo" y "Cancelar".
-  - Qué hace `Escape` con un monto abierto.
-  - Qué pasa al tocar "Guardar" del egreso con un monto abierto.
-  - Qué pasa al abrir otro monto con uno ya abierto (reemplaza la
-    pregunta "¿Cancelar los cambios actuales?").
-  - Los botones del pie de la ventana y el mensaje cuando no hay montos
-    al guardar.
+  - `Escape`, "Guardar" del egreso y abrir otro monto con uno abierto.
+  - Los botones del pie y el mensaje cuando no hay montos al guardar.
 - No incluye (iteración 003): cómo se escribe y se ve la cifra (sin
   flechitas, coma decimal), el formato de la fecha de vencimiento
   (`dd/mm/aaaa` sin importar el idioma del dispositivo) ni la moneda
   preseleccionada. Los tres campos se comportan igual que hoy.
-- No incluye (nunca en esta spec): la vista de detalle del egreso, las
-  listas del resumen del mes, la importación de una copia de seguridad,
-  ni lo que ya define la spec 001 para las filas cerradas (formato,
-  "Pagado", "Más acciones", Duplicar y Eliminar).
+- No incluye: el detalle del egreso, el resumen del mes, la importación
+  ni lo que la spec 001 ya define para las filas cerradas.
 
 ## Criterios de aceptación
 
@@ -116,9 +110,7 @@ hablada son las formas que define la spec 001.
     falta Acreedor o Tipo de deuda, también se marcan, y el foco va al
     primer campo con problema en el orden de la ventana.
 11. **Dado** un monto nuevo abierto con los tres campos vacíos, **cuando**
-    se toca "Guardar" en el pie, **entonces** se trata como el criterio 10:
-    no se guarda y se marcan los campos del monto. (Para no incluirlo hay
-    que tocar su "Cancelar".)
+    se toca "Guardar" en el pie, **entonces** pasa lo del criterio 10.
 
 ### Un solo monto abierto a la vez
 
@@ -154,9 +146,8 @@ hablada son las formas que define la spec 001.
   y Vencimiento van uno debajo del otro y "Listo" y "Cancelar" quedan
   debajo de los campos, dentro de la fila, sin scroll horizontal. Con el
   teclado del teléfono abierto, el campo con foco queda visible.
-- Lista larga: con un monto abierto, la lista se recorre con el scroll de
-  la ventana del egreso (sin scroll propio, como en la spec 001), y el
-  monto abierto no queda tapado por el encabezado ni por el pie.
+- Lista larga: sin scroll propio (spec 001); el monto abierto no queda
+  tapado por el encabezado ni por el pie.
 
 ## Accesibilidad (WCAG 2.2 AA)
 
@@ -186,9 +177,7 @@ Ver `docs/sdd/accesibilidad.md`.
 | Descartar el monto abierto | `Cancelar` |
 | Nombres que anuncia el lector (monto nuevo) | `Listo, monto nuevo` · `Cancelar monto nuevo` |
 | Nombres que anuncia el lector (monto 3) | `Listo, monto 3` · `Cancelar cambios del monto 3` |
-| Campos del monto abierto | `Monto` · `Moneda` · `Vencimiento` (sin cambios) |
-| Errores de cada campo | `Ingresá un monto válido.` · `Seleccioná una moneda.` · `Ingresá una fecha válida.` (sin cambios) |
-| Error general del monto abierto | `Completá monto, moneda y vencimiento para agregar el monto.` (sin cambios) |
+| Campos y errores del monto | Sin cambios respecto de hoy |
 | Anuncio al agregar | `Monto agregado. Vence el 10 de noviembre de 2026.` |
 | Anuncio al editar | `Monto actualizado.` |
 | Egreso sin montos al guardar | `Agregá al menos un monto para guardar el egreso.` (reemplaza `Debe agregar al menos un monto antes de guardar.`) |
@@ -199,14 +188,10 @@ Ver `docs/sdd/accesibilidad.md`.
 
 Deben quedar vacías antes de aprobar.
 
-1. `Listo` no está en la lista de verbos permitidos de
-   `docs/wiki/06-CTAs.md`. Se eligió igual para que no aparezca un segundo
-   "Guardar" en la ventana. ¿Se suma `Listo` a 06-CTAs como excepción
-   ("confirmar una fila dentro de un formulario que se guarda después")
-   en un PR aparte antes de aprobar esta spec?
-2. Criterio 12: con un monto abierto incompleto, tocar el "Editar" de
-   otro no lo abre y marca errores. ¿Está bien, o preferís que el monto
-   abierto se descarte sin preguntar?
+1. `Listo` no está en los verbos de `docs/wiki/06-CTAs.md`. ¿Se suma
+   como excepción en un PR aparte antes de aprobar esta spec?
+2. Criterio 12: ¿no abrir el otro monto y marcar errores, o descartar
+   el abierto sin preguntar?
 
 ## Definition of Ready
 
