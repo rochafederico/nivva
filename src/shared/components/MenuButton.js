@@ -3,6 +3,7 @@
 // Uso: el.label = 'Más acciones'; el.accessibleName = '…'; el.options = [{ value, text }].
 // Emite 'menu:select' con detail.value al elegir una opción.
 // Enter y Espacio sobre el botón lo activan como un clic nativo: abren con foco en la primera opción.
+import { teclaEnBoton, teclaEnMenu } from './menuButtonTeclas.js';
 
 let menuAbierto = null;
 let contador = 0;
@@ -44,6 +45,7 @@ export class MenuButton extends HTMLElement {
         });
         button.textContent = this.label;
         button.addEventListener('click', () => (this.isOpen ? this.close() : this.open(0)));
+        button.addEventListener('keydown', (e) => teclaEnBoton(e, this));
         const menu = crear('ul', 'dropdown-menu dropdown-menu-end', { id, role: 'menu', 'aria-label': this.label });
         this.options.forEach(({ value, text }) => {
             const item = crear('li', 'dropdown-item', { role: 'menuitem', tabindex: '-1', 'data-value': value });
@@ -51,7 +53,7 @@ export class MenuButton extends HTMLElement {
             item.addEventListener('click', () => this.select(value));
             menu.appendChild(item);
         });
-        menu.addEventListener('keydown', (e) => this._onMenuKey(e));
+        menu.addEventListener('keydown', (e) => teclaEnMenu(e, this));
         this.replaceChildren(button, menu);
     }
 
@@ -77,20 +79,6 @@ export class MenuButton extends HTMLElement {
     select(value) {
         this.close({ focusButton: true });
         this.dispatchEvent(new CustomEvent('menu:select', { detail: { value }, bubbles: true }));
-    }
-
-    _onMenuKey(e) {
-        const item = e.target.closest('[role="menuitem"]');
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            this.close({ focusButton: true });
-        } else if (e.key === 'Tab') {
-            this.close();
-        } else if ((e.key === 'Enter' || e.key === ' ') && item) {
-            e.preventDefault();
-            this.select(item.dataset.value);
-        }
     }
 }
 
