@@ -1,10 +1,10 @@
 import { DeudaModel } from '../DeudaModel.js';
 import { el } from '../../../shared/utils/dom.js';
 import '../../../shared/components/AppButton.js';
-import '../../../shared/components/AppCheckbox.js';
 import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
+import '../../montos/components/MontosList.js';
 import {
     trackFlowStart,
     trackFlowComplete,
@@ -35,7 +35,8 @@ export class DebtForm extends HTMLElement {
         if (!this._rendered) {
             this._rendered = true;
             this.render();
-            this.montosTbody = this.querySelector('#montos-tbody');
+            this.montosList = this.querySelector('montos-list');
+            this._conectarListaMontos();
         }
         this._addMontoBtn = this.querySelector('#add-monto');
         this._onAddMontoClick = (event) => {
@@ -132,32 +133,7 @@ export class DebtForm extends HTMLElement {
                             className: 'border rounded p-3',
                             attrs: { id: 'montos-table-wrapper' },
                             children: [
-                                el('div', {
-                                    className: 'overflow-auto',
-                                    style: 'min-height: 100px; max-height: 220px;',
-                                    // Zona con scroll: enfocable para poder recorrerla con teclado
-                                    attrs: { tabindex: '0', role: 'region', 'aria-labelledby': 'montos-label' },
-                                    children: [
-                                        el('table', {
-                                            className: 'table table-sm w-100 mb-0',
-                                            children: [
-                                                el('thead', {
-                                                    children: [
-                                                        el('tr', {
-                                                            children: [
-                                                                el('th', { text: 'Monto' }),
-                                                                el('th', { text: 'Moneda' }),
-                                                                el('th', { text: 'Vencimiento' }),
-                                                                el('th', { text: 'Acciones' })
-                                                            ]
-                                                        })
-                                                    ]
-                                                }),
-                                                el('tbody', { attrs: { id: 'montos-tbody' } })
-                                            ]
-                                        })
-                                    ]
-                                })
+                                el('montos-list', { attrs: { labelledby: 'montos-label' } })
                             ]
                         }),
                         el('div', {
@@ -377,85 +353,22 @@ export class DebtForm extends HTMLElement {
         }
     }
 
-    // Duplicate a monto in memory: copies monto/moneda/vencimiento, forces pagado=false.
-    // No modal is opened (inline only).
-    duplicateMonto(monto) {
-        trackFlowStart('duplicate_installment', { step: 'inline_duplicate', deudaId: this.deudaId, source: 'DebtForm' });
-        const nuevoMonto = { ...monto, pagado: false };
-        delete nuevoMonto.id;
-        this.montos.push(nuevoMonto);
-        this.renderMontosList();
-        const nuevoPeriodo = nuevoMonto.vencimiento ? nuevoMonto.vencimiento.slice(0, 7) : '';
-        trackFlowComplete('duplicate_installment', { deudaId: this.deudaId, period: nuevoPeriodo });
+    // La lista "Montos" (spec 001) dibuja, duplica y elimina; el formulario abre la edición.
+    _conectarListaMontos() {
+        this.montosList.addEventListener('montos:edit', (e) => this.openInlineEdit(e.detail.monto, e.detail.idx));
+        this.montosList.addEventListener('montos:empty', () => this.querySelector('#add-monto button')?.focus());
+        this.montosList.addEventListener('montos:duplicated', (e) => {
+            trackFlowStart('duplicate_installment', { step: 'inline_duplicate', deudaId: this.deudaId, source: 'DebtForm' });
+            trackFlowComplete('duplicate_installment', { deudaId: this.deudaId, period: e.detail.monto.vencimiento.slice(0, 7) });
+        });
     }
 
     renderMontosList() {
-        // Ordenar montos por fecha de vencimiento ascendente
-        this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
-        this.montosTbody.innerHTML = '';
         this._renderInlineAddForm();
         if (this.hasMontosAdded()) {
             this.clearFormError();
         }
-        this.montos.forEach((monto, idx) => {
-            const tr = el('tr');
-            const cells = [
-                { text: monto.monto },
-                { text: monto.moneda },
-                { text: monto.vencimiento },
-                {
-                    children: [
-                        el('div', {
-                            className: 'd-flex gap-1 align-items-center',
-                            children: [
-                                el('app-button', {
-                                    className: 'edit-monto',
-                                    text: '✎',
-                                    attrs: { title: 'Editar' },
-                                    on: {
-                                        click: () => this.openInlineEdit(monto, idx)
-                                    }
-                                }),
-                                el('app-button', {
-                                    className: 'delete-monto',
-                                    text: '×',
-                                    attrs: { variant: 'delete', title: 'Eliminar' },
-                                    on: {
-                                        click: () => {
-                                            if (!confirm('¿Seguro quiere eliminar el monto "' + monto.monto + '"?')) return;
-                                            this.montos.splice(idx, 1);
-                                            this.renderMontosList();
-                                        }
-                                    }
-                                }),
-                                el('app-button', {
-                                    className: 'duplicate-monto',
-                                    text: '⧉',
-                                    attrs: { variant: 'success', title: 'Duplicar' },
-                                    on: {
-                                        click: () => this.duplicateMonto(monto)
-                                    }
-                                }),
-                                (() => {
-                                    const idBase = monto.id ?? monto.vencimiento ?? 'monto';
-                                    const id = `app-checkbox-${idBase}-${idx}`;
-                                    const appCheckbox = document.createElement('app-checkbox');
-                                    appCheckbox.inputId = id;
-                                    appCheckbox.checked = !!monto.pagado;
-                                    appCheckbox.title = 'Marcar como pagado';
-                                    appCheckbox.addEventListener('checkbox-change', async (e) => {
-                                        monto.pagado = e.detail.checked;
-                                    });
-                                    return appCheckbox;
-                                })()
-                            ]
-                        })
-                    ]
-                }
-            ];
-            cells.forEach(cellOpts => tr.appendChild(el('td', cellOpts)));
-            this.montosTbody.appendChild(tr);
-        });
+        if (this.montosList) this.montosList.montos = this.montos;
     }
 
     load(deuda) {

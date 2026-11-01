@@ -735,14 +735,14 @@ async function testDuplicarMontoInline() {
     assert(form.querySelector('#montoModal') === null, 'No hay #montoModal');
     assert(form.querySelector('#duplicateMontoModal') === null, 'No hay #duplicateMontoModal');
 
-    form.duplicateMonto(form.montos[0]);
+    const menu = form.querySelector('montos-list menu-button'); menu.open(0); menu.items[0].click();
 
     assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
     const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
     assert(dupl !== undefined, 'El duplicado no tiene id');
     assert(dupl.monto === 5000, 'Monto copiado: 5000');
     assert(dupl.moneda === 'USD', 'Moneda copiada: USD');
-    assert(dupl.vencimiento === '2026-09-01', 'Vencimiento copiado');
+    assert(dupl.vencimiento === '2026-10-01', 'Vence el mes siguiente (spec 001)');
     assert(dupl.pagado === false, 'pagado forzado a false en el duplicado');
 
     document.body.removeChild(form);
@@ -763,7 +763,6 @@ async function testNoModalSecundarioEnDebtForm() {
     assert(form.querySelector('#duplicateMontoModal') === null, 'No debe existir #duplicateMontoModal en DebtForm');
     assert(typeof form.openInlineAdd === 'function', 'Debe existir método openInlineAdd');
     assert(typeof form.openInlineEdit === 'function', 'Debe existir método openInlineEdit');
-    assert(typeof form.duplicateMonto === 'function', 'Debe existir método duplicateMonto');
     assert(typeof form.openMontoModal === 'undefined', 'openMontoModal ya no debe existir');
     assert(typeof form.openDuplicateMontoModal === 'undefined', 'openDuplicateMontoModal ya no debe existir');
 
