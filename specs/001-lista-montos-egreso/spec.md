@@ -34,7 +34,8 @@ la lista (criterios 6 y 7).
     "Editar egreso", en lugar de la tabla.
   - Cifra y vencimiento con formato, y casilla "Pagado" visible.
   - Acción "Editar" visible y menú "Más acciones" con Duplicar y Eliminar.
-  - Duplicar con vencimiento en el mes siguiente al último monto.
+  - Duplicar con vencimiento en el mes siguiente al último monto; el
+    monto nuevo corresponde al mes de ese vencimiento.
   - Mensaje cuando no hay montos.
   - Que la lista no tenga scroll propio.
 - No incluye (iteración 002):
@@ -51,17 +52,17 @@ la lista (criterios 6 y 7).
 ## Forma hablada
 
 Lo que lee el lector de pantalla y lo que dice la confirmación al
-eliminar usa estas formas, distintas de lo que se ve en la fila:
+eliminar usa estas formas, distintas de lo que se ve en la fila. Igual
+que lo visible, no depende de la región configurada en el dispositivo.
 
 - **Monto hablado:** la cifra sin separador de miles y el nombre de la
   moneda. Si no tiene centavos, va sin decimales; si tiene, siempre con
-  dos (`1,5` se dice `1,50`). El separador de decimales es el de la
-  región de la persona (en Argentina, la coma). La moneda va en singular
-  solo si la cifra es exactamente 1 (`1 peso`, `1 dólar`); si no, en
-  plural (`2 pesos`, `1,50 pesos`, `0,50 dólares`). Nunca se lee `$` ni
+  dos (`1,5` se dice `1,50`). El separador de decimales es la coma. La
+  moneda va en singular solo si la cifra es exactamente 1 (`1 peso`,
+  `1 dólar`); si no, en plural (`2 pesos`, `1,50 pesos`,
+  `0,50 dólares`). Nunca se lee `$` ni
   `US$`, porque en español el lector dice "dólares" también para `$`.
-- **Fecha hablada:** día, nombre del mes y año, en el orden de la región
-  de la persona (en Argentina, `10 de noviembre de 2026`).
+- **Fecha hablada:** día, nombre del mes y año (`10 de noviembre de 2026`).
 
 ## Criterios de aceptación
 
@@ -92,10 +93,14 @@ eliminar usa estas formas, distintas de lo que se ve en la fila:
    2026, **cuando** se duplica un monto que vence el día 10, **entonces**
    aparece un monto nuevo con la misma cifra y moneda, sin marcar como
    pagado, que vence el 10/01/2027: mismo día que el monto duplicado, en
-   el mes siguiente al último vencimiento de la lista.
-7. **Dado** que se duplica un monto que vence el día 31 y el mes siguiente
-   tiene menos días, **cuando** se calcula el vencimiento, **entonces**
-   vence el último día de ese mes (por ejemplo, 28/02/2027).
+   el mes siguiente al último vencimiento de la lista. El monto nuevo
+   corresponde a enero de 2027: en el resumen del mes aparece en enero,
+   no en diciembre.
+7. **Dado** un egreso cuyo último monto de la lista vence en enero de
+   2027, **cuando** se duplica un monto que vence el día 31, **entonces**
+   el monto nuevo vence el 28/02/2027, el último día del mes siguiente.
+   En un año bisiesto vence el 29 (por ejemplo, 29/02/2028 si el último
+   monto vence en enero de 2028).
 8. **Dado** un monto, **cuando** se usa su botón "Más acciones",
    **entonces** se abre un menú con "Duplicar" y "Eliminar" que funciona
    así con teclado y mouse:
@@ -115,8 +120,9 @@ eliminar usa estas formas, distintas de lo que se ve en la fila:
      cada opción como opción de menú.
 9. **Dado** que se duplicó un monto, **cuando** la lista se actualiza,
    **entonces** el foco pasa a "Editar" del monto nuevo y el lector
-   anuncia, sin mover el foco, `Monto duplicado. Vence el 10 de enero de
-   2027.` (fecha en la forma hablada).
+   anuncia, sin mover el foco, `Monto duplicado.` seguido del vencimiento
+   del monto nuevo en la forma hablada (con el ejemplo del criterio 6:
+   `Monto duplicado. Vence el 10 de enero de 2027.`).
 10. **Dado** un monto, **cuando** se elige "Eliminar" en su menú,
     **entonces** el menú se cierra y aparece la confirmación propia del
     navegador, con sus botones de siempre, y el texto
