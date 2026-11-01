@@ -32,7 +32,7 @@ la lista (criterios 6 y 7).
 - Incluye:
   - Ver los montos como filas tipo tarjeta, en "Agregar egreso" y en
     "Editar egreso", en lugar de la tabla.
-  - Cifra y vencimiento con formato, y casilla "Pagado" visible.
+  - Cifra y vencimiento con formato, e interruptor "Pagado" visible.
   - Acción "Editar" visible y menú "Más acciones" con Duplicar y Eliminar.
   - Duplicar con vencimiento en el mes siguiente al último monto; el
     monto nuevo corresponde al mes de ese vencimiento.
@@ -82,11 +82,13 @@ que lo visible, no depende de la región configurada en el dispositivo.
 3. **Dado** un monto, **cuando** el lector de pantalla lee su fila,
    **entonces** dice el monto y el vencimiento en la forma hablada
    (`15000 pesos`, `Vence el 10 de noviembre de 2026`).
-4. **Dado** un monto, **cuando** se ve su fila, **entonces** tiene una
-   casilla con la etiqueta visible "Pagado", marcada si el monto está
-   pagado, que es la única indicación del estado (no hay otro texto
-   "Pagado" o "Pendiente"). Al cambiarla, el estado queda así cuando se
-   guarda el egreso (como hoy) y el foco sigue en la casilla.
+4. **Dado** un monto, **cuando** se ve su fila, **entonces** tiene un
+   interruptor con la etiqueta visible "Pagado", con el mismo aspecto
+   que el del listado de egresos, activado si el monto está pagado, que
+   es la única indicación del estado (no hay otro texto "Pagado" o
+   "Pendiente"). El lector lo anuncia como interruptor e indica si está
+   activado. Al cambiarlo, el estado queda así cuando se guarda el
+   egreso (como hoy) y el foco sigue en el interruptor.
 5. **Dado** un monto, **cuando** se toca "Editar" en su fila, **entonces**
    se abre la edición de ese monto, igual que hoy con ✎.
 6. **Dado** un egreso cuyo último monto de la lista vence en diciembre de
@@ -154,7 +156,7 @@ que lo visible, no depende de la región configurada en el dispositivo.
   resuelve en la validación al importar, que no es parte de esta spec.
 - Vacío: criterio 12.
 - Mobile: a 320 px de ancho cada fila se lee completa (monto,
-  vencimiento, casilla y acciones) sin scroll horizontal; las acciones
+  vencimiento, interruptor y acciones) sin scroll horizontal; las acciones
   pueden pasar a una segunda línea dentro de la fila.
 
 ## Accesibilidad (WCAG 2.2 AA)
@@ -163,16 +165,16 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Escuchar los montos como una lista llamada "Montos", la casilla con su etiqueta, la moneda por su nombre y la fecha completa (criterios 1 y 3) | Recorrer la lista con lector de pantalla |
+| 1.3.1 Info y relaciones | Escuchar los montos como una lista llamada "Montos", el interruptor con su etiqueta, la moneda por su nombre y la fecha completa (criterios 1 y 3) | Recorrer la lista con lector de pantalla |
 | 1.4.3 Contraste mínimo | Leer monto, vencimiento y textos de la fila sobre su fondo | Revisar el contraste a mano |
 | 1.4.10 Reflow | Usar la lista a 320 px sin scroll horizontal ni scroll interno | Achicar la ventana a 320 px o usar zoom al 400 % |
-| 1.4.11 Contraste no textual | Distinguir el borde de la fila, la casilla y el foco | Revisar el contraste a mano |
-| 2.1.1 Teclado | Editar, abrir el menú, elegir una opción y marcar "Pagado" sin mouse (criterio 8) | Recorrer la fila solo con teclado |
+| 1.4.11 Contraste no textual | Distinguir el borde de la fila, el interruptor y el foco | Revisar el contraste a mano |
+| 2.1.1 Teclado | Editar, abrir el menú, elegir una opción y activar "Pagado" sin mouse (criterios 4 y 8) | Recorrer la fila solo con teclado |
 | 2.4.3 Orden del foco | Saber dónde queda el foco después de cada acción (criterios 4, 8, 9, 10 y 11) | Duplicar, eliminar y cancelar con teclado |
-| 2.4.7 Foco visible | Ver dónde está el foco en botones, opciones del menú y casilla | Recorrer la fila con `Tab` |
+| 2.4.7 Foco visible | Ver dónde está el foco en botones, opciones del menú e interruptor | Recorrer la fila con `Tab` |
 | 2.4.11 Foco no tapado | Que el foco en una fila no quede debajo del encabezado ni del pie de la ventana (criterio 13) | Recorrer con `Tab` una lista más larga que la pantalla |
 | 2.5.3 Etiqueta en el nombre | Activar cada control por voz diciendo el texto que ve (criterio 14) | Escuchar los nombres con lector de pantalla |
-| 2.5.8 Tamaño del objetivo | Tocar botones y casilla sin errar | Usar la lista con el dedo en un teléfono |
+| 2.5.8 Tamaño del objetivo | Tocar botones e interruptor sin errar | Usar la lista con el dedo en un teléfono |
 | 4.1.2 Nombre, función, valor | Saber qué es cada control, cómo se llama y su estado, incluido si el menú está abierto (criterio 8) | Escuchar los controles con lector de pantalla |
 | 4.1.3 Mensajes de estado | Enterarse de que un monto se duplicó o se eliminó sin perder el foco (criterios 9 y 11) | Duplicar y eliminar con lector de pantalla |
 
@@ -186,7 +188,7 @@ Ver `docs/sdd/accesibilidad.md`.
 | Monto hablado | `15000 pesos` · `15000,50 pesos` · `1 peso` · `1 dólar` · `1200 dólares` |
 | Vencimiento visible | `Vence el 10/11/2026` |
 | Vencimiento hablado | `Vence el 10 de noviembre de 2026` |
-| Casilla | `Pagado` |
+| Interruptor | `Pagado` |
 | Botón de la fila | `Editar` |
 | Botón del menú | `Más acciones` |
 | Opciones del menú | `Duplicar` · `Eliminar` |
