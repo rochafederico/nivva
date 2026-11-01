@@ -10,7 +10,7 @@
 | Término aprobado | Sinónimos prohibidos | Definición operativa | Ejemplo de uso en UI |
 |---|---|---|---|
 | **Egreso** | Deuda, gasto fijo, compromiso, obligación | Pago periódico o único que la persona debe realizar (alquiler, tarjeta, préstamo, servicio) | "Agregá un egreso" / "Egresos del mes" |
-| **Monto** | Cuota, importe, valor, plata, precio | Cifra numérica de un pago dentro de un egreso, asociada a moneda, vencimiento y período | "Monto: $15.000 ARS" / "Agregar monto" |
+| **Monto** | Cuota, importe, valor, plata, precio | Cifra numérica de un pago dentro de un egreso, asociada a moneda, vencimiento y período | "$ 15.000,00" / "US$ 15.000,00" / "Agregar monto" |
 | **Acreedor** | A quién le debo, prestamista, empresa | Entidad o persona a la que se le debe el pago del egreso | "Acreedor: Banco Galicia" |
 | **Tipo de deuda** | Categoría, tipo, clase | Clasificación libre del egreso (ej: tarjeta, alquiler, préstamo, servicio) | "Tipo de deuda: Tarjeta de crédito" |
 | **Ingreso** | Sueldo, entrada, plata que entra | Dinero recibido en un período (sueldo, honorarios, renta, etc.) | "Agregar ingreso" / "Ingresos del mes" |
