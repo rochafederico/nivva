@@ -19,6 +19,7 @@ import { tests as layoutTests } from './layout.test.js';
 import { tests as appFormTests } from './app-form.test.js';
 import { tests as pwaResponsiveTests } from './pwa-responsive.test.js';
 import { tests as resumenTests } from './resumen.test.js';
+import { tests as montosFormatoTests } from './montos-formato.test.js';
 
 async function run() {
     try {
@@ -69,6 +70,9 @@ async function run() {
 
         console.log('\n--- PWA / Responsive ---');
         for (const test of pwaResponsiveTests) { await test(); }
+
+        console.log('\n--- Spec 001: lista de montos ---');
+        for (const test of montosFormatoTests) { await test(); }
 
         printResults();
         process.exit(0);
