@@ -15,7 +15,7 @@ function nuevoFormulario(montos) {
     return form;
 }
 
-const filas = (form) => [...form.querySelectorAll('montos-list li')];
+const filas = (form) => [...form.querySelectorAll('montos-list ul[role="list"] > li')];
 
 function elegir(fila, indice) {
     const menu = fila.querySelector('menu-button'); menu.open(0); menu.items[indice].click();
