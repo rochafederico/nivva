@@ -31,10 +31,8 @@ para esta iteración.
   - Botones de la fila abierta: "Listo" y "Cancelar".
   - `Escape`, "Guardar" del egreso y abrir otro monto con uno abierto.
   - Los botones del pie y el mensaje cuando no hay montos al guardar.
-- No incluye (iteración 003): cómo se escribe y se ve la cifra (sin
-  flechitas, coma decimal), el formato de la fecha de vencimiento
-  (`dd/mm/aaaa` sin importar el idioma del dispositivo) ni la moneda
-  preseleccionada. Los tres campos se comportan igual que hoy.
+- No incluye (iteración 003): cifra con coma decimal, fecha
+  `dd/mm/aaaa` y moneda preseleccionada. Los campos quedan como hoy.
 - No incluye: el detalle del egreso, el resumen del mes, la importación
   ni lo que la spec 001 ya define para las filas cerradas.
 
@@ -121,10 +119,8 @@ hablada son las formas que define la spec 001.
     muestra sus errores como en el criterio 8. Ya no aparece la pregunta
     `¿Cancelar los cambios actuales?`. Nunca hay más de un monto abierto.
 13. **Dado** un monto abierto, **cuando** se usa "Pagado" o "Más acciones"
-    de otro monto, **entonces** esos controles funcionan como en la spec
-    001 y el monto abierto sigue abierto con lo que se haya escrito. Si
-    se duplica o elimina otro monto, el monto abierto no pierde lo
-    escrito.
+    de otro monto (spec 001), **entonces** el monto abierto sigue abierto
+    sin perder lo escrito.
 
 ### Pie de la ventana y lista vacía
 
