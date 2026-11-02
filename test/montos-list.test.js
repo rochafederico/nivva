@@ -69,7 +69,9 @@ function testEditarAvisaAlFormulario() {
     const { lista, quitar } = montar(montos);
     let aviso = null;
     lista.addEventListener('montos:edit', e => { aviso = e.detail; });
-    lista.querySelectorAll('[data-accion="editar"]')[1].click();
+    const menu = lista.querySelectorAll('menu-button')[1];
+    menu.open(0);
+    menu.items[0].click();
     assert(aviso && aviso.monto.monto === 200 && aviso.idx === 1, 'Avisa el monto 2 de la lista');
     assert(lista.querySelector('[role="status"]'), 'Tiene una región para anuncios desde el inicio');
     quitar();

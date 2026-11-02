@@ -735,7 +735,7 @@ async function testDuplicarMontoInline() {
     assert(form.querySelector('#montoModal') === null, 'No hay #montoModal');
     assert(form.querySelector('#duplicateMontoModal') === null, 'No hay #duplicateMontoModal');
 
-    const menu = form.querySelector('montos-list menu-button'); menu.open(0); menu.items[0].click();
+    const menu = form.querySelector('montos-list menu-button'); menu.open(0); menu.items[1].click();
 
     assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
     const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
