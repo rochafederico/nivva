@@ -32,8 +32,8 @@ function testListaLlamadaMontos() {
     assert(ul.children.length === 3, 'Una fila por monto (el lector cuenta los elementos)');
     const cifras = [...ul.querySelectorAll('li .fw-semibold [aria-hidden="true"]')].map(n => n.textContent);
     assert(cifras.join('|') === '$ 100,00|US$ 200,00|$ 300,00', 'Ordenada por vencimiento');
-    assert(ul.children[2].querySelector('[data-accion="editar"]').getAttribute('aria-label') ===
-        'Editar monto 3, 300 pesos', 'La posición sigue el orden de la lista');
+    assert(ul.children[2].querySelector('menu-button').button.getAttribute('aria-label') ===
+        'Acciones del monto 3, 300 pesos', 'La posición sigue el orden de la lista');
     quitar();
 }
 

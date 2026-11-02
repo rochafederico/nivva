@@ -1,6 +1,6 @@
 // src/features/montos/components/MontoRow.js
 // Fila de un monto en la lista "Montos" (spec 001): cifra y vencimiento visibles y hablados,
-// casilla "Pagado", botón "Editar" y menú "Más acciones" (Duplicar, Eliminar).
+// interruptor "Pagado" y menú ⋮ (Editar, Duplicar, Eliminar).
 // La fila avisa con 'monto:edit', 'monto:duplicate' y 'monto:delete' (detail.monto).
 import { formatMoneda } from '../../../shared/config/monedas.js';
 import { formatFecha } from '../../../shared/utils/fechas.js';
@@ -27,11 +27,13 @@ function dobleTexto(className, visibleText, habladoText) {
     return contenedor;
 }
 
-function casillaPagado(monto, referencia) {
+// Interruptor con el mismo aspecto que el del listado de egresos (form-switch, role="switch").
+function interruptorPagado(monto, referencia) {
     const id = `monto-pagado-${++contador}`;
-    const contenedor = nodo('div', 'form-check mb-0');
+    const contenedor = nodo('div', 'form-check form-switch mb-0');
     const casilla = nodo('input', 'form-check-input');
     casilla.type = 'checkbox';
+    casilla.setAttribute('role', 'switch');
     casilla.id = id;
     casilla.checked = !!monto.pagado;
     casilla.style.cssText = MARGEN_FOCO;
@@ -61,26 +63,20 @@ export function crearFilaMonto(monto, posicion) {
             `Vence el ${fechaHablada(monto.vencimiento)}`)
     );
 
-    const editar = nodo('button', 'btn btn-outline-primary btn-sm', 'Editar');
-    editar.type = 'button';
-    editar.dataset.accion = 'editar';
-    editar.setAttribute('aria-label', `Editar ${referencia}`);
-    editar.style.cssText = MARGEN_FOCO;
-    editar.addEventListener('click', () => avisar('monto:edit'));
-
+    const opciones = { editar: 'monto:edit', duplicar: 'monto:duplicate', eliminar: 'monto:delete' };
     const menu = document.createElement('menu-button');
-    menu.label = 'Más acciones';
-    menu.accessibleName = `Más acciones para el ${referencia}`;
-    menu.options = [{ value: 'duplicar', text: 'Duplicar' }, { value: 'eliminar', text: 'Eliminar' }];
+    menu.label = '⋮';
+    menu.accessibleName = `Acciones del ${referencia}`;
+    menu.options = [
+        { value: 'editar', text: 'Editar' }, { value: 'duplicar', text: 'Duplicar' }, { value: 'eliminar', text: 'Eliminar' }
+    ];
     menu.render();
     menu.button.style.cssText = MARGEN_FOCO;
     menu.addEventListener('menu:select', (e) => {
         e.stopPropagation();
-        avisar(e.detail.value === 'duplicar' ? 'monto:duplicate' : 'monto:delete');
+        avisar(opciones[e.detail.value]);
     });
 
-    const acciones = nodo('div', 'd-flex gap-2');
-    acciones.append(editar, menu);
-    fila.append(datos, casillaPagado(monto, referencia), acciones);
+    fila.append(datos, interruptorPagado(monto, referencia), menu);
     return fila;
 }
