@@ -1,6 +1,7 @@
 // src/shared/components/MenuButton.js
 // Botón de menú (patrón Menu Button del W3C): un botón que abre una lista de opciones.
-// Uso: el.label = 'Más acciones'; el.accessibleName = '…'; el.options = [{ value, text }].
+// Uso: el.label = '⋮'; el.accessibleName = '…'; el.options = [{ value, text }].
+// El menú se llama como el botón, así el lector no lee el texto visible si es un ícono.
 // Emite 'menu:select' con detail.value al elegir una opción.
 // Enter y Espacio sobre el botón lo activan como un clic nativo: abren con foco en la primera opción.
 import { teclaEnBoton, teclaEnMenu } from './menuButtonTeclas.js';
@@ -40,13 +41,13 @@ export class MenuButton extends HTMLElement {
         this._rendered = true;
         const id = `menu-button-${++contador}`;
         const button = crear('button', 'btn btn-outline-secondary btn-sm', {
-            type: 'button', 'aria-label': this.accessibleName || this.label,
+            type: 'button', id: `${id}-boton`, 'aria-label': this.accessibleName || this.label,
             'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-controls': id
         });
         button.textContent = this.label;
         button.addEventListener('click', () => (this.isOpen ? this.close() : this.open(0)));
         button.addEventListener('keydown', (e) => teclaEnBoton(e, this));
-        const menu = crear('ul', 'dropdown-menu dropdown-menu-end', { id, role: 'menu', 'aria-label': this.label });
+        const menu = crear('ul', 'dropdown-menu dropdown-menu-end', { id, role: 'menu', 'aria-labelledby': `${id}-boton` });
         this.options.forEach(({ value, text }) => {
             const item = crear('li', 'dropdown-item', { role: 'menuitem', tabindex: '-1', 'data-value': value });
             item.textContent = text;
