@@ -25,6 +25,8 @@ function testAnunciosCerrado() {
     assert(document.getElementById(button.getAttribute('aria-controls')) === menu.menu, 'Controla su menú');
     assert(menu.items.map(i => i.getAttribute('role')).join() === 'menuitem,menuitem', 'Opciones como opción de menú');
     assert(menu.items.map(i => i.textContent).join() === 'Duplicar,Eliminar', 'Opciones Duplicar y Eliminar');
+    assert(menu.menu.matches('.dropdown-menu-end[data-bs-popper]'), 'Alineado al borde derecho del botón');
+    assert(button.classList.contains('btn-outline-primary'), 'Botón btn-outline-primary');
     menu.remove();
 }
 

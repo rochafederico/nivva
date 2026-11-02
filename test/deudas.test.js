@@ -730,12 +730,8 @@ async function testDuplicarMontoInline() {
         id: 42, monto: 5000, moneda: 'USD', vencimiento: '2026-09-01', pagado: true
     }];
     form.renderMontosList();
-
-    // No debe haber montoModal ni duplicateMontoModal en el DOM
-    assert(form.querySelector('#montoModal') === null, 'No hay #montoModal');
-    assert(form.querySelector('#duplicateMontoModal') === null, 'No hay #duplicateMontoModal');
-
-    const menu = form.querySelector('montos-list menu-button'); menu.open(0); menu.items[0].click();
+    // Que no use modales lo prueba UC14.
+    const menu = form.querySelector('montos-list menu-button'); menu.open(0); menu.items[1].click();
 
     assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
     const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));

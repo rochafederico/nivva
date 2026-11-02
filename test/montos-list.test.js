@@ -32,8 +32,8 @@ function testListaLlamadaMontos() {
     assert(ul.children.length === 3, 'Una fila por monto (el lector cuenta los elementos)');
     const cifras = [...ul.querySelectorAll('li .fw-semibold [aria-hidden="true"]')].map(n => n.textContent);
     assert(cifras.join('|') === '$ 100,00|US$ 200,00|$ 300,00', 'Ordenada por vencimiento');
-    assert(ul.children[2].querySelector('[data-accion="editar"]').getAttribute('aria-label') ===
-        'Editar monto 3, 300 pesos', 'La posición sigue el orden de la lista');
+    assert(ul.children[2].querySelector('menu-button').button.getAttribute('aria-label') ===
+        'Acciones del monto 3, 300 pesos', 'La posición sigue el orden de la lista');
     quitar();
 }
 
@@ -69,7 +69,9 @@ function testEditarAvisaAlFormulario() {
     const { lista, quitar } = montar(montos);
     let aviso = null;
     lista.addEventListener('montos:edit', e => { aviso = e.detail; });
-    lista.querySelectorAll('[data-accion="editar"]')[1].click();
+    const menu = lista.querySelectorAll('menu-button')[1];
+    menu.open(0);
+    menu.items[0].click();
     assert(aviso && aviso.monto.monto === 200 && aviso.idx === 1, 'Avisa el monto 2 de la lista');
     assert(lista.querySelector('[role="status"]'), 'Tiene una región para anuncios desde el inicio');
     quitar();
