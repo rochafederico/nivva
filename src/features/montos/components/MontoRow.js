@@ -1,6 +1,6 @@
 // src/features/montos/components/MontoRow.js
 // Fila de un monto en la lista "Montos" (spec 001): cifra y vencimiento visibles y hablados,
-// interruptor "Pagado" y menú ⋮ (Editar, Duplicar, Eliminar).
+// interruptor de pagado sin texto visible y menú ⋮ (Editar, Duplicar, Eliminar).
 // La fila avisa con 'monto:edit', 'monto:duplicate' y 'monto:delete' (detail.monto).
 import { formatMoneda } from '../../../shared/config/monedas.js';
 import { formatFecha } from '../../../shared/utils/fechas.js';
@@ -38,9 +38,9 @@ function interruptorPagado(monto, referencia) {
     casilla.checked = !!monto.pagado;
     casilla.style.cssText = MARGEN_FOCO;
     casilla.addEventListener('change', () => { monto.pagado = casilla.checked; });
-    const etiqueta = nodo('label', 'form-check-label ms-2', 'Pagado');
+    // Sin texto visible, como el del listado: el nombre solo lo escucha el lector.
+    const etiqueta = nodo('label', 'visually-hidden', `Pagado, ${referencia}`);
     etiqueta.htmlFor = id;
-    etiqueta.appendChild(nodo('span', 'visually-hidden', `: ${referencia}`));
     contenedor.append(casilla, etiqueta);
     return contenedor;
 }

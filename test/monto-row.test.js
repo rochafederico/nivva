@@ -1,5 +1,5 @@
 // test/monto-row.test.js
-// Spec 001 · T04 y T08: fila de un monto — cifra, vencimiento, interruptor "Pagado" y menú ⋮.
+// Spec 001 · T04 y T08: fila de un monto — cifra, vencimiento, interruptor de pagado y menú ⋮.
 import { assert } from './setup.js';
 import { crearFilaMonto } from '../src/features/montos/components/MontoRow.js';
 
@@ -38,7 +38,7 @@ function testFormaHablada() {
 }
 
 function testInterruptorPagado() {
-    console.log('  Spec 001 C4: interruptor "Pagado" con etiqueta visible, única indicación del estado');
+    console.log('  Spec 001 C4: interruptor sin texto visible, única indicación del estado');
     const monto = { ...peso, pagado: true };
     const fila = montar(monto);
     const casilla = fila.querySelector('input[type="checkbox"]');
@@ -46,7 +46,7 @@ function testInterruptorPagado() {
     assert(casilla.getAttribute('role') === 'switch', 'El lector lo anuncia como interruptor');
     assert(casilla.closest('.form-switch'), 'Mismo aspecto que el del listado de egresos');
     assert(casilla.checked, 'Activado si el monto está pagado');
-    assert(etiqueta && etiqueta.textContent.startsWith('Pagado'), 'Etiqueta visible "Pagado"');
+    assert(etiqueta && etiqueta.classList.contains('visually-hidden'), 'Sin texto visible');
     assert(!/Pendiente/.test(fila.textContent), 'No hay texto "Pendiente"');
     assert(fila.textContent.split('Pagado').length === 2, 'No hay otro texto "Pagado"');
     casilla.focus();
@@ -57,7 +57,7 @@ function testInterruptorPagado() {
 }
 
 function testNombresDeLosControles() {
-    console.log('  Spec 001 C14: nombres que empiezan con el texto visible');
+    console.log('  Spec 001 C14: nombres del interruptor y del botón ⋮');
     const fila = montar(peso, 3);
     const casilla = fila.querySelector('input[type="checkbox"]');
     const etiqueta = fila.querySelector(`label[for="${casilla.id}"]`);
@@ -67,7 +67,7 @@ function testNombresDeLosControles() {
     assert(menu.button.getAttribute('aria-label') === 'Acciones del monto 3, 15000 pesos', 'Acciones del monto 3, 15000 pesos');
     assert(!menu.menu.hasAttribute('aria-label') && menu.menu.getAttribute('aria-labelledby') === menu.button.id,
         'El menú se llama como el botón: el lector no lee los tres puntos');
-    assert(etiqueta.textContent === 'Pagado: monto 3, 15000 pesos', 'Pagado: monto 3, 15000 pesos');
+    assert(etiqueta.textContent === 'Pagado, monto 3, 15000 pesos', 'Pagado, monto 3, 15000 pesos');
     assert(menu.items.map(i => i.textContent).join() === 'Editar,Duplicar,Eliminar', 'Menú con Editar, Duplicar y Eliminar');
     fila.parentNode.remove();
 }
