@@ -18,8 +18,8 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
 - [1] Defecto del flujo, ya corregido: la interacción se vio recién en la
   última tarea y se cambió después (#248: interruptor y menú ⋮), y se
   hizo un menú propio existiendo el dropdown de Bootstrap. Ahora el plan
-  incluye `flujo.md` con recorrido en Mermaid, componentes de Bootstrap y
-  heurísticas. Evaluar en la retro si alcanzó. (001)
+  incluye `flujo.md` con recorrido en Mermaid, componentes de Bootstrap,
+  wireframe y heurísticas. Evaluar en la retro si alcanzó. (001)
 
 ## Promovidos
 

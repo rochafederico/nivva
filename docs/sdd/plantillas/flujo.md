@@ -27,9 +27,26 @@ a lo que Bootstrap ofrece o se justifica acá el componente propio.
 |---|---|---|
 | … | … | sí · no: qué falta y qué se decide |
 
+## Wireframe
+
+Cada pantalla o estado que cambia, en texto a 320 px de ancho. Solo
+elementos, orden y textos de la spec, con el componente de Bootstrap a la
+derecha. Sin colores ni medidas: alcanza con ver qué entra y qué se ve.
+
+```
+┌──────────────────────────────────┐  320 px
+│ Título                           │
+│ ┌──────────────────────────────┐ │  list-group-item
+│ │ Dato principal   Control    ⋮│ │  form-switch · dropdown
+│ │ Dato secundario              │ │
+│ └──────────────────────────────┘ │
+└──────────────────────────────────┘
+```
+
 ## Heurísticas de Nielsen
 
-Una línea por heurística: "ok" o el hallazgo y qué se decide.
+Se evalúan sobre el recorrido y el wireframe. Una línea por heurística:
+"ok" o el hallazgo y qué se decide.
 
 1. Visibilidad del estado del sistema: …
 2. Coincidencia con el mundo real: …

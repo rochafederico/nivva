@@ -22,7 +22,7 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
 4. Rama `it/NNN-descripcion-plan` desde `origin/main`.
 5. Si la spec cambia lo que ve o hace la persona, primero completá
    `flujo.md` desde la plantilla: recorrido en Mermaid, componente de
-   Bootstrap para cada paso y heurísticas. El plan elige componentes a
+   Bootstrap para cada paso, wireframe a 320 px y heurísticas. El plan elige componentes a
    partir de ese flujo. Si un paso pide algo que Bootstrap no hace, pará
    y preguntá si se ajusta la spec o se justifica un componente propio.
 6. Completá `plan.md` y `tareas.md` desde `docs/sdd/plantillas/`.
