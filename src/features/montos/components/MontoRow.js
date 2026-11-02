@@ -38,7 +38,7 @@ function interruptorPagado(monto, referencia) {
     casilla.checked = !!monto.pagado;
     casilla.style.cssText = MARGEN_FOCO;
     casilla.addEventListener('change', () => { monto.pagado = casilla.checked; });
-    const etiqueta = nodo('label', 'form-check-label', 'Pagado');
+    const etiqueta = nodo('label', 'form-check-label ms-2', 'Pagado');
     etiqueta.htmlFor = id;
     etiqueta.appendChild(nodo('span', 'visually-hidden', `: ${referencia}`));
     contenedor.append(casilla, etiqueta);

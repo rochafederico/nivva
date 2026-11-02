@@ -40,14 +40,16 @@ export class MenuButton extends HTMLElement {
     render() {
         this._rendered = true;
         const id = `menu-button-${++contador}`;
-        const button = crear('button', 'btn btn-outline-secondary btn-sm', {
+        const button = crear('button', 'btn btn-outline-primary btn-sm', {
             type: 'button', id: `${id}-boton`, 'aria-label': this.accessibleName || this.label,
             'aria-haspopup': 'menu', 'aria-expanded': 'false', 'aria-controls': id
         });
         button.textContent = this.label;
         button.addEventListener('click', () => (this.isOpen ? this.close() : this.open(0)));
         button.addEventListener('keydown', (e) => teclaEnBoton(e, this));
-        const menu = crear('ul', 'dropdown-menu dropdown-menu-end', { id, role: 'menu', 'aria-labelledby': `${id}-boton` });
+        const menu = crear('ul', 'dropdown-menu dropdown-menu-end', {
+            id, role: 'menu', 'aria-labelledby': `${id}-boton`, 'data-bs-popper': 'static' // activa dropdown-menu-end
+        });
         this.options.forEach(({ value, text }) => {
             const item = crear('li', 'dropdown-item', { role: 'menuitem', tabindex: '-1', 'data-value': value });
             item.textContent = text;
