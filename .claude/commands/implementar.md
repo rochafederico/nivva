@@ -17,7 +17,9 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
    `git config branch.<rama>.sddBase <rama-anterior>`.
 3. Rama `it/NNN-descripcion` (o `it/NNN-descripcion-T0N` si apilás).
 4. Primero los tests de los criterios que cubre la tarea; después el código.
-5. Si algo de la spec no cierra, pará y explicá qué falta. No lo resuelvas
+5. Si la tarea toca UI, seguí `flujo.md`: los componentes de Bootstrap
+   que nombra y el recorrido. Si algo no coincide, pará y avisá.
+   Si algo de la spec no cierra, pará y explicá qué falta. No lo resuelvas
    inventando comportamiento.
 6. Si tocás un archivo que pasa de 100 líneas, refactorizalo en la misma
    tarea para que quede con menos líneas que antes. Si el hook de límites
