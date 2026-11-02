@@ -32,7 +32,8 @@ la lista (criterios 6 y 7).
 - Incluye:
   - Ver los montos como filas tipo tarjeta, en "Agregar egreso" y en
     "Editar egreso", en lugar de la tabla.
-  - Cifra y vencimiento con formato, e interruptor "Pagado" visible.
+  - Cifra y vencimiento con formato, e interruptor de pagado sin texto
+    visible, como el del listado de egresos.
   - Un botón de tres puntos verticales (⋮) por fila con un menú de
     acciones: Editar, Duplicar y Eliminar.
   - Duplicar con vencimiento en el mes siguiente al último monto; el
@@ -84,11 +85,11 @@ que lo visible, no depende de la región configurada en el dispositivo.
    **entonces** dice el monto y el vencimiento en la forma hablada
    (`15000 pesos`, `Vence el 10 de noviembre de 2026`).
 4. **Dado** un monto, **cuando** se ve su fila, **entonces** tiene un
-   interruptor con la etiqueta visible "Pagado", con el mismo aspecto
-   que el del listado de egresos, activado si el monto está pagado, que
-   es la única indicación del estado (no hay otro texto "Pagado" o
-   "Pendiente"). El lector lo anuncia como interruptor e indica si está
-   activado. Al cambiarlo, el estado queda así cuando se guarda el
+   interruptor sin texto visible, igual que el del listado de egresos,
+   activado si el monto está pagado, que es la única indicación del
+   estado (no hay texto "Pagado" ni "Pendiente" en la fila). El lector
+   lo anuncia como interruptor, con el nombre del criterio 14, e indica
+   si está activado. Al cambiarlo, el estado queda así cuando se guarda el
    egreso (como hoy) y el foco sigue en el interruptor.
 5. **Dado** un monto, **cuando** se elige "Editar" en el menú de su fila,
    **entonces** se abre la edición de ese monto, igual que hoy con ✎.
@@ -145,9 +146,9 @@ que lo visible, no depende de la región configurada en el dispositivo.
     lista no tiene un scroll propio.
 14. **Dado** el monto 3 de la lista, de 15000 pesos, **cuando** el lector
     de pantalla anuncia los controles de su fila, **entonces** dice
-    `Pagado: monto 3, 15000 pesos`, que empieza con el texto que se ve en
-    pantalla, y `Acciones del monto 3, 15000 pesos` para el botón ⋮. El
-    lector no lee los tres puntos.
+    `Pagado, monto 3, 15000 pesos` para el interruptor y
+    `Acciones del monto 3, 15000 pesos` para el botón ⋮. El lector no lee
+    los tres puntos.
 
 ## Escenarios
 
@@ -167,16 +168,15 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.1.1 Contenido no textual | Saber para qué sirve el botón ⋮ aunque no se vean palabras (criterio 14) | Escuchar el botón con lector de pantalla |
-| 1.3.1 Info y relaciones | Escuchar los montos como una lista llamada "Montos", el interruptor con su etiqueta, la moneda por su nombre y la fecha completa (criterios 1 y 3) | Recorrer la lista con lector de pantalla |
+| 1.1.1 Contenido no textual | Saber para qué sirven el botón ⋮ y el interruptor aunque no se vean palabras (criterios 4 y 14) | Escuchar el botón y el interruptor con lector de pantalla |
+| 1.3.1 Info y relaciones | Escuchar los montos como una lista llamada "Montos", el interruptor con su nombre, la moneda por su nombre y la fecha completa (criterios 1 y 3) | Recorrer la lista con lector de pantalla |
 | 1.4.3 Contraste mínimo | Leer monto, vencimiento y textos de la fila sobre su fondo | Revisar el contraste a mano |
 | 1.4.10 Reflow | Usar la lista y su menú a 320 px sin scroll horizontal ni scroll interno | Achicar la ventana a 320 px o usar zoom al 400 % |
 | 1.4.11 Contraste no textual | Distinguir el borde de la fila, el interruptor y el foco | Revisar el contraste a mano |
-| 2.1.1 Teclado | Abrir el menú, elegir Editar, Duplicar o Eliminar y activar "Pagado" sin mouse (criterios 4, 5 y 8) | Recorrer la fila solo con teclado |
+| 2.1.1 Teclado | Abrir el menú, elegir Editar, Duplicar o Eliminar y activar el interruptor de pagado sin mouse (criterios 4, 5 y 8) | Recorrer la fila solo con teclado |
 | 2.4.3 Orden del foco | Saber dónde queda el foco después de cada acción (criterios 4, 8, 9, 10 y 11) | Duplicar, eliminar y cancelar con teclado |
 | 2.4.7 Foco visible | Ver dónde está el foco en botones, opciones del menú e interruptor | Recorrer la fila con `Tab` |
 | 2.4.11 Foco no tapado | Que el foco en una fila no quede debajo del encabezado ni del pie de la ventana (criterio 13) | Recorrer con `Tab` una lista más larga que la pantalla |
-| 2.5.3 Etiqueta en el nombre | Activar "Pagado" por voz diciendo el texto que ve (criterio 14) | Escuchar los nombres con lector de pantalla |
 | 2.5.8 Tamaño del objetivo | Tocar el botón ⋮, las opciones del menú y el interruptor sin errar; el botón ⋮ mide al menos 24 × 24 px | Usar la lista con el dedo en un teléfono |
 | 4.1.2 Nombre, función, valor | Saber qué es cada control, cómo se llama y su estado, incluido si el menú está abierto (criterio 8) | Escuchar los controles con lector de pantalla |
 | 4.1.3 Mensajes de estado | Enterarse de que un monto se duplicó o se eliminó sin perder el foco (criterios 9 y 11) | Duplicar y eliminar con lector de pantalla |
@@ -191,10 +191,10 @@ Ver `docs/sdd/accesibilidad.md`.
 | Monto hablado | `15000 pesos` · `15000,50 pesos` · `1 peso` · `1 dólar` · `1200 dólares` |
 | Vencimiento visible | `Vence el 10/11/2026` |
 | Vencimiento hablado | `Vence el 10 de noviembre de 2026` |
-| Interruptor | `Pagado` |
+| Interruptor | (sin texto visible) |
 | Botón del menú | `⋮` (sin texto visible) |
 | Opciones del menú | `Editar` · `Duplicar` · `Eliminar` |
-| Nombres que anuncia el lector | `Pagado: monto 3, 15000 pesos` · `Acciones del monto 3, 15000 pesos` |
+| Nombres que anuncia el lector | `Pagado, monto 3, 15000 pesos` · `Acciones del monto 3, 15000 pesos` |
 | Confirmación al eliminar | `¿Eliminar el monto de 15000 pesos que vence el 10 de noviembre de 2026?` |
 | Anuncio al duplicar | `Monto duplicado. Vence el 10 de enero de 2027.` |
 | Anuncio al eliminar | `Monto eliminado.` |
