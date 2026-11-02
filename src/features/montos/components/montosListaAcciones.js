@@ -4,8 +4,9 @@
 import { duplicarMonto } from '../utils/duplicarMonto.js';
 import { montoHablado, fechaHablada } from '../utils/montoHablado.js';
 
-const editarDe = (lista, monto) =>
-    lista.lista.children[lista.montos.indexOf(monto)]?.querySelector('[data-accion="editar"]');
+// El foco va al botón ⋮ de la fila de ese monto.
+const accionesDe = (lista, monto) =>
+    lista.lista.children[lista.montos.indexOf(monto)]?.querySelector('menu-button')?.button;
 
 // Se vacía y se escribe después, para que el lector anuncie aunque el texto se repita.
 function anunciar(lista, texto) {
@@ -18,7 +19,7 @@ function duplicar(lista, monto) {
     const nuevo = duplicarMonto(monto, lista.montos);
     lista.montos.push(nuevo);
     lista.render();
-    editarDe(lista, nuevo)?.focus();
+    accionesDe(lista, nuevo)?.focus();
     anunciar(lista, `Monto duplicado. Vence el ${fechaHablada(nuevo.vencimiento)}.`);
     lista.dispatchEvent(new CustomEvent('montos:duplicated', { detail: { monto: nuevo }, bubbles: true }));
 }
@@ -35,7 +36,7 @@ function eliminar(lista, monto, fila) {
     lista.render();
     const vecino = lista.montos[idx] || lista.montos[idx - 1];
     if (vecino) {
-        editarDe(lista, vecino)?.focus();
+        accionesDe(lista, vecino)?.focus();
     } else {
         lista.dispatchEvent(new CustomEvent('montos:empty', { bubbles: true }));
     }

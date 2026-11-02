@@ -36,9 +36,9 @@ async function testListaEnAgregarYEditar() {
 }
 
 async function testEditarAbreLaEdicion() {
-    console.log('  Spec 001 C5: "Editar" abre la edición de ese monto, como antes');
+    console.log('  Spec 001 C5: "Editar" del menú ⋮ abre la edición de ese monto, como antes');
     const form = nuevoFormulario([{ monto: 1, moneda: 'ARS', vencimiento: '2026-11-10' }, { monto: 2, moneda: 'ARS', vencimiento: '2026-12-10' }]);
-    filas(form)[1].querySelector('[data-accion="editar"]').click();
+    elegir(filas(form)[1], 0);
     assert(form._amountMode === 'editing' && form._inlineEditRef === form.montos[1], 'Edita el monto 2');
     assert(form.querySelector('#add-monto-form-container monto-form'), 'Se abre el formulario del monto');
     assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La lista se oculta mientras tanto');
@@ -51,7 +51,7 @@ async function testPagadoYDuplicadoAlGuardar() {
     const form = nuevoFormulario([{ monto: 15000, moneda: 'ARS', vencimiento: '2026-11-10', pagado: false },
         { monto: 15000, moneda: 'ARS', vencimiento: '2026-12-05', pagado: false }]);
     filas(form)[0].querySelector('input[type="checkbox"]').click();
-    elegir(filas(form)[0], 0);
+    elegir(filas(form)[0], 1);
     await form.handleSubmit({ preventDefault: () => {}, detail: datosEgreso });
     const noviembre = await listMontos({ mes: '2026-11' });
     const enero = await listMontos({ mes: '2027-01' });
@@ -66,7 +66,7 @@ async function testEliminarElUltimoEnfocaAgregar() {
     const form = nuevoFormulario([{ monto: 1, moneda: 'ARS', vencimiento: '2026-11-10' }]);
     const original = global.confirm;
     global.confirm = () => true;
-    elegir(filas(form)[0], 1);
+    elegir(filas(form)[0], 2);
     global.confirm = original;
     assert(form.montos.length === 0, 'La lista queda vacía');
     assert(document.activeElement === form.querySelector('#add-monto button'), 'Foco en "Agregar monto"');
