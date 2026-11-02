@@ -15,6 +15,11 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   "Cómo se cumple" en accesibilidad y nada lo prohibía. Ahora la spec es
   solo funcional y la técnica va al plan. Evaluar en la retro si alcanzó
   o hace falta un check automático. (001)
+- [1] Defecto del flujo, ya corregido: la interacción se vio recién en la
+  última tarea y se cambió después (#248: interruptor y menú ⋮), y se
+  hizo un menú propio existiendo el dropdown de Bootstrap. Ahora el plan
+  incluye `flujo.md` con recorrido en Mermaid, componentes de Bootstrap,
+  wireframe y heurísticas. Evaluar en la retro si alcanzó. (001)
 
 ## Promovidos
 

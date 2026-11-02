@@ -17,7 +17,7 @@ Carpeta: `specs/NNN-descripcion/`. Rama base de cada PR: `it/NNN-descripcion`
 | Paso | Comando | Archivo | Equivale a | Se aprueba cuando |
 |---|---|---|---|---|
 | 1. Spec | `/spec` | `spec.md` | Historia + escenarios + DoR | se mergea el PR |
-| 2. Plan y tareas | `/plan` | `plan.md`, `tareas.md` | Tareas | se mergea el PR |
+| 2. Plan y tareas | `/plan` | `flujo.md` (si cambia la UI), `plan.md`, `tareas.md` | Interacción + tareas | se mergea el PR |
 | 3. Implementación | `/implementar` | código y tests | — | se mergea cada PR |
 | 4. Cierre | `/retro` | `retro.md`, `docs/sdd/learnings.md` | DoD + aprendizaje | se mergea el PR |
 
@@ -28,6 +28,9 @@ Reglas:
   tiene más de 8 tareas, la spec se parte en dos iteraciones.
 - Cada tarea entra en un PR dentro de los límites de `.sdd/limits.json`.
   Si una tarea no entra, se divide en `tareas.md` antes de implementarla.
+- Si la spec cambia la UI, el PR del plan incluye `flujo.md`: el
+  recorrido en Mermaid, el componente de Bootstrap de cada paso, un
+  wireframe en texto a 320 px y las heurísticas de Nielsen. Así la interacción se valida antes del código.
 - Si durante la implementación la spec resulta incompleta o equivocada,
   se frena y se abre un PR que corrige la spec.
 

@@ -20,7 +20,12 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
 3. Leé la spec, la constitución, `docs/sdd/learnings.md` y el código que
    vas a tocar. Medí las líneas actuales de cada archivo con `wc -l`.
 4. Rama `it/NNN-descripcion-plan` desde `origin/main`.
-5. Completá `plan.md` y `tareas.md` desde `docs/sdd/plantillas/`.
+5. Si la spec cambia lo que ve o hace la persona, primero completá
+   `flujo.md` desde la plantilla: recorrido en Mermaid, componente de
+   Bootstrap para cada paso, wireframe a 320 px y heurísticas. El plan elige componentes a
+   partir de ese flujo. Si un paso pide algo que Bootstrap no hace, pará
+   y preguntá si se ajusta la spec o se justifica un componente propio.
+6. Completá `plan.md` y `tareas.md` desde `docs/sdd/plantillas/`.
    - Cada tarea entra en un PR: 10 archivos, 200 líneas, archivos de
      código de 100 líneas o menos.
    - Si hay que tocar un archivo que ya pasa de 100 líneas, las primeras
@@ -33,7 +38,7 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
      `docs/sdd/accesibilidad.md`) y anotala en la sección del plan. Acá sí
      van HTML, roles y atributos ARIA.
    - Máximo 8 tareas.
-6. Cambiá el estado de la spec a `aprobada` en el mismo PR.
-7. Corré `node scripts/check-pr-size.mjs` y abrí el PR. No lo mergees.
+7. Cambiá el estado de la spec a `aprobada` en el mismo PR.
+8. Corré `node scripts/check-pr-size.mjs` y abrí el PR. No lo mergees.
 
 Terminá diciendo que, cuando mergee, el siguiente paso es `/implementar NNN`.
