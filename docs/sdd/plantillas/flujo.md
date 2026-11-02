@@ -19,9 +19,10 @@ flowchart LR
 
 ## Componentes de Bootstrap
 
-La UI usa Bootstrap 5.3 (`src/shared/ui/bootstrap/`). No se inventan
-componentes: si un paso pide algo que Bootstrap no hace, se ajusta la spec
-a lo que Bootstrap ofrece o se justifica acá el componente propio.
+Cada paso elige su componente de `docs/sdd/bootstrap.md`, que dice qué
+trae Bootstrap 5.3 y qué agrega Nivva. No se inventan componentes: si un
+paso pide algo que Bootstrap no hace, se ajusta la spec a lo que Bootstrap
+ofrece o se justifica acá el componente propio.
 
 | Paso del recorrido | Componente de Bootstrap (link a su doc) | ¿Cubre lo que pide la spec? |
 |---|---|---|
@@ -34,27 +35,28 @@ elementos, orden y textos de la spec, con el componente de Bootstrap a la
 derecha. Sin colores ni medidas: alcanza con ver qué entra y qué se ve.
 
 ```
+Notación: [Botón]  (◯─) interruptor  [__] campo  [▾] desplegable
+          ⋮ menú  ── separador  «texto» texto exacto de la spec
+
 ┌──────────────────────────────────┐  320 px
-│ Título                           │
-│ ┌──────────────────────────────┐ │  list-group-item
-│ │ Dato principal   Control    ⋮│ │  form-switch · dropdown
-│ │ Dato secundario              │ │
-│ └──────────────────────────────┘ │
+│ «Título de la pantalla»          │
+│ …un elemento por línea, en el    │  componente de Bootstrap
+│   orden en que se ve…            │  de cada elemento
 └──────────────────────────────────┘
 ```
 
 ## Heurísticas de Nielsen
 
 Se evalúan sobre el recorrido y el wireframe. Una línea por heurística:
-"ok" o el hallazgo y qué se decide.
+respuesta corta y, si hay un hallazgo, qué se decide.
 
-1. Visibilidad del estado del sistema: …
-2. Coincidencia con el mundo real: …
-3. Control y libertad (deshacer, cancelar): …
-4. Consistencia y estándares: …
-5. Prevención de errores: …
-6. Reconocer antes que recordar: …
-7. Flexibilidad y eficiencia: …
-8. Diseño estético y minimalista: …
-9. Ayuda para reconocer y recuperarse de errores: …
-10. Ayuda y documentación: …
+1. ¿Después de cada acción, la persona ve o escucha qué pasó?
+2. ¿Las palabras son las de la persona y del glosario, no las del sistema?
+3. ¿Puede cancelar o volver atrás sin perder lo que hizo?
+4. ¿Se ve y se usa igual que en el resto de Nivva y que en Bootstrap?
+5. ¿Qué error es fácil cometer acá y cómo se evita?
+6. ¿Tiene a la vista lo que necesita, sin recordarlo de otra pantalla?
+7. ¿Lo frecuente se hace en pocos pasos?
+8. ¿Sobra algo en la pantalla que no ayude a la tarea?
+9. ¿Los errores dicen qué pasó y cómo seguir?
+10. ¿Hace falta alguna ayuda o texto de apoyo?
