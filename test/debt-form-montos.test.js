@@ -73,4 +73,16 @@ async function testEliminarElUltimoEnfocaAgregar() {
     form.remove();
 }
 
-export const tests = [testListaEnAgregarYEditar, testEditarAbreLaEdicion, testPagadoYDuplicadoAlGuardar, testEliminarElUltimoEnfocaAgregar];
+async function testCancelarConMontoAbiertoConservaElFormulario() {
+    console.log('  Cancelar del pie con un monto abierto no rompe el formulario del egreso');
+    const form = nuevoFormulario([]);
+    form.openInlineAdd();
+    form.reset({ trackAbandonment: false });
+    assert(form.querySelector('[name="acreedor"]') !== null, 'Sigue el campo Acreedor');
+    assert(form.querySelector('[name="tipoDeuda"]') !== null, 'Sigue el campo Tipo de deuda');
+    assert(form.querySelector('[name="notas"]') !== null, 'Sigue el campo Notas');
+    assert(form.querySelector('[name="monto"]') === null, 'No queda ningún monto abierto');
+    form.remove();
+}
+
+export const tests = [testListaEnAgregarYEditar, testEditarAbreLaEdicion, testPagadoYDuplicadoAlGuardar, testEliminarElUltimoEnfocaAgregar, testCancelarConMontoAbiertoConservaElFormulario];

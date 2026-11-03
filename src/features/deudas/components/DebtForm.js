@@ -47,7 +47,7 @@ export class DebtForm extends HTMLElement {
         this._addMontoBtn.removeEventListener('click', this._onAddMontoClick);
         this._addMontoBtn.addEventListener('click', this._onAddMontoClick);
         // Re-attach form listeners on every (re)connect so they survive DOM moves
-        this.form = this.querySelector('app-form');
+        this.form = this.querySelector(':scope > app-form');
         this._onSubmit = this.handleSubmit.bind(this);
         this._onCancel = () => this.reset();
         this._onValidationError = (event) => {
@@ -103,7 +103,6 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('deuda:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
-        // Restaurar el listener para cancelar
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
@@ -196,7 +195,7 @@ export class DebtForm extends HTMLElement {
         const validationController = new AbortController();
         fieldWrapper._validationController = validationController;
         input?.addEventListener('invalid', () => {
-            const appForm = this.querySelector('app-form');
+            const appForm = this.querySelector(':scope > app-form');
             appForm?.querySelector('form')?.classList.add('was-validated');
             fieldWrapper.classList.add('was-validated');
             appForm?.dispatchEvent(new CustomEvent('form:validation-error', {
@@ -219,7 +218,7 @@ export class DebtForm extends HTMLElement {
     }
 
     clearValidationState() {
-        this.querySelector('app-form')?.clearValidationState();
+        this.querySelector(':scope > app-form')?.clearValidationState();
         this.querySelectorAll('[data-debt-form-field].was-validated').forEach(field => {
             field.classList.remove('was-validated');
         });
@@ -380,8 +379,7 @@ export class DebtForm extends HTMLElement {
         this._inlineEditRef = null;
         this.renderMontosList();
         this.startAnalyticsFlow('edit_debt', { step: 'form', deudaId: deuda.id });
-        // Precarga los valores en <app-form>
-        const form = this.querySelector('app-form');
+        const form = this.querySelector(':scope > app-form');
         if (form) {
             form.initialValues = {
                 acreedor: deuda.acreedor || '',
@@ -406,7 +404,7 @@ export class DebtForm extends HTMLElement {
         this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
-        const form = this.querySelector('app-form');
+        const form = this.querySelector(':scope > app-form');
         if (form) {
             form.initialValues = {};
             this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
