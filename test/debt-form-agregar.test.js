@@ -24,7 +24,7 @@ async function testAbrir() {
     assert(filas(form).length === 2 && filas(form)[1].contains(abierto(form)), 'La fila abierta va al final');
     assert(!form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La lista sigue visible');
     assert(!form.querySelector('#add-monto-btn-row').classList.contains('d-none'), '"Agregar monto" sigue visible');
-    assert(form.querySelector('#monto-form-title').classList.contains('d-none'), 'Sin título "Nuevo monto"');
+    assert(!form.querySelector('#monto-form-title'), 'Sin título "Nuevo monto"');
     assert(document.activeElement === campoMonto(form), 'Foco en el campo "Monto"');
     form.remove();
     const vacia = montar();

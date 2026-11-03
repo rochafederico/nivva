@@ -6,11 +6,11 @@ import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/MontosList.js';
 import { cerrarAbiertoParaAbrirOtro } from '../../montos/components/montosListaAbierto.js';
+import { debtFormAnalitica } from './debtFormAnalitica.js';
 import {
     trackFlowStart,
     trackFlowComplete,
     trackFlowError,
-    trackFlowAbandoned,
     updateFlowStep
 } from '../../../shared/observability/index.js';
 
@@ -24,11 +24,8 @@ export class DebtForm extends HTMLElement {
         this._analyticsStep = 'form';
         this._analyticsCompleted = false;
         this._analyticsStartedFor = null;
-        // Amount section mode: idle (list), editing
-        this._amountMode = 'idle';
         // Inline editing state: null = no inline open, 'new' = adding, number = editing existing
         this._inlineEditIdx = null;
-        this._inlineEditRef = null; // direct reference to the monto object being edited
     }
 
     connectedCallback() {
@@ -141,14 +138,6 @@ export class DebtForm extends HTMLElement {
                             className: 'invalid-feedback mt-2 d-none'
                         }),
                         el('div', {
-                            attrs: { id: 'monto-form-title' },
-                            className: 'fw-semibold mt-3 mb-2 d-none'
-                        }),
-                        el('div', {
-                            attrs: { id: 'add-monto-form-container' },
-                            className: 'mt-3 d-none'
-                        }),
-                        el('div', {
                             attrs: { id: 'add-monto-btn-row' },
                             className: 'd-flex justify-content-end mt-3',
                             children: [
@@ -237,9 +226,7 @@ export class DebtForm extends HTMLElement {
         if (!cerrarAbiertoParaAbrirOtro(this.montosList)) return;
         this._analyticsStep = 'add_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
-        this._amountMode = 'idle';
         this._inlineEditIdx = 'new';
-        this._inlineEditRef = null;
         this.renderMontosList();
         this.montosList.abrirMonto();
     }
@@ -252,53 +239,6 @@ export class DebtForm extends HTMLElement {
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
         this._inlineEditIdx = this.montos.indexOf(monto);
         this.montosList.abrirMonto(monto);
-    }
-
-    // Cancel the currently open inline form without saving changes.
-    _cancelInline() {
-        // montos array was never modified during inline editing, just clear the UI state
-        this._amountMode = 'idle';
-        this._inlineEditIdx = null;
-        this._inlineEditRef = null;
-        this.montosList.cerrarMonto();
-        this.renderMontosList();
-    }
-
-    // Build the inline monto form (delegates validation to AppForm).
-    _buildMontoForm(monto, { inline = false } = {}) {
-        const montoFormEl = document.createElement('monto-form');
-        if (inline) {
-            montoFormEl.inline = true;
-        }
-        montoFormEl.compactErrors = true;
-        if (monto) {
-            // Set before appending so connectedCallback renders with the correct values.
-            montoFormEl.monto = {
-                monto: monto.monto,
-                moneda: monto.moneda,
-                vencimiento: monto.vencimiento
-            };
-        }
-        montoFormEl.addEventListener('monto:save', (e) => {
-            const existing = this._inlineEditRef;
-            const nuevoMonto = {
-                monto: parseFloat(e.detail.monto),
-                moneda: e.detail.moneda,
-                vencimiento: e.detail.vencimiento,
-                pagado: existing ? (existing.pagado ?? false) : false,
-                ...(existing && existing.id !== undefined ? { id: existing.id } : {})
-            };
-            const editIdx = this.montos.indexOf(this._inlineEditRef);
-            if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
-            this._amountMode = 'idle';
-            this._inlineEditIdx = null;
-            this._inlineEditRef = null;
-            this.renderMontosList();
-        });
-        montoFormEl.addEventListener('monto:cancel', () => {
-            this._cancelInline();
-        });
-        return montoFormEl;
     }
 
     // La lista "Montos" (spec 001) dibuja, duplica y elimina; el formulario abre la edición.
@@ -329,9 +269,7 @@ export class DebtForm extends HTMLElement {
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.montosList?.cerrarMonto();
-        this._amountMode = 'idle';
         this._inlineEditIdx = null;
-        this._inlineEditRef = null;
         this.renderMontosList();
         this.startAnalyticsFlow('edit_debt', { step: 'form', deudaId: deuda.id });
         const form = this.querySelector(':scope > app-form');
@@ -357,9 +295,7 @@ export class DebtForm extends HTMLElement {
         this.deudaId = null;
         this.montos = [];
         this.montosList?.cerrarMonto();
-        this._amountMode = 'idle';
         this._inlineEditIdx = null;
-        this._inlineEditRef = null;
         const form = this.querySelector(':scope > app-form');
         if (form) {
             form.initialValues = {};
@@ -441,36 +377,6 @@ export class DebtForm extends HTMLElement {
             montosTableWrapper.classList.remove('border-danger');
         }
     }
-
-    startAnalyticsFlow(flowName, metadata = {}) {
-        if (!flowName) return;
-        this._analyticsFlow = flowName;
-        this._analyticsStep = metadata.step || this._analyticsStep || 'form';
-        updateFlowStep(flowName, this._analyticsStep, metadata);
-        if (this._analyticsStartedFor === flowName) return;
-        this._analyticsStartedFor = flowName;
-        this._analyticsCompleted = false;
-        trackFlowStart(flowName, metadata);
-    }
-
-    abandonAnalyticsFlow(reason = 'cancel') {
-        if (!this._analyticsFlow || this._analyticsCompleted) {
-            this.clearAnalyticsFlow();
-            return;
-        }
-        trackFlowAbandoned(this._analyticsFlow, this._analyticsStep, { deudaId: this.deudaId, reason });
-        this.clearAnalyticsFlow();
-    }
-
-    clearAnalyticsFlow() {
-        this._analyticsFlow = null;
-        this._analyticsStep = 'form';
-        this._analyticsCompleted = false;
-        this._analyticsStartedFor = null;
-    }
-
-    _getFlowName() {
-        return this.editing ? 'edit_debt' : 'create_debt';
-    }
 }
+Object.assign(DebtForm.prototype, debtFormAnalitica);
 customElements.define('debt-form', DebtForm);

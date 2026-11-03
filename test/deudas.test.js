@@ -550,8 +550,7 @@ async function testCancelarAltaInline() {
     form.openInlineAdd();
     assert(form._inlineEditIdx === 'new', 'Inline add abierto');
 
-    form._cancelInline();
-    assert(form._amountMode === 'idle', 'Debe volver a modo idle tras cancelar');
+    form.montosList.cerrarMonto('descartado');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
     assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
@@ -622,9 +621,8 @@ async function testCancelarEdicionInline() {
     const inlineRow = form.querySelector('montos-list monto-form');
     inlineRow.querySelector('input[name="monto"]').value = '99999';
 
-    form._cancelInline();
+    form.montosList.cerrarMonto('restaurado');
 
-    assert(form._amountMode === 'idle', 'Cancelar edición vuelve a modo lista');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
     assert(form.montos.length === 1, 'Sigue con 1 monto');
     assert(form.montos[0].monto === 9000, 'Monto original sin cambios: 9000');
@@ -824,12 +822,8 @@ async function testShowFormErrorNearMontos() {
     assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
     assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
-    const montoFormTitle = form.querySelector('#monto-form-title');
-    const montoFormContainer = form.querySelector('#add-monto-form-container');
     const addMontoBtn = form.querySelector('#add-monto');
-    assert(errEl.nextElementSibling === montoFormTitle, 'El título del formulario de monto debe quedar debajo del mensaje de error');
-    assert(montoFormTitle.nextElementSibling === montoFormContainer, 'El contenedor del formulario de alta debe quedar debajo del título');
-    assert(montoFormContainer.nextElementSibling?.querySelector('#add-monto') === addMontoBtn, 'El botón Agregar monto debe quedar debajo del mensaje de error y del formulario de alta');
+    assert(errEl.nextElementSibling?.querySelector('#add-monto') === addMontoBtn, 'El botón Agregar monto debe quedar debajo del mensaje de error');
     assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
     assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
     assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
