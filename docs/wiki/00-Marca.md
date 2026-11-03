@@ -60,7 +60,7 @@ Es una herramienta de **registro y visibilidad** para quien quiere saber exactam
 
 | # | Objetivo del usuario |
 |---|---|
-| 1 | Tener visibilidad clara de sus gastos fijos |
+| 1 | Tener visibilidad clara de sus egresos: gastos y gastos con vencimiento |
 | 2 | Ahorrar tiempo y esfuerzo en el seguimiento |
 | 3 | Evitar olvidos y recargos por pagos atrasados |
 | 4 | Sentir control y tranquilidad sobre sus compromisos |
