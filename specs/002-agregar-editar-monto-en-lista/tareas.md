@@ -14,7 +14,7 @@ Máximo 8 tareas; si hacen falta más, la spec se parte.
 | T05 | Un solo monto abierto a la vez; se va `¿Cancelar los cambios actuales?` | 12, 13 | `montosListaAbierto.js`, `DebtForm.js`, `test/deudas.test.js`, `test/montos-list-un-abierto.test.js`, `test/run-repo-tests.js` | 150 | en PR |
 | T06 | Limpieza: "Cancelar" del pie con un monto abierto (el arreglo de que no rompa el formulario se adelantó en #269), sin restos del formulario aparte, analítica fuera de `DebtForm` | 7 | `DebtForm.js`, `debtFormAnalitica.js`, `test/deudas.test.js`, `test/debt-form-cancelar.test.js`, `test/run-repo-tests.js` | 170 | en PR |
 | T07 | "Guardar" con un monto abierto: incluirlo, marcar y mover el foco | 9, 10, 11 | `DebtForm.js`, `debtFormGuardar.js`, `test/debt-form-guardar.test.js`, `test/run-repo-tests.js` | 170 | en PR |
-| T08 | Pie con un solo botón principal y mensaje sin montos; revisión a mano del PR | 14, 15 | `DebtModal.js`, `DebtForm.js`, `debtFormGuardar.js`, `test/deudas.test.js`, `test/debt-form-sin-montos.test.js`, `test/run-repo-tests.js` | 130 | pendiente |
+| T08 | Pie con un solo botón principal y mensaje sin montos; revisión a mano del PR | 14, 15 | `DebtModal.js`, `DebtForm.js`, `debtFormGuardar.js`, `test/deudas.test.js`, `test/debt-form-sin-montos.test.js`, `test/run-repo-tests.js` | 130 | en PR |
 
 Estados: pendiente · en curso · en PR · mergeada.
 Solo una tarea puede estar **en curso**.

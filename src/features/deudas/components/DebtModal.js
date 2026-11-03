@@ -64,7 +64,7 @@ export class DebtModal extends HTMLElement {
 
                 const cancelBtn = document.createElement('button');
                 cancelBtn.type = 'button';
-                cancelBtn.className = 'btn btn-primary';
+                cancelBtn.className = 'btn btn-outline-secondary';
                 cancelBtn.setAttribute('aria-label', 'Cancelar');
                 cancelBtn.textContent = 'Cancelar';
                 cancelBtn.addEventListener('click', () => appForm && appForm.triggerCancel());

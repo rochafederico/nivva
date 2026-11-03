@@ -25,7 +25,6 @@ export class DebtForm extends HTMLElement {
         this._analyticsStep = 'form';
         this._analyticsCompleted = false;
         this._analyticsStartedFor = null;
-        // Inline editing state: null = no inline open, 'new' = adding, number = editing existing
         this._inlineEditIdx = null;
     }
 
@@ -92,7 +91,6 @@ export class DebtForm extends HTMLElement {
     }
 
     render() {
-        // Formulario principal con <app-form>
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
@@ -139,7 +137,7 @@ export class DebtForm extends HTMLElement {
                             ]
                         }),
                         el('div', {
-                            attrs: { id: 'form-error' },
+                            attrs: { id: 'form-error', role: 'alert' },
                             className: 'invalid-feedback mt-2 d-none'
                         }),
                         el('div', {

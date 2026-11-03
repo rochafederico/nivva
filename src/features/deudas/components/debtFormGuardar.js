@@ -1,4 +1,4 @@
-// Guardar el egreso: incluye el monto abierto y decide si se envía (spec 002, criterios 9 a 11).
+// Guardar el egreso: incluye el monto abierto y decide si se envía (spec 002, criterios 9 a 11 y 15).
 // También los mensajes del bloque de montos, que se suman a DebtForm.prototype.
 const esGuardar = (event) => event.target.matches?.('[data-programmatic-submit="true"]');
 
@@ -13,9 +13,12 @@ export function antesDeGuardar(debtForm, event) {
     const campos = ['acreedor', 'tipoDeuda']
         .map((nombre) => debtForm.querySelector(`[name="${nombre}"]`))
         .filter((campo) => campo && !campo.checkValidity());
-    if (!lista.abierto && campos.length === 0) return;
+    const sinMontos = !lista.abierto && !debtForm.hasMontosAdded();
+    if (sinMontos) debtForm.showFormError(debtForm.getMontosRequiredError());
+    if (!lista.abierto && !sinMontos && campos.length === 0) return;
     event.preventDefault();
-    campos[0]?.focus();
+    const primero = campos[0] || (sinMontos ? debtForm.querySelector('#add-monto button') : null);
+    primero?.focus();
 }
 
 export const debtFormErrores = {
@@ -31,7 +34,7 @@ export const debtFormErrores = {
     },
 
     getMontosRequiredError() {
-        return 'Debe agregar al menos un monto antes de guardar.';
+        return 'Agregá al menos un monto para guardar el egreso.';
     },
 
     clearFormError() {
