@@ -1,8 +1,14 @@
 // src/components/MontoForm.js
 import monedas from '../../../shared/config/monedas.js';
 import '../../../shared/components/AppForm.js';
+import { aplicarErroresDelMonto, MONTO_FORM_GENERAL_ERROR_MESSAGE } from './montoFormErrores.js';
 
-export const MONTO_FORM_GENERAL_ERROR_MESSAGE = 'Completá monto, moneda y vencimiento para agregar el monto.';
+export { MONTO_FORM_GENERAL_ERROR_MESSAGE };
+
+// Nombres que anuncia el lector: empiezan con el texto visible (spec 002).
+const nombresDeBotones = (numero) => (numero === 'nuevo'
+    ? { listo: 'Listo, monto nuevo', cancelar: 'Cancelar monto nuevo' }
+    : { listo: `Listo, monto ${numero}`, cancelar: `Cancelar cambios del monto ${numero}` });
 
 export class MontoForm extends HTMLElement {
     constructor() {
@@ -42,6 +48,15 @@ export class MontoForm extends HTMLElement {
         this.render();
     }
 
+    // Posición de la fila en la lista, o 'nuevo'. Sin valor, los botones usan su texto visible.
+    get numero() {
+        return this._numero;
+    }
+    set numero(value) {
+        this._numero = value;
+        this.render();
+    }
+
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
@@ -70,20 +85,28 @@ export class MontoForm extends HTMLElement {
             { name: 'vencimiento', type: 'date', label: 'Vencimiento', required: true }
         ];
         form.initialValues = this._monto || {};
-        form.submitText = 'Guardar';
+        form.submitText = 'Listo';
         form.cancelText = 'Cancelar';
         // Usar evento personalizado para submit
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
         if (this.compactErrors) {
-            this._applyCompactErrors(form);
+            aplicarErroresDelMonto(form);
         }
         this.appendChild(form);
         this._applyFormLayout(form);
         if (this.inline) {
             this._applyInlineLayout(form);
         }
+        this._aplicarNombres(form);
+    }
+
+    _aplicarNombres(form) {
+        if (this._numero === undefined || this._numero === null) return;
+        const { listo, cancelar } = nombresDeBotones(this._numero);
+        form.querySelector('button[type="submit"]')?.setAttribute('aria-label', listo);
+        form.querySelector('#cancelBtn')?.setAttribute('aria-label', cancelar);
     }
 
     _applyFormLayout(appForm) {
@@ -130,45 +153,6 @@ export class MontoForm extends HTMLElement {
             cancelBtn?.classList.add('btn-outline-secondary', 'btn-sm');
             saveBtn?.classList.add('btn-sm');
         }
-    }
-
-    _applyCompactErrors(form) {
-        form.querySelectorAll('.invalid-feedback').forEach(feedbackEl => {
-            feedbackEl.classList.add('d-none');
-            const input = feedbackEl.previousElementSibling;
-            if (!input) return;
-            const fieldName = input.name;
-            if (fieldName === 'monto') {
-                feedbackEl.textContent = 'Ingresá un monto válido.';
-            } else if (fieldName === 'moneda') {
-                feedbackEl.textContent = 'Seleccioná una moneda.';
-            } else if (fieldName === 'vencimiento') {
-                feedbackEl.textContent = 'Ingresá una fecha válida.';
-            } else {
-                feedbackEl.textContent = 'Campo inválido.';
-            }
-        });
-
-        const formEl = form.querySelector('form');
-        if (!formEl) return;
-        const generalError = document.createElement('div');
-        generalError.className = 'invalid-feedback mt-2 d-none';
-        generalError.dataset.montoGeneralError = 'true';
-        generalError.textContent = MONTO_FORM_GENERAL_ERROR_MESSAGE;
-        formEl.appendChild(generalError);
-
-        const clearGeneralError = () => {
-            generalError.classList.add('d-none');
-            generalError.classList.remove('d-block');
-        };
-        const showGeneralError = () => {
-            generalError.classList.remove('d-none');
-            generalError.classList.add('d-block');
-        };
-        form.addEventListener('form:validation-error', showGeneralError);
-        form.addEventListener('form:submit', clearGeneralError);
-        form.addEventListener('input', clearGeneralError);
-        form.addEventListener('change', clearGeneralError);
     }
 }
 customElements.define('monto-form', MontoForm);

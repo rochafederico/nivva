@@ -7,7 +7,7 @@ Máximo 8 tareas; si hacen falta más, la spec se parte.
 
 | ID | Tarea | Criterios que cubre | Archivos | Líneas estimadas | Estado |
 |---|---|---|---|---|---|
-| T01 | Monto abierto: "Listo" y "Cancelar" con sus nombres, errores por campo y general, foco en el primero | 8 | `MontoForm.js`, `montoFormErrores.js`, `test/monto-abierto-errores.test.js`, `test/montos.test.js`, `test/deudas.test.js`, `test/run-repo-tests.js` | 180 | pendiente |
+| T01 | Monto abierto: "Listo" y "Cancelar" con sus nombres, errores por campo y general, foco en el primero | 8 | `MontoForm.js`, `montoFormErrores.js`, `test/monto-abierto-errores.test.js`, `test/montos.test.js`, `test/deudas.test.js`, `test/run-repo-tests.js` | 180 | en PR |
 | T02 | La lista dibuja una fila abierta y no pierde lo escrito al cambiar otras filas | 13 | `montoAbierto.js`, `montosListaAbierto.js`, `MontosList.js`, `test/montos-list-abierto.test.js`, `test/run-repo-tests.js` | 180 | pendiente |
 | T03 | Agregar y descartar un monto nuevo en la lista; se borra su formulario aparte | 1, 2, 5 | `montosListaAbierto.js`, `DebtForm.js`, `test/deudas.test.js`, `test/debt-form-agregar.test.js`, `test/run-repo-tests.js` | 190 | pendiente |
 | T04 | Editar y descartar un monto en su fila; se borra su formulario aparte | 3, 4, 6 | `montosListaAbierto.js`, `DebtForm.js`, `test/deudas.test.js`, `test/debt-form-montos.test.js`, `test/debt-form-editar.test.js`, `test/run-repo-tests.js` | 190 | pendiente |
