@@ -881,9 +881,7 @@ async function testDebtModalCancelClosesModal() {
     document.body.removeChild(modal);
 }
 
-// ===================================================================
 // UC17b: Cancelar monto inline no debe cerrar el DebtModal
-// ===================================================================
 async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
     console.log('  UC17b: Cancelar monto inline no cierra el modal de deuda');
 
@@ -901,7 +899,7 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
     const inlineActionRow = inlineMontoForm?.querySelector('[data-form-actions="true"]');
     const inlineCancelBtn = inlineActionRow?.querySelector('#cancelBtn');
     const inlineSaveBtn = inlineActionRow?.querySelector('button[type="submit"]');
-    const footerCancelBtn = modal.querySelector('.modal-footer .btn.btn-primary');
+    const footerCancelBtn = modal.querySelector('.modal-footer .btn.btn-outline-secondary');
     const footerSaveBtn = modal.querySelector('.modal-footer .btn.btn-success');
     assert(inlineMontoForm !== null, 'Debe existir app-form inline para cancelar monto');
     assert(inlineCancelBtn?.classList.contains('btn-sm'), 'Cancelar del monto inline debe usar tamaño chico');
