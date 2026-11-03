@@ -161,16 +161,14 @@ Ver `docs/sdd/accesibilidad.md`.
 
 ## Preguntas abiertas
 
-1. Glosario y marca: ¿se aprueban `Gasto` y `Gasto con vencimiento`, se amplía
-   la definición de egreso ("pago que debe realizar") y se ajusta el objetivo
-   "gastos fijos" de la marca? Los cambios van en su propio PR.
+Deben quedar vacías antes de aprobar.
 
 ## Definition of Ready
 
 - [x] Los criterios se pueden testear sin interpretar
 - [x] El alcance entra en una iteración (8 tareas o menos)
-- [ ] No hay preguntas abiertas
-- [ ] Textos revisados contra voz y tono y glosario
+- [x] No hay preguntas abiertas
+- [x] Textos revisados contra voz y tono y glosario
 - [x] Criterios de accesibilidad identificados
 - [x] Sin referencias a código, componentes, HTML, ARIA, funciones ni datos internos
 - [x] Se leyó `docs/sdd/learnings.md`
