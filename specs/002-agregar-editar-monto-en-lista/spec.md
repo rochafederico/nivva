@@ -97,19 +97,17 @@ hablada son como en la spec 001.
 
 ### Guardar el egreso con un monto abierto
 
-9. **Dado** un monto abierto con los tres campos completos y el resto del
-   egreso completo, **cuando** se toca "Guardar" en el pie, **entonces**
-   ese monto se incluye (como si se hubiera tocado "Listo") y el egreso se
-   guarda con él.
+9. **Dado** un monto abierto con los tres campos completos, **cuando** se
+   toca "Guardar" en el pie, **entonces** ese monto se incluye (como si se
+   hubiera tocado "Listo"). Si el resto del egreso está completo, se guarda
+   con él; si falta Acreedor o Tipo de deuda, no se guarda, la ventana
+   sigue abierta, se marcan esos campos y el foco va al primero.
 10. **Dado** un monto abierto con algún campo vacío o inválido, **cuando**
     se toca "Guardar" en el pie, **entonces** el egreso no se guarda, la
     ventana sigue abierta, el monto abierto muestra sus errores como en el
     criterio 8 y el foco pasa a su primer campo con problema. Si además
     falta Acreedor o Tipo de deuda, también se marcan, y el foco va al
-    primer campo con problema en el orden de la ventana. Si el monto abierto
-    está completo pero falta Acreedor o Tipo de deuda, el egreso no se
-    guarda, el monto se incluye en la lista como con "Listo", se marcan
-    esos campos y el foco va al primero.
+    primer campo con problema en el orden de la ventana.
 11. **Dado** un monto nuevo abierto con los tres campos vacíos, **cuando**
     se toca "Guardar" en el pie, **entonces** pasa lo del criterio 10.
 
@@ -126,6 +124,8 @@ hablada son como en la spec 001.
 13. **Dado** un monto abierto, **cuando** se usa el interruptor de otro
     monto o se elige "Duplicar" o "Eliminar" en su menú (spec 001),
     **entonces** el monto abierto sigue abierto sin perder lo escrito.
+    Para el vencimiento del duplicado no cuenta un monto nuevo abierto; uno
+    existente abierto cuenta con los valores que tenía antes de abrirlo.
 
 ### Pie de la ventana y lista vacía
 
