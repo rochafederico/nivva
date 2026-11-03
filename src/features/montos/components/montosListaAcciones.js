@@ -5,11 +5,11 @@ import { duplicarMonto } from '../utils/duplicarMonto.js';
 import { montoHablado, fechaHablada } from '../utils/montoHablado.js';
 
 // El foco va al botón ⋮ de la fila de ese monto.
-const accionesDe = (lista, monto) =>
+export const accionesDe = (lista, monto) =>
     lista.lista.children[lista.montos.indexOf(monto)]?.querySelector('menu-button')?.button;
 
 // Se vacía y se escribe después, para que el lector anuncie aunque el texto se repita.
-function anunciar(lista, texto) {
+export function anunciar(lista, texto) {
     const estado = lista.querySelector('[role="status"]');
     estado.textContent = '';
     setTimeout(() => { estado.textContent = texto; }, 50);

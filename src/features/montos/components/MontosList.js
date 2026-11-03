@@ -3,8 +3,9 @@
 // lista.montos = [...]. Ordena en el mismo arreglo, del vencimiento más antiguo al más reciente.
 // Avisa 'montos:edit' con detail { monto, idx } cuando se toca "Editar" en una fila, y
 // 'montos:duplicated' y 'montos:empty' desde las acciones (montosListaAcciones.js).
-// abrirMonto(monto) y cerrarMonto() manejan la fila abierta (spec 002); sin monto, es uno nuevo.
-import { crearAbierto, dibujarFilas } from './montosListaAbierto.js';
+// abrirMonto(monto) y cerrarMonto(motivo) manejan la fila abierta (spec 002); sin monto, es uno nuevo.
+// Con motivo, avisa 'montos:cerrado' con detail { motivo } ('agregado' o 'descartado').
+import { conectarAbierto, crearAbierto, dibujarFilas } from './montosListaAbierto.js';
 import { conectarAcciones } from './montosListaAcciones.js';
 
 let contador = 0;
@@ -30,14 +31,18 @@ export class MontosList extends HTMLElement {
 
     get lista() { return this._estructura?.lista; }
 
+    get abierto() { return this._abierto; }
+
     abrirMonto(monto = null) {
         this._abierto = crearAbierto(monto);
         this.render();
+        this._abierto.fila.querySelector('[name="monto"]')?.focus();
     }
 
-    cerrarMonto() {
+    cerrarMonto(motivo) {
         this._abierto = null;
         this.render();
+        if (motivo) this.dispatchEvent(new CustomEvent('montos:cerrado', { detail: { motivo }, bubbles: true }));
     }
 
     _crearEstructura() {
@@ -61,6 +66,7 @@ export class MontosList extends HTMLElement {
         this.replaceChildren(orden, lista, vacio, estado);
         this._estructura = { orden, lista, vacio, estado };
         conectarAcciones(this);
+        conectarAbierto(this);
         lista.addEventListener('monto:edit', (e) => {
             e.stopPropagation();
             const { monto } = e.detail;

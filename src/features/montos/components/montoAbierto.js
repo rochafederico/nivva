@@ -14,7 +14,11 @@ export function crearMontoAbierto(monto) {
     grupo.appendChild(form);
     fila.appendChild(grupo);
     // Escape lo decide la fila: la ventana del egreso no lo recibe.
-    fila.addEventListener('keydown', (e) => { if (e.key === 'Escape') e.stopPropagation(); });
+    fila.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        e.stopPropagation();
+        form.dispatchEvent(new CustomEvent('monto:cancel', { bubbles: true }));
+    });
     return fila;
 }
 
