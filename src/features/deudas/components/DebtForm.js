@@ -23,7 +23,7 @@ export class DebtForm extends HTMLElement {
         this._analyticsStep = 'form';
         this._analyticsCompleted = false;
         this._analyticsStartedFor = null;
-        // Amount section mode: idle (list), creating, editing
+        // Amount section mode: idle (list), editing
         this._amountMode = 'idle';
         // Inline editing state: null = no inline open, 'new' = adding, number = editing existing
         this._inlineEditIdx = null;
@@ -230,7 +230,7 @@ export class DebtForm extends HTMLElement {
         this.clearFormError();
     }
 
-    // Open inline form to add a new monto at the bottom of the table.
+    // Abre un monto nuevo como fila de la lista (spec 002).
     // Rule: only 1 inline open at a time; if one is already open, ask user via confirm().
     openInlineAdd() {
         if (this._inlineEditIdx !== null) {
@@ -240,11 +240,11 @@ export class DebtForm extends HTMLElement {
         }
         this._analyticsStep = 'add_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
-        this._amountMode = 'creating';
+        this._amountMode = 'idle';
         this._inlineEditIdx = 'new';
         this._inlineEditRef = null;
         this.renderMontosList();
-        this._focusFirstInlineInput();
+        this.montosList.abrirMonto();
     }
 
     // Open inline form to edit an existing monto at the given index.
@@ -254,6 +254,7 @@ export class DebtForm extends HTMLElement {
             if (!confirm('¿Cancelar los cambios actuales?')) return;
             this._inlineEditIdx = null;
             this._inlineEditRef = null;
+            this.montosList.cerrarMonto();
         }
         this._analyticsStep = 'edit_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
@@ -270,6 +271,7 @@ export class DebtForm extends HTMLElement {
         this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
+        this.montosList.cerrarMonto();
         this.renderMontosList();
     }
 
@@ -306,12 +308,8 @@ export class DebtForm extends HTMLElement {
                 pagado: existing ? (existing.pagado ?? false) : false,
                 ...(existing && existing.id !== undefined ? { id: existing.id } : {})
             };
-            if (this._inlineEditIdx === 'new') {
-                this.montos.push(nuevoMonto);
-            } else {
-                const editIdx = this.montos.indexOf(this._inlineEditRef);
-                if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
-            }
+            const editIdx = this.montos.indexOf(this._inlineEditRef);
+            if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
             this._amountMode = 'idle';
             this._inlineEditIdx = null;
             this._inlineEditRef = null;
@@ -330,14 +328,7 @@ export class DebtForm extends HTMLElement {
         const addMontoBtnRow = this.querySelector('#add-monto-btn-row');
         if (!container) return;
         container.innerHTML = '';
-        if (this._amountMode === 'creating') {
-            container.classList.remove('d-none');
-            title?.classList.remove('d-none');
-            if (title) title.textContent = 'Nuevo monto';
-            tableWrapper?.classList.add('d-none');
-            addMontoBtnRow?.classList.add('d-none');
-            container.appendChild(this._buildMontoForm(null, { inline: true }));
-        } else if (this._amountMode === 'editing' && this._inlineEditRef) {
+        if (this._amountMode === 'editing' && this._inlineEditRef) {
             container.classList.remove('d-none');
             title?.classList.remove('d-none');
             if (title) title.textContent = 'Editar monto';
@@ -355,7 +346,13 @@ export class DebtForm extends HTMLElement {
     // La lista "Montos" (spec 001) dibuja, duplica y elimina; el formulario abre la edición.
     _conectarListaMontos() {
         this.montosList.addEventListener('montos:edit', (e) => this.openInlineEdit(e.detail.monto, e.detail.idx));
-        this.montosList.addEventListener('montos:empty', () => this.querySelector('#add-monto button')?.focus());
+        const enfocarAgregar = () => this.querySelector('#add-monto button')?.focus();
+        this.montosList.addEventListener('montos:empty', enfocarAgregar);
+        this.montosList.addEventListener('montos:cerrado', (e) => {
+            this._inlineEditIdx = null;
+            if (this.hasMontosAdded()) this.clearFormError();
+            if (e.detail.motivo === 'descartado') enfocarAgregar();
+        });
         this.montosList.addEventListener('montos:duplicated', (e) => {
             trackFlowStart('duplicate_installment', { step: 'inline_duplicate', deudaId: this.deudaId, source: 'DebtForm' });
             trackFlowComplete('duplicate_installment', { deudaId: this.deudaId, period: e.detail.monto.vencimiento.slice(0, 7) });
@@ -374,6 +371,7 @@ export class DebtForm extends HTMLElement {
         this.editing = true;
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
+        this.montosList?.cerrarMonto();
         this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
@@ -401,6 +399,7 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
+        this.montosList?.cerrarMonto();
         this._amountMode = 'idle';
         this._inlineEditIdx = null;
         this._inlineEditRef = null;

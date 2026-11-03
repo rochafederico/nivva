@@ -2,6 +2,8 @@
 // La fila abierta nunca sale del DOM: al reconectarse, monto-form se redibuja y pierde lo escrito.
 import { crearFilaMonto } from './MontoRow.js';
 import { crearMontoAbierto, numerarMontoAbierto, protegerFocoDelMontoAbierto } from './montoAbierto.js';
+import { accionesDe, anunciar } from './montosListaAcciones.js';
+import { fechaHablada } from '../utils/montoHablado.js';
 
 export const crearAbierto = (monto) => ({ monto, fila: crearMontoAbierto(monto) });
 
@@ -36,4 +38,24 @@ export function dibujarFilas(lista, abierto) {
     const filas = filasEnOrden(lista, abierto);
     if (abierto) ubicarAlrededor(lista.lista, filas, abierto.fila);
     else lista.lista.replaceChildren(...filas);
+}
+
+function confirmarNuevo(lista, datos) {
+    const nuevo = { monto: parseFloat(datos.monto), moneda: datos.moneda, vencimiento: datos.vencimiento, pagado: false };
+    lista.montos.push(nuevo);
+    lista.cerrarMonto('agregado');
+    accionesDe(lista, nuevo)?.focus();
+    anunciar(lista, `Monto agregado. Vence el ${fechaHablada(nuevo.vencimiento)}.`);
+}
+
+// Confirmar y descartar la fila abierta. Un monto existente se confirma desde T04.
+export function conectarAbierto(lista) {
+    lista.lista.addEventListener('monto:save', (e) => {
+        e.stopPropagation();
+        if (!lista.abierto?.monto) confirmarNuevo(lista, e.detail);
+    });
+    lista.lista.addEventListener('monto:cancel', (e) => {
+        e.stopPropagation();
+        lista.cerrarMonto('descartado');
+    });
 }

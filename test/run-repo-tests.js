@@ -1,6 +1,4 @@
-// Main test runner — imports setup (happy-dom + fake-indexeddb) and runs
-// all feature test suites. Each test file is organized by E2E use cases
-// that go from UI components down to the repository/DB layer.
+// Runner: setup (happy-dom + fake-indexeddb) y todas las suites por feature.
 import { initDB } from '../src/shared/database/initDB.js';
 import { printResults } from './setup.js';
 import { tests as deudasTests } from './deudas.test.js';
@@ -27,6 +25,7 @@ import { tests as montosListAccionesTests } from './montos-list-acciones.test.js
 import { tests as debtFormMontosTests } from './debt-form-montos.test.js';
 import { tests as montoAbiertoErroresTests } from './monto-abierto-errores.test.js';
 import { tests as montosListAbiertoTests } from './montos-list-abierto.test.js';
+import { tests as debtFormAgregarTests } from './debt-form-agregar.test.js';
 
 async function run() {
     try {
@@ -88,6 +87,7 @@ async function run() {
         for (const test of debtFormMontosTests) { await test(); }
         for (const test of montoAbiertoErroresTests) { await test(); }
         for (const test of montosListAbiertoTests) { await test(); }
+        for (const test of debtFormAgregarTests) { await test(); }
 
         printResults();
         process.exit(0);

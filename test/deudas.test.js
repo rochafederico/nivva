@@ -440,8 +440,7 @@ async function testPagoToggleVisualFeedback() {
 }
 
 // ===================================================================
-// UC8: Alta inline — openInlineAdd() muestra sólo el formulario de monto
-// Verifica estados de visibilidad: en creating se ocultan tabla y botón Agregar monto.
+// UC8: Alta inline — openInlineAdd() abre una fila en la lista (spec 002)
 // Al guardar con datos válidos, form.montos crece en 1 y vuelve el modo lista.
 // ===================================================================
 async function testAltaInlineAgregarYGuardar() {
@@ -455,19 +454,9 @@ async function testAltaInlineAgregarYGuardar() {
 
     // Abrir inline add
     form.openInlineAdd();
-    assert(form._amountMode === 'creating', '_amountMode debe ser "creating"');
     assert(form._inlineEditIdx === 'new', '_inlineEditIdx debe ser "new"');
 
-    const tableWrapper = form.querySelector('#montos-table-wrapper');
-    const addMontoBtnRow = form.querySelector('#add-monto-btn-row');
-    const title = form.querySelector('#monto-form-title');
-    const inlineAddContainer = form.querySelector('#add-monto-form-container');
-    assert(inlineAddContainer !== null, 'Debe existir contenedor separado para alta de monto');
-    assert(!inlineAddContainer.classList.contains('d-none'), 'El formulario de alta debe estar visible');
-    assert(tableWrapper.classList.contains('d-none'), 'La tabla/lista debe ocultarse al crear');
-    assert(addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto debe ocultarse al crear');
-    assert(title.textContent === 'Nuevo monto', 'El formulario debe titularse "Nuevo monto"');
-    let inlineForm = inlineAddContainer.querySelector('monto-form');
+    let inlineForm = form.querySelector('montos-list monto-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
     // Verify inputs exist inside monto-form > app-form
@@ -496,7 +485,6 @@ async function testAltaInlineAgregarYGuardar() {
         bubbles: true,
         composed: true
     }));
-    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
     assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
@@ -505,11 +493,8 @@ async function testAltaInlineAgregarYGuardar() {
     assert(form.montos[0].pagado === false, 'pagado = false por defecto');
 
     // El formulario inline ya no debe estar presente
-    inlineForm = inlineAddContainer.querySelector('monto-form');
+    inlineForm = form.querySelector('montos-list monto-form');
     assert(inlineForm === null, 'Formulario inline desaparecido tras guardar');
-    assert(inlineAddContainer.classList.contains('d-none'), 'El contenedor de alta vuelve a ocultarse tras guardar');
-    assert(!tableWrapper.classList.contains('d-none'), 'La tabla/lista vuelve a mostrarse tras guardar');
-    assert(!addMontoBtnRow.classList.contains('d-none'), 'El botón Agregar monto vuelve a mostrarse tras guardar');
 
     document.body.removeChild(form);
     await cleanup();
@@ -526,8 +511,7 @@ async function testAltaInlineValidacionErrores() {
     document.body.appendChild(form);
 
     form.openInlineAdd();
-    const inlineAddContainer = form.querySelector('#add-monto-form-container');
-    const inlineForm = inlineAddContainer.querySelector('monto-form');
+    const inlineForm = form.querySelector('montos-list monto-form');
     assert(inlineForm !== null, 'Debe haber un formulario inline de alta');
 
     const montoInput = inlineForm.querySelector('input[name="monto"]');
@@ -565,7 +549,6 @@ async function testCancelarAltaInline() {
 
     form.openInlineAdd();
     assert(form._inlineEditIdx === 'new', 'Inline add abierto');
-    assert(form._amountMode === 'creating', 'Debe quedar en modo creating');
 
     form._cancelInline();
     assert(form._amountMode === 'idle', 'Debe volver a modo idle tras cancelar');
@@ -573,7 +556,7 @@ async function testCancelarAltaInline() {
     assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
     assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
 
-    const inlineForm = form.querySelector('#add-monto-form-container monto-form');
+    const inlineForm = form.querySelector('montos-list monto-form');
     assert(inlineForm === null, 'No hay formulario inline tras cancelar');
 
     document.body.removeChild(form);
@@ -986,7 +969,7 @@ async function testDebtModalInlineMontoCancelDoesNotCloseModal() {
 
     const debtForm = modal.querySelector('debt-form');
     debtForm.openInlineAdd();
-    const inlineMontoForm = debtForm.querySelector('#add-monto-form-container app-form');
+    const inlineMontoForm = debtForm.querySelector('montos-list app-form');
     const inlineActionRow = inlineMontoForm?.querySelector('[data-form-actions="true"]');
     const inlineCancelBtn = inlineActionRow?.querySelector('#cancelBtn');
     const inlineSaveBtn = inlineActionRow?.querySelector('button[type="submit"]');
