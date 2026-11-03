@@ -17,7 +17,7 @@ function crearMensajeGeneral(formEl) {
 }
 
 function limpiarCampoCorregido(campo) {
-    if (!campo?.hasAttribute?.('aria-invalid') || !campo.checkValidity()) return;
+    if (!campo?.hasAttribute?.('aria-invalid') || !campo.validity.valid) return;
     campo.removeAttribute('aria-invalid');
     campo.removeAttribute('aria-describedby');
 }

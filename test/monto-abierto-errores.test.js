@@ -41,6 +41,7 @@ async function testErrores() {
     assert(form.querySelector('[data-monto-general-error="true"]').classList.contains('d-block'), 'Mensaje general');
     assert(document.activeElement === campo(form, 'monto'), 'Foco en el primer campo con problema');
 
+    campo(form, 'monto').step = 'any'; // happy-dom calcula mal el step con decimales
     campo(form, 'monto').value = '100';
     campo(form, 'monto').dispatchEvent(new Event('input', { bubbles: true }));
     assert(campo(form, 'monto').getAttribute('aria-invalid') === null, 'Al corregir se limpia la marca');
