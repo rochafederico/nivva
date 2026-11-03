@@ -5,6 +5,7 @@ import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/MontosList.js';
+import { cerrarAbiertoParaAbrirOtro } from '../../montos/components/montosListaAbierto.js';
 import {
     trackFlowStart,
     trackFlowComplete,
@@ -231,13 +232,9 @@ export class DebtForm extends HTMLElement {
     }
 
     // Abre un monto nuevo como fila de la lista (spec 002).
-    // Rule: only 1 inline open at a time; if one is already open, ask user via confirm().
+    // Nunca hay más de un monto abierto (criterio 12).
     openInlineAdd() {
-        if (this._inlineEditIdx !== null) {
-            if (!confirm('¿Cancelar los cambios actuales?')) return;
-            this._inlineEditIdx = null;
-            this._inlineEditRef = null;
-        }
+        if (!cerrarAbiertoParaAbrirOtro(this.montosList)) return;
         this._analyticsStep = 'add_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
         this._amountMode = 'idle';
@@ -249,16 +246,11 @@ export class DebtForm extends HTMLElement {
 
     // Abre un monto existente en su misma fila (spec 002).
     // Rule: only 1 inline open at a time; if one is already open, ask user via confirm().
-    openInlineEdit(monto, idx) {
-        if (this._inlineEditIdx !== null) {
-            if (!confirm('¿Cancelar los cambios actuales?')) return;
-            this._inlineEditIdx = null;
-            this._inlineEditRef = null;
-            this.montosList.cerrarMonto();
-        }
+    openInlineEdit(monto) {
+        if (!cerrarAbiertoParaAbrirOtro(this.montosList)) return;
         this._analyticsStep = 'edit_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
-        this._inlineEditIdx = idx;
+        this._inlineEditIdx = this.montos.indexOf(monto);
         this.montosList.abrirMonto(monto);
     }
 
@@ -311,7 +303,7 @@ export class DebtForm extends HTMLElement {
 
     // La lista "Montos" (spec 001) dibuja, duplica y elimina; el formulario abre la edición.
     _conectarListaMontos() {
-        this.montosList.addEventListener('montos:edit', (e) => this.openInlineEdit(e.detail.monto, e.detail.idx));
+        this.montosList.addEventListener('montos:edit', (e) => this.openInlineEdit(e.detail.monto));
         const enfocarAgregar = () => this.querySelector('#add-monto button')?.focus();
         this.montosList.addEventListener('montos:empty', enfocarAgregar);
         this.montosList.addEventListener('montos:cerrado', (e) => {

@@ -27,6 +27,7 @@ import { tests as montoAbiertoErroresTests } from './monto-abierto-errores.test.
 import { tests as montosListAbiertoTests } from './montos-list-abierto.test.js';
 import { tests as debtFormAgregarTests } from './debt-form-agregar.test.js';
 import { tests as debtFormEditarTests } from './debt-form-editar.test.js';
+import { tests as montosListUnAbiertoTests } from './montos-list-un-abierto.test.js';
 
 async function run() {
     try {
@@ -77,17 +78,10 @@ async function run() {
         for (const test of pwaResponsiveTests) { await test(); }
 
         console.log('\n--- Spec 001: lista de montos ---');
-        for (const test of montosFormatoTests) { await test(); }
-        for (const test of menuButtonTests) { await test(); }
-        for (const test of menuButtonTeclasTests) { await test(); }
-        for (const test of montoRowTests) { await test(); }
-        for (const test of montosListTests) { await test(); }
-        for (const test of montosListAccionesTests) { await test(); }
-        for (const test of debtFormMontosTests) { await test(); }
-        for (const test of montoAbiertoErroresTests) { await test(); }
-        for (const test of montosListAbiertoTests) { await test(); }
-        for (const test of debtFormAgregarTests) { await test(); }
-        for (const test of debtFormEditarTests) { await test(); }
+        for (const test of [...montosFormatoTests, ...menuButtonTests, ...menuButtonTeclasTests, ...montoRowTests,
+            ...montosListTests, ...montosListAccionesTests, ...debtFormMontosTests, ...montoAbiertoErroresTests,
+            ...montosListAbiertoTests, ...debtFormAgregarTests, ...debtFormEditarTests,
+            ...montosListUnAbiertoTests]) { await test(); }
 
         printResults();
         process.exit(0);
