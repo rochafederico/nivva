@@ -127,6 +127,8 @@ hablada son como en la spec 001.
     **entonces** el monto abierto sigue abierto sin perder lo escrito.
     Para el vencimiento del duplicado no cuenta un monto nuevo abierto; uno
     existente abierto cuenta con los valores que tenía antes de abrirlo.
+    Si al eliminar otro monto el foco tuviera que pasar al botón ⋮ del monto
+    abierto (spec 001, criterio 11), pasa a su campo "Monto".
 
 ### Pie de la ventana y lista vacía
 
