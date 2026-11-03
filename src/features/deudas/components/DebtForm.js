@@ -7,6 +7,7 @@ import '../../montos/components/MontoForm.js';
 import '../../montos/components/MontosList.js';
 import { cerrarAbiertoParaAbrirOtro } from '../../montos/components/montosListaAbierto.js';
 import { debtFormAnalitica } from './debtFormAnalitica.js';
+import { antesDeGuardar, debtFormErrores } from './debtFormGuardar.js';
 import {
     trackFlowStart,
     trackFlowComplete,
@@ -52,7 +53,7 @@ export class DebtForm extends HTMLElement {
             const flowName = this._analyticsFlow || this._getFlowName();
             this.startAnalyticsFlow(flowName, { step: this._analyticsStep });
             const errors = { ...(event.detail?.errors || {}) };
-            if (!this.hasMontosAdded()) {
+            if (!this.hasMontosAdded() && !this.montosList.abierto) {
                 const montosError = this.getMontosRequiredError();
                 this.showFormError(montosError);
                 errors.montos = montosError;
@@ -65,6 +66,9 @@ export class DebtForm extends HTMLElement {
             });
         };
         this._onInteraction = () => this.startAnalyticsFlow(this._getFlowName(), { step: this._analyticsStep });
+        // En captura: decide antes de que el formulario se envíe (Guardar del pie o Enter).
+        this._onGuardar = (event) => antesDeGuardar(this, event);
+        this.form.addEventListener('click', this._onGuardar, true);
         this.form.addEventListener('deuda:submit', this._onSubmit);
         this.form.addEventListener('form:cancel', this._onCancel);
         this.form.addEventListener('form:validation-error', this._onValidationError);
@@ -75,6 +79,7 @@ export class DebtForm extends HTMLElement {
 
     disconnectedCallback() {
         if (this.form) {
+            this.form.removeEventListener('click', this._onGuardar, true);
             this.form.removeEventListener('deuda:submit', this._onSubmit);
             this.form.removeEventListener('form:cancel', this._onCancel);
             this.form.removeEventListener('form:validation-error', this._onValidationError);
@@ -348,35 +353,6 @@ export class DebtForm extends HTMLElement {
         this._analyticsCompleted = true;
         this.reset({ trackAbandonment: false });
     }
-
-    showFormError(msg) {
-        const err = this.querySelector('#form-error');
-        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
-        if (!err || !montosTableWrapper) return;
-        err.textContent = msg;
-        err.classList.add('d-block');
-        err.classList.remove('d-none');
-        montosTableWrapper.setAttribute('aria-describedby', 'form-error');
-        montosTableWrapper.classList.add('border-danger');
-    }
-
-    getMontosRequiredError() {
-        return 'Debe agregar al menos un monto antes de guardar.';
-    }
-
-    clearFormError() {
-        const err = this.querySelector('#form-error');
-        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
-        if (err) {
-            err.textContent = '';
-            err.classList.remove('d-block');
-            err.classList.add('d-none');
-        }
-        if (montosTableWrapper) {
-            montosTableWrapper.removeAttribute('aria-describedby');
-            montosTableWrapper.classList.remove('border-danger');
-        }
-    }
 }
-Object.assign(DebtForm.prototype, debtFormAnalitica);
+Object.assign(DebtForm.prototype, debtFormAnalitica, debtFormErrores);
 customElements.define('debt-form', DebtForm);

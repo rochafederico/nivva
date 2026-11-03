@@ -29,6 +29,7 @@ import { tests as debtFormAgregarTests } from './debt-form-agregar.test.js';
 import { tests as debtFormEditarTests } from './debt-form-editar.test.js';
 import { tests as montosListUnAbiertoTests } from './montos-list-un-abierto.test.js';
 import { tests as debtFormCancelarTests } from './debt-form-cancelar.test.js';
+import { tests as debtFormGuardarTests } from './debt-form-guardar.test.js';
 
 async function run() {
     try {
@@ -82,7 +83,7 @@ async function run() {
         for (const test of [...montosFormatoTests, ...menuButtonTests, ...menuButtonTeclasTests, ...montoRowTests,
             ...montosListTests, ...montosListAccionesTests, ...debtFormMontosTests, ...montoAbiertoErroresTests,
             ...montosListAbiertoTests, ...debtFormAgregarTests, ...debtFormEditarTests,
-            ...montosListUnAbiertoTests, ...debtFormCancelarTests]) { await test(); }
+            ...montosListUnAbiertoTests, ...debtFormCancelarTests, ...debtFormGuardarTests]) { await test(); }
 
         printResults();
         process.exit(0);
