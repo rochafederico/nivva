@@ -48,14 +48,33 @@ function confirmarNuevo(lista, datos) {
     anunciar(lista, `Monto agregado. Vence el ${fechaHablada(nuevo.vencimiento)}.`);
 }
 
-// Confirmar y descartar la fila abierta. Un monto existente se confirma desde T04.
+// Reemplaza el monto en su lugar del arreglo: conserva si estaba pagado y su id.
+function confirmarExistente(lista, datos) {
+    const anterior = lista.abierto.monto;
+    const actualizado = {
+        monto: parseFloat(datos.monto),
+        moneda: datos.moneda,
+        vencimiento: datos.vencimiento,
+        pagado: anterior.pagado ?? false,
+        ...(anterior.id !== undefined ? { id: anterior.id } : {})
+    };
+    lista.montos[lista.montos.indexOf(anterior)] = actualizado;
+    lista.cerrarMonto('actualizado');
+    accionesDe(lista, actualizado)?.focus();
+    anunciar(lista, 'Monto actualizado.');
+}
+
+// Confirmar y descartar la fila abierta.
 export function conectarAbierto(lista) {
     lista.lista.addEventListener('monto:save', (e) => {
         e.stopPropagation();
-        if (!lista.abierto?.monto) confirmarNuevo(lista, e.detail);
+        if (lista.abierto?.monto) confirmarExistente(lista, e.detail);
+        else if (lista.abierto) confirmarNuevo(lista, e.detail);
     });
     lista.lista.addEventListener('monto:cancel', (e) => {
         e.stopPropagation();
-        lista.cerrarMonto('descartado');
+        const monto = lista.abierto?.monto;
+        lista.cerrarMonto(monto ? 'restaurado' : 'descartado');
+        if (monto) accionesDe(lista, monto)?.focus();
     });
 }

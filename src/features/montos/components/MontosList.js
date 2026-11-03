@@ -4,7 +4,7 @@
 // Avisa 'montos:edit' con detail { monto, idx } cuando se toca "Editar" en una fila, y
 // 'montos:duplicated' y 'montos:empty' desde las acciones (montosListaAcciones.js).
 // abrirMonto(monto) y cerrarMonto(motivo) manejan la fila abierta (spec 002); sin monto, es uno nuevo.
-// Con motivo, avisa 'montos:cerrado' con detail { motivo } ('agregado' o 'descartado').
+// Con motivo, avisa 'montos:cerrado' con detail { motivo } ('agregado', 'actualizado', 'descartado' o 'restaurado').
 import { conectarAbierto, crearAbierto, dibujarFilas } from './montosListaAbierto.js';
 import { conectarAcciones } from './montosListaAcciones.js';
 
