@@ -9,8 +9,10 @@
 
 | Término aprobado | Sinónimos prohibidos | Definición operativa | Ejemplo de uso en UI |
 |---|---|---|---|
-| **Egreso** | Deuda, gasto fijo, compromiso, obligación | Pago periódico o único que la persona debe realizar (alquiler, tarjeta, préstamo, servicio) | "Agregá un egreso" / "Egresos del mes" |
-| **Monto** | Cuota, importe, valor, plata, precio | Cifra numérica de un pago dentro de un egreso, asociada a moneda, vencimiento y período | "$ 15.000,00" / "US$ 15.000,00" / "Agregar monto" |
+| **Egreso** | Deuda, gasto fijo, compromiso, obligación | Salida registrada por la persona. Es de uno de dos tipos: Gasto o Gasto con vencimiento | "Agregá un egreso" / "Egresos del mes" |
+| **Gasto** | Compra, consumo, gasto hormiga, gasto diario | Egreso ya pagado, sin acreedor ni vencimiento (súper, transporte, salidas) | "Agregar gasto" / "Gasto · 03/11/2026" |
+| **Gasto con vencimiento** | Gasto mensual, gasto fijo, deuda | Egreso con acreedor y uno o más montos con vencimiento, periódico o único (alquiler, tarjeta, préstamo, servicio) | "Agregar gasto con vencimiento" |
+| **Monto** | Cuota, importe, valor, plata, precio | Cifra numérica de un egreso, asociada a moneda y período; en un gasto con vencimiento, también a un vencimiento | "$ 15.000,00" / "US$ 15.000,00" / "Agregar monto" |
 | **Acreedor** | A quién le debo, prestamista, empresa | Entidad o persona a la que se le debe el pago del egreso | "Acreedor: Banco Galicia" |
 | **Tipo de deuda** | Categoría, tipo, clase | Clasificación libre del egreso (ej: tarjeta, alquiler, préstamo, servicio) | "Tipo de deuda: Tarjeta de crédito" |
 | **Ingreso** | Sueldo, entrada, plata que entra | Dinero recibido en un período (sueldo, honorarios, renta, etc.) | "Agregar ingreso" / "Ingresos del mes" |
@@ -60,6 +62,11 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 - En contextos educativos o de onboarding, podemos usar "compromiso financiero" como alternativa más neutral.
 - El repo se llama internamente "deudas-app" — esto es un nombre técnico, no de UI.
 
+### Gasto vs. Gasto con vencimiento
+- La diferencia es el vencimiento: un gasto ya está pagado; uno con vencimiento puede estar pendiente.
+- "Gasto" solo nombra siempre al tipo sin vencimiento. Para hablar de los dos, se usa **"egreso"**.
+- No se dice "gasto mensual": un gasto con vencimiento también puede ser un pago único.
+
 ### Monto vs. Cuota
 - **"Monto"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
 - **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de monto en todos los contextos.
@@ -82,7 +89,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ## ✅ Checklist QA — 05-Glosario
 
 - [x] Cada término tiene: término aprobado, sinónimos prohibidos, definición, ejemplo de uso
-- [x] Cubre: Egreso, Monto, Acreedor, Tipo de deuda, Ingreso, Moneda, Vencimiento, Período
+- [x] Cubre: Egreso, Gasto, Gasto con vencimiento, Monto, Acreedor, Tipo de deuda, Ingreso, Moneda, Vencimiento, Período
 - [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes
 - [x] Sección de términos técnicos internos que no deben exponerse al usuario
 - [x] Regla de anglicismos con decisión por término
