@@ -59,6 +59,8 @@ Exportar datos        ← verbo + objeto
 | **Siguiente** | Avanzar al siguiente paso | `Siguiente` |
 | **Anterior** | Volver al paso previo | `Anterior` |
 
+**Excepción:** `Listo` confirma una fila abierta dentro de un formulario que después se guarda con `Guardar`. No es infinitivo, pero no sugiere que ya quedó guardado. No se usa en otros casos.
+
 ---
 
 ## 🚫 Verbos prohibidos (y sus alternativas)
