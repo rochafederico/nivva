@@ -114,7 +114,7 @@ export class MontoForm extends HTMLElement {
         if (!formEl) return;
 
         const fieldsRow = document.createElement('div');
-        fieldsRow.className = 'row g-2 align-items-end';
+        fieldsRow.className = 'row g-2 align-items-start';
         const fieldNames = ['monto', 'moneda', 'vencimiento'];
         const fields = fieldNames.map(fieldName => formEl.querySelector(`[data-field-name="${fieldName}"]`));
         if (fields.some(field => field === null)) return;

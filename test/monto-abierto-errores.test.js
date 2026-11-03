@@ -3,10 +3,7 @@ import { assert } from './setup.js';
 import '../src/features/montos/components/MontoForm.js';
 
 function abrir(numero) {
-    const form = document.createElement('monto-form');
-    form.inline = true;
-    form.compactErrors = true;
-    form.numero = numero;
+    const form = Object.assign(document.createElement('monto-form'), { inline: true, compactErrors: true, numero });
     document.body.appendChild(form);
     return form;
 }
