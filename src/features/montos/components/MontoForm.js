@@ -48,13 +48,13 @@ export class MontoForm extends HTMLElement {
         this.render();
     }
 
-    // Posición de la fila en la lista, o 'nuevo'. Sin valor, los botones usan su texto visible.
+    // Posición de la fila, o 'nuevo'; sin valor, los botones usan su texto visible. No redibuja: se perdería lo escrito.
     get numero() {
         return this._numero;
     }
     set numero(value) {
         this._numero = value;
-        this.render();
+        this._aplicarNombres(this.querySelector('app-form'));
     }
 
     connectedCallback() {
@@ -87,7 +87,6 @@ export class MontoForm extends HTMLElement {
         form.initialValues = this._monto || {};
         form.submitText = 'Listo';
         form.cancelText = 'Cancelar';
-        // Usar evento personalizado para submit
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
@@ -103,7 +102,7 @@ export class MontoForm extends HTMLElement {
     }
 
     _aplicarNombres(form) {
-        if (this._numero === undefined || this._numero === null) return;
+        if (!form || this._numero === undefined || this._numero === null) return;
         const { listo, cancelar } = nombresDeBotones(this._numero);
         form.querySelector('button[type="submit"]')?.setAttribute('aria-label', listo);
         form.querySelector('#cancelBtn')?.setAttribute('aria-label', cancelar);
