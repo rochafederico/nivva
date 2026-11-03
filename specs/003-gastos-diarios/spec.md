@@ -19,12 +19,17 @@ vencimiento. Una compra en el súper no tiene ninguno de los dos, así que
 queda afuera y el balance muestra más margen del real. Es un agregado a la
 pregunta "cuánto debo, cuánto entra y qué vence": también "cuánto me queda".
 
+Un gasto es un egreso. Desde esta iteración, un egreso es de uno de dos tipos:
+**Gasto**, ya pagado y sin acreedor ni vencimiento, o **Gasto con vencimiento**,
+que es lo que hoy se carga como egreso.
+
 ## Alcance
 
-- Incluye: agregar, editar y eliminar un gasto; verlo en los movimientos del
-  mes; contarlo en Egresos y Balance; conservarlo en la copia de seguridad.
+- Incluye: elegir el tipo de egreso al agregarlo; agregar, editar y eliminar
+  un gasto; verlo en los movimientos del mes; contarlo en Egresos y Balance;
+  conservarlo en la copia de seguridad.
 - No incluye: categorías, presupuestos, límites, gastos recurrentes, gráficos
-  ni pasar un gasto a egreso con vencimiento, o al revés.
+  ni cambiar el tipo de un egreso ya guardado.
 
 ## Forma hablada
 
@@ -33,9 +38,11 @@ Monto y fecha se leen como define la spec 001 (`5000 pesos`,
 
 ## Criterios de aceptación
 
-1. **Dado** el Inicio, **cuando** se toca el botón +, **entonces** "¿Qué
-   querés agregar?" ofrece también `Gasto`, con el detalle `Súper, transporte,
-   salidas`, después de Ingreso y Egreso.
+1. **Dado** el Inicio, **cuando** en "¿Qué querés agregar?" se elige `Egreso`,
+   **entonces** la misma ventana pasa a "¿Qué tipo de egreso?" y ofrece `Gasto`,
+   con el detalle `Súper, transporte, salidas`, y `Gasto con vencimiento`, con
+   el detalle `Tarjeta, préstamo, alquiler, servicio`. En el primer paso, el
+   detalle de `Egreso` pasa a `Súper, tarjeta, préstamo, alquiler`.
 2. **Dado** que se eligió `Gasto`, **cuando** se abre "Agregar gasto",
    **entonces** pide Descripción, Monto, Moneda y Fecha, sin acreedor ni
    vencimiento. Moneda viene con pesos elegido, Fecha viene con el día de hoy
@@ -89,18 +96,30 @@ Monto y fecha se leen como define la spec 001 (`5000 pesos`,
     importa, **entonces** los gastos vuelven con todos sus datos. Una copia
     hecha antes de que existieran los gastos se sigue importando sin error.
 16. **Dado** que hay gastos, **cuando** se eliminan todos los datos desde
-    Ajustes, **entonces** los gastos también se borran, y la confirmación dice
-    `Vas a eliminar todos tus egresos, gastos e ingresos. Esta acción no se puede deshacer. ¿Continuás?`
+    Ajustes, **entonces** los gastos también se borran. La confirmación no
+    cambia, porque un gasto es un egreso.
 17. **Dado** el lector de pantalla en una fila de gasto, **cuando** la recorre,
     **entonces** dice la descripción, `Gasto`, la fecha y el monto en la forma
     hablada, y el botón ⋮ se llama `Acciones del gasto Súper, 5000 pesos`.
+18. **Dado** "¿Qué tipo de egreso?", **cuando** aparece, **entonces** el lector
+    anuncia ese título y el foco queda en `Gasto`. `Tab` pasa a la otra opción y
+    `Enter` o `Espacio` la eligen. `Escape` cierra la ventana y el foco vuelve
+    al botón +.
+19. **Dado** que se eligió `Gasto con vencimiento`, **cuando** se abre el
+    formulario, **entonces** funciona igual que hoy, con los títulos
+    `Agregar gasto con vencimiento` y, al editar,
+    `Editar gasto con vencimiento`.
+20. **Dado** un egreso cargado antes de esta iteración, **cuando** se ve o se
+    edita, **entonces** es un `Gasto con vencimiento` y conserva todos sus datos
+    y su comportamiento. Lo mismo vale para el que llega en una copia anterior.
+21. **Dado** un egreso guardado, **cuando** se edita, **entonces** no se puede
+    cambiar su tipo: para cambiarlo, se elimina y se carga de nuevo.
 
 ## Escenarios
 
 - Error: si no se puede guardar, la ventana sigue abierta con lo escrito y
   dice `No pudimos guardar el gasto. Intentá de nuevo.`
-- Vacío: "Todo" sin nada en el mes dice
-  `Todavía no hay movimientos este mes. Agregá un ingreso, un egreso o un gasto.`
+- Vacío: los mensajes de "Todo" y "Egresos" sin nada en el mes no cambian.
 - Mobile: a 320 px la fila no genera scroll horizontal; una descripción larga
   se corta en lo visible y el lector la lee completa.
 
@@ -114,8 +133,8 @@ Ver `docs/sdd/accesibilidad.md`.
 | 1.4.1 Uso del color | Distinguir un gasto de un egreso o un ingreso sin ver colores (criterio 7) | Mirar la lista en escala de grises |
 | 1.4.3 y 1.4.11 Contraste | Leer textos y distinguir campos, botón ⋮ y foco | Revisar el contraste a mano |
 | 1.4.10 Reflow | Agregar y ver gastos a 320 px sin scroll horizontal | Achicar la ventana a 320 px |
-| 2.1.1 Teclado | Agregar, editar y eliminar sin mouse (criterios 3, 6, 8, 9 y 10) | Hacer todo el recorrido con teclado |
-| 2.4.3 Orden del foco | Saber dónde queda el foco después de cada acción (criterios 3, 6, 9, 10 y 11) | Agregar, editar, eliminar y cancelar con teclado |
+| 2.1.1 Teclado | Elegir el tipo, agregar, editar y eliminar sin mouse (criterios 3, 6, 8, 9, 10 y 18) | Hacer todo el recorrido con teclado |
+| 2.4.3 Orden del foco | Saber dónde queda el foco después de cada acción (criterios 3, 6, 9, 10, 11 y 18) | Agregar, editar, eliminar y cancelar con teclado |
 | 2.4.7 y 2.4.11 Foco visible y no tapado | Ver siempre dónde está el foco | Recorrer con `Tab` una lista larga |
 | 2.5.8 Tamaño del objetivo | Tocar el botón ⋮ y sus opciones sin errar | Usarlo con el dedo en un teléfono |
 | 3.3.1 y 3.3.3 Errores | Saber qué campo falló y cómo corregirlo (criterio 5) | Guardar con campos vacíos |
@@ -126,8 +145,10 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Lugar | Texto |
 |---|---|
-| Opción del botón + | `Gasto` · `Súper, transporte, salidas` |
-| Títulos de la ventana | `Agregar gasto` · `Editar gasto` |
+| Primer paso del botón + | `Egreso` · `Súper, tarjeta, préstamo, alquiler` |
+| Segundo paso | `¿Qué tipo de egreso?` |
+| Tipos de egreso | `Gasto` · `Súper, transporte, salidas` · `Gasto con vencimiento` · `Tarjeta, préstamo, alquiler, servicio` |
+| Títulos de la ventana | `Agregar gasto` · `Editar gasto` · `Agregar gasto con vencimiento` · `Editar gasto con vencimiento` |
 | Campos | `Descripción` · `Monto` · `Moneda` · `Fecha` |
 | Botones | `Agregar gasto` · `Guardar cambios` · `Cancelar` |
 | Errores por campo | `Ingresá una descripción.` · `Ingresá un monto mayor a 0.` · `Seleccioná una moneda.` · `Ingresá una fecha válida.` |
@@ -136,14 +157,13 @@ Ver `docs/sdd/accesibilidad.md`.
 | Menú | `Editar` · `Eliminar` |
 | Nombre del botón ⋮ | `Acciones del gasto Súper, 5000 pesos` |
 | Mensajes | `Gasto agregado.` · `Gasto agregado en octubre de 2026.` · `Gasto actualizado.` · `Gasto actualizado en octubre de 2026.` · `Gasto eliminado.` |
-| Confirmaciones | `¿Eliminar el gasto "Súper" de 5000 pesos del 3 de noviembre de 2026?` · `Vas a eliminar todos tus egresos, gastos e ingresos. Esta acción no se puede deshacer. ¿Continuás?` |
-| Vacío en "Todo" | `Todavía no hay movimientos este mes. Agregá un ingreso, un egreso o un gasto.` |
+| Confirmación al eliminar | `¿Eliminar el gasto "Súper" de 5000 pesos del 3 de noviembre de 2026?` |
 
 ## Preguntas abiertas
 
-1. Marca y glosario: la marca dice "No es una app de presupuesto", y "gasto"
-   no es un término aprobado. ¿Se amplía el propósito a los gastos del día a
-   día y se aprueba `Gasto` como término? Los cambios van en su propio PR.
+1. Glosario y marca: ¿se aprueban `Gasto` y `Gasto con vencimiento`, se amplía
+   la definición de egreso ("pago que debe realizar") y se ajusta el objetivo
+   "gastos fijos" de la marca? Los cambios van en su propio PR.
 
 ## Definition of Ready
 
