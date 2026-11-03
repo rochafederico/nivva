@@ -36,12 +36,11 @@ async function testListaEnAgregarYEditar() {
 }
 
 async function testEditarAbreLaEdicion() {
-    console.log('  Spec 001 C5: "Editar" del menú ⋮ abre la edición de ese monto, como antes');
+    console.log('  Spec 002 C3: "Editar" del menú ⋮ abre ese monto en su fila');
     const form = nuevoFormulario([{ monto: 1, moneda: 'ARS', vencimiento: '2026-11-10' }, { monto: 2, moneda: 'ARS', vencimiento: '2026-12-10' }]);
     elegir(filas(form)[1], 0);
-    assert(form._amountMode === 'editing' && form._inlineEditRef === form.montos[1], 'Edita el monto 2');
-    assert(form.querySelector('#add-monto-form-container monto-form'), 'Se abre el formulario del monto');
-    assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La lista se oculta mientras tanto');
+    assert(form.montosList.abierto.monto === form.montos[1], 'Edita el monto 2');
+    assert(filas(form)[1].querySelector('monto-form'), 'Se abre en su fila');
     form.remove();
 }
 

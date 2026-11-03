@@ -35,7 +35,9 @@ function eliminar(lista, monto, fila) {
     lista.montos.splice(idx, 1);
     lista.render();
     const vecino = lista.montos[idx] || lista.montos[idx - 1];
-    if (vecino) {
+    if (vecino && vecino === lista.abierto?.monto) {
+        lista.abierto.fila.querySelector('[name="monto"]')?.focus();
+    } else if (vecino) {
         accionesDe(lista, vecino)?.focus();
     } else {
         lista.dispatchEvent(new CustomEvent('montos:empty', { bubbles: true }));

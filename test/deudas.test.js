@@ -582,33 +582,15 @@ async function testEdicionInlineGuardar() {
     // Editar el primer monto (idx=0 después de ordenar por vencimiento)
     form.openInlineEdit(form.montos[0], 0);
     assert(form._inlineEditIdx === 0, '_inlineEditIdx = 0');
-    assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
-    assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
-
-    assert(form._amountMode === 'editing', 'Debe quedar en modo editing');
-    const inlineContainer = form.querySelector('#add-monto-form-container');
-    const inlineRow = inlineContainer.querySelector('monto-form');
-    assert(inlineRow !== null, 'Formulario inline presente para edición');
-    assert(form.querySelector('#monto-form-title').textContent === 'Editar monto', 'Debe usar título "Editar monto"');
-    assert(form.querySelector('#montos-table-wrapper').classList.contains('d-none'), 'La tabla debe ocultarse durante edición');
-    assert(form.querySelector('#add-monto-btn-row').classList.contains('d-none'), 'El botón Agregar monto debe ocultarse durante edición');
-
-    const montoInput = inlineRow.querySelector('input[name="monto"]');
-    assert(montoInput.value === '1000', 'Input monto precargado con 1000');
-
-    // Modificar el valor
-    montoInput.value = '1500';
-    const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
-    vencInput.value = '2026-05-10';
-    const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
-    monedaSelect.value = 'ARS';
+    const inlineRow = form.querySelector('montos-list monto-form');
+    assert(inlineRow !== null, 'Fila abierta presente para edición');
+    assert(inlineRow.querySelector('input[name="monto"]').value === '1000', 'Input monto precargado con 1000');
 
     inlineRow.querySelector('app-form').dispatchEvent(new CustomEvent('form:submit', {
         detail: { monto: '1500', moneda: 'ARS', vencimiento: '2026-05-10' },
         bubbles: true,
         composed: true
     }));
-    assert(form._amountMode === 'idle', 'Debe volver a modo lista tras guardar edición');
     assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
     assert(form.montos.length === 2, 'Sigue con 2 montos');
 
@@ -637,7 +619,7 @@ async function testCancelarEdicionInline() {
     form.openInlineEdit(form.montos[0], 0);
 
     // Modificar inputs pero cancelar sin guardar
-    const inlineRow = form.querySelector('#add-monto-form-container monto-form');
+    const inlineRow = form.querySelector('montos-list monto-form');
     inlineRow.querySelector('input[name="monto"]').value = '99999';
 
     form._cancelInline();

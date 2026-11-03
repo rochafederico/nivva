@@ -247,7 +247,7 @@ export class DebtForm extends HTMLElement {
         this.montosList.abrirMonto();
     }
 
-    // Open inline form to edit an existing monto at the given index.
+    // Abre un monto existente en su misma fila (spec 002).
     // Rule: only 1 inline open at a time; if one is already open, ask user via confirm().
     openInlineEdit(monto, idx) {
         if (this._inlineEditIdx !== null) {
@@ -258,11 +258,8 @@ export class DebtForm extends HTMLElement {
         }
         this._analyticsStep = 'edit_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
-        this._amountMode = 'editing';
         this._inlineEditIdx = idx;
-        this._inlineEditRef = monto; // stable reference — survives sort/splice
-        this.renderMontosList();
-        this._focusFirstInlineInput();
+        this.montosList.abrirMonto(monto);
     }
 
     // Cancel the currently open inline form without saving changes.
@@ -273,15 +270,6 @@ export class DebtForm extends HTMLElement {
         this._inlineEditRef = null;
         this.montosList.cerrarMonto();
         this.renderMontosList();
-    }
-
-    // Focus the first input/select in the active monto form container.
-    _focusFirstInlineInput() {
-        setTimeout(() => {
-            const selector = '#add-monto-form-container input, #add-monto-form-container select';
-            const input = this.querySelector(selector);
-            if (input) input.focus();
-        }, 0);
     }
 
     // Build the inline monto form (delegates validation to AppForm).
@@ -321,28 +309,6 @@ export class DebtForm extends HTMLElement {
         return montoFormEl;
     }
 
-    _renderInlineAddForm() {
-        const container = this.querySelector('#add-monto-form-container');
-        const title = this.querySelector('#monto-form-title');
-        const tableWrapper = this.querySelector('#montos-table-wrapper');
-        const addMontoBtnRow = this.querySelector('#add-monto-btn-row');
-        if (!container) return;
-        container.innerHTML = '';
-        if (this._amountMode === 'editing' && this._inlineEditRef) {
-            container.classList.remove('d-none');
-            title?.classList.remove('d-none');
-            if (title) title.textContent = 'Editar monto';
-            tableWrapper?.classList.add('d-none');
-            addMontoBtnRow?.classList.add('d-none');
-            container.appendChild(this._buildMontoForm(this._inlineEditRef, { inline: true }));
-        } else {
-            title?.classList.add('d-none');
-            container.classList.add('d-none');
-            tableWrapper?.classList.remove('d-none');
-            addMontoBtnRow?.classList.remove('d-none');
-        }
-    }
-
     // La lista "Montos" (spec 001) dibuja, duplica y elimina; el formulario abre la edición.
     _conectarListaMontos() {
         this.montosList.addEventListener('montos:edit', (e) => this.openInlineEdit(e.detail.monto, e.detail.idx));
@@ -360,7 +326,6 @@ export class DebtForm extends HTMLElement {
     }
 
     renderMontosList() {
-        this._renderInlineAddForm();
         if (this.hasMontosAdded()) {
             this.clearFormError();
         }
