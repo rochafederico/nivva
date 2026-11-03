@@ -31,6 +31,7 @@ async function testCompletoSeAplica() {
     const form = montar();
     editar(filas(form)[0]);
     campo(form, 'monto').value = '150';
+    campo(form, 'moneda').value = 'ARS';
     sinPregunta(() => editar(filas(form)[1]));
     assert(abiertos(form).length === 1, 'Hay un solo monto abierto');
     assert(form.montos[0].monto === 150, 'Se aplicó lo escrito');
