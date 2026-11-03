@@ -19,9 +19,11 @@ flowchart TD
   O -->|no| X
   N & E -->|interruptor, Duplicar o Eliminar de otro · 13| N & E
   L -->|Guardar sin montos · 15| V[Mensaje debajo, foco en Agregar monto]
-  N & E -->|Guardar, completo · 9| G[Egreso guardado]
+  N & E -->|Guardar, monto completo: lo incluye · 9| R{¿Acreedor y Tipo de deuda completos?}
+  R -->|sí| G[Egreso guardado]
+  R -->|no| F[Ventana abierta, campos marcados, foco en el primero]
   N & E -->|Guardar, incompleto · 10, 11| X
-  L -->|Guardar con montos · 9| G
+  L -->|Guardar con montos · 9| R
   L & N & E -->|Cancelar del pie · 7| C[Ventana cerrada sin guardar]
 ```
 
