@@ -38,10 +38,10 @@ para esta iteración.
 
 ## Criterios de aceptación
 
-"Monto abierto" es una fila de la lista que muestra los campos Monto,
-Moneda y Vencimiento en lugar de la cifra y el vencimiento. "Monto N" es
-la posición en la lista, como en la spec 001. Monto hablado y fecha
-hablada son las formas que define la spec 001.
+"Monto abierto" es una fila de la lista que muestra solo los campos Monto,
+Moneda y Vencimiento y los botones "Listo" y "Cancelar": el interruptor y
+el botón ⋮ vuelven a verse al cerrarla. "Monto N", monto hablado y fecha
+hablada son como en la spec 001.
 
 ### Agregar
 
@@ -54,22 +54,22 @@ hablada son las formas que define la spec 001.
 2. **Dado** un monto nuevo abierto con los tres campos completos,
    **cuando** se toca "Listo" o se presiona `Enter` en uno de sus campos,
    **entonces** la fila se cierra, el monto queda en la lista en el lugar
-   que le corresponde por su vencimiento, el foco pasa a su "Editar" y el
+   que le corresponde por su vencimiento, el foco pasa a su botón ⋮ y el
    lector anuncia, sin mover el foco, `Monto agregado. Vence el 10 de
    noviembre de 2026.` (fecha hablada del monto). El monto nuevo no está
    marcado como pagado.
 
 ### Editar
 
-3. **Dado** un monto cerrado en la lista, **cuando** se toca su
-   "Editar", **entonces** esa misma fila pasa a ser un monto abierto con
-   la cifra, la moneda y el vencimiento que tenía, el resto de la lista
+3. **Dado** un monto cerrado en la lista, **cuando** se elige "Editar"
+   en su menú ⋮, **entonces** esa misma fila pasa a ser un monto abierto
+   con la cifra, la moneda y el vencimiento que tenía, el resto de la lista
    sigue visible y el foco queda en el campo "Monto" de esa fila.
 4. **Dado** un monto existente abierto, **cuando** se toca "Listo" o se
    presiona `Enter` en uno de sus campos con los tres campos completos,
    **entonces** la fila se cierra con los valores nuevos, se reubica
    según su vencimiento, conserva si estaba marcado como pagado, el foco
-   pasa a su "Editar" y el lector anuncia, sin mover el foco,
+   pasa a su botón ⋮ y el lector anuncia, sin mover el foco,
    `Monto actualizado.`
 
 ### Descartar
@@ -81,7 +81,7 @@ hablada son las formas que define la spec 001.
 6. **Dado** un monto existente abierto, **cuando** se toca su "Cancelar"
    o se presiona `Escape` con el foco dentro de la fila, **entonces** la
    fila se cierra con los valores que tenía antes de abrirla y el foco
-   vuelve a su "Editar". La ventana del egreso sigue abierta.
+   vuelve a su botón ⋮. La ventana del egreso sigue abierta.
 7. **Dado** un monto abierto, **cuando** se toca "Cancelar" en el pie de
    la ventana, **entonces** se cierra la ventana sin guardar nada, igual
    que hoy, incluido el monto abierto.
@@ -106,21 +106,26 @@ hablada son las formas que define la spec 001.
     ventana sigue abierta, el monto abierto muestra sus errores como en el
     criterio 8 y el foco pasa a su primer campo con problema. Si además
     falta Acreedor o Tipo de deuda, también se marcan, y el foco va al
-    primer campo con problema en el orden de la ventana.
+    primer campo con problema en el orden de la ventana. Si el monto abierto
+    está completo pero falta Acreedor o Tipo de deuda, el egreso no se
+    guarda, el monto se incluye en la lista como con "Listo", se marcan
+    esos campos y el foco va al primero.
 11. **Dado** un monto nuevo abierto con los tres campos vacíos, **cuando**
     se toca "Guardar" en el pie, **entonces** pasa lo del criterio 10.
 
 ### Un solo monto abierto a la vez
 
-12. **Dado** un monto abierto, **cuando** se toca "Agregar monto" o el
-    "Editar" de otro monto, **entonces** primero se intenta cerrar el
-    abierto como si se tocara "Listo": si sus campos están completos, se
-    aplica y se abre el otro; si no, el otro no se abre y el abierto
-    muestra sus errores como en el criterio 8. Ya no aparece la pregunta
-    `¿Cancelar los cambios actuales?`. Nunca hay más de un monto abierto.
-13. **Dado** un monto abierto, **cuando** se usa "Pagado" o "Más acciones"
-    de otro monto (spec 001), **entonces** el monto abierto sigue abierto
-    sin perder lo escrito.
+12. **Dado** un monto abierto, **cuando** se toca "Agregar monto" o se
+    elige "Editar" en el menú de otro monto, **entonces** primero se
+    intenta cerrar el abierto como si se tocara "Listo": si sus campos
+    están completos, se aplica y se abre el otro; si no, el otro no se abre
+    y el abierto muestra sus errores como en el criterio 8. Un monto nuevo
+    con los tres campos vacíos se descarta sin aviso y se abre el otro.
+    Ya no aparece la pregunta `¿Cancelar los cambios actuales?`. Nunca hay
+    más de un monto abierto.
+13. **Dado** un monto abierto, **cuando** se usa el interruptor de otro
+    monto o se elige "Duplicar" o "Eliminar" en su menú (spec 001),
+    **entonces** el monto abierto sigue abierto sin perder lo escrito.
 
 ### Pie de la ventana y lista vacía
 
@@ -184,16 +189,11 @@ Ver `docs/sdd/accesibilidad.md`.
 
 Deben quedar vacías antes de aprobar.
 
-1. `Listo` no está en los verbos de `docs/wiki/06-CTAs.md`. ¿Se suma
-   como excepción en un PR aparte antes de aprobar esta spec?
-2. Criterio 12: ¿no abrir el otro monto y marcar errores, o descartar
-   el abierto sin preguntar?
-
 ## Definition of Ready
 
-- [ ] Los criterios se pueden testear sin interpretar
+- [x] Los criterios se pueden testear sin interpretar
 - [ ] El alcance entra en una iteración (8 tareas o menos)
-- [ ] No hay preguntas abiertas
+- [x] No hay preguntas abiertas
 - [x] Textos revisados contra voz y tono y glosario
 - [x] Criterios de accesibilidad identificados
 - [x] Sin referencias a código, componentes, HTML, ARIA, funciones ni datos internos
