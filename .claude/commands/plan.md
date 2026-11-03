@@ -25,6 +25,10 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
    Bootstrap para cada paso, wireframe a 320 px y heurísticas. El plan elige componentes a
    partir de ese flujo. Si un paso pide algo que Bootstrap no hace, pará
    y preguntá si se ajusta la spec o se justifica un componente propio.
+   Si el entorno tiene lienzos de diseño, armá uno con el recorrido y una
+   pantalla por estado a 320 px, y anotá el link en `flujo.md`. Si no tiene,
+   seguí con el wireframe en texto y avisalo en el PR. Si validarlo cambia la
+   interacción, corregí `flujo.md` en este mismo PR.
 6. Completá `plan.md` y `tareas.md` desde `docs/sdd/plantillas/`.
    - Cada tarea entra en un PR: 10 archivos, 200 líneas, archivos de
      código de 100 líneas o menos.

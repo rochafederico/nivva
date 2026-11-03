@@ -6,6 +6,10 @@ Se escribe antes que el plan y va en el mismo PR. Sale de los criterios
 de la spec y define cómo se recorre la interacción antes de hacer la UI.
 Si algo no cierra, se corrige la spec en su propio PR.
 
+Lienzo: link al lienzo recorrible, o `no disponible en este entorno`.
+Lo que vale es este archivo: si el lienzo cambia la interacción, se corrige
+acá. El lienzo es privado: compartilo con quien tenga que validarlo.
+
 ## Recorrido
 
 Camino principal y alternativos: cancelar, vacío y error. Cada caja es lo
