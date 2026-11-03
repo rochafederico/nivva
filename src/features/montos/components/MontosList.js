@@ -3,7 +3,8 @@
 // lista.montos = [...]. Ordena en el mismo arreglo, del vencimiento más antiguo al más reciente.
 // Avisa 'montos:edit' con detail { monto, idx } cuando se toca "Editar" en una fila, y
 // 'montos:duplicated' y 'montos:empty' desde las acciones (montosListaAcciones.js).
-import { crearFilaMonto } from './MontoRow.js';
+// abrirMonto(monto) y cerrarMonto() manejan la fila abierta (spec 002); sin monto, es uno nuevo.
+import { crearAbierto, dibujarFilas } from './montosListaAbierto.js';
 import { conectarAcciones } from './montosListaAcciones.js';
 
 let contador = 0;
@@ -23,10 +24,21 @@ export class MontosList extends HTMLElement {
     get montos() { return this._montos; }
     set montos(valor) {
         this._montos = Array.isArray(valor) ? valor : [];
+        if (this._abierto?.monto && !this._montos.includes(this._abierto.monto)) this._abierto = null;
         if (this._estructura) this.render();
     }
 
     get lista() { return this._estructura?.lista; }
+
+    abrirMonto(monto = null) {
+        this._abierto = crearAbierto(monto);
+        this.render();
+    }
+
+    cerrarMonto() {
+        this._abierto = null;
+        this.render();
+    }
 
     _crearEstructura() {
         const id = `montos-orden-${++contador}`;
@@ -61,11 +73,12 @@ export class MontosList extends HTMLElement {
     render() {
         const { orden, lista, vacio } = this._estructura;
         this._montos.sort((a, b) => String(a.vencimiento).localeCompare(String(b.vencimiento)));
-        lista.replaceChildren(...this._montos.map((monto, i) => crearFilaMonto(monto, i + 1)));
+        dibujarFilas(this, this._abierto);
         const hayMontos = this._montos.length > 0;
+        const hayFilas = hayMontos || !!this._abierto;
         orden.hidden = !hayMontos;
-        lista.hidden = !hayMontos;
-        vacio.hidden = hayMontos;
+        lista.hidden = !hayFilas;
+        vacio.hidden = hayFilas;
     }
 }
 
