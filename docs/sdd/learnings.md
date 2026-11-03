@@ -20,7 +20,9 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   (interruptor sin texto visible) y el menú desalineado en T08. Ahora el
   plan incluye `flujo.md`, pero la 001 no lo tuvo. **Promover** a un
   check: tarea de UI en `tareas.md` exige `flujo.md` con wireframe, y la
-  primera tarea de UI se valida en el preview mobile antes de seguir. (001)
+  primera tarea de UI se valida en el preview mobile antes de seguir. El
+  lienzo recorrible de `/plan` adelanta la validación, pero no reemplaza
+  este check. (001)
 - [1] Un PR apilado se mergea después de su base, nunca antes: T07 entró
   dentro de T06 y #246 llegó a `main` con 360 líneas. (001)
 - [1] Defecto del flujo: 7 PRs de la 001 se mergearon sin `validado`.

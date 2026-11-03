@@ -31,6 +31,9 @@ Reglas:
 - Si la spec cambia la UI, el PR del plan incluye `flujo.md`: el
   recorrido en Mermaid, el componente de Bootstrap de cada paso, un
   wireframe en texto a 320 px y las heurísticas de Nielsen. Así la interacción se valida antes del código.
+- Si el entorno tiene lienzos de diseño, ese PR suma el link a un lienzo
+  recorrible del flujo. Si no tiene, no bloquea: el PR lo avisa. `flujo.md`
+  manda: lo que cambie al validar el lienzo se corrige ahí en el mismo PR.
 - Si durante la implementación la spec resulta incompleta o equivocada,
   se frena y se abre un PR que corrige la spec.
 
