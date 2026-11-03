@@ -319,7 +319,7 @@ async function testMontoFormLayoutCamposYAcciones() {
     assert(fields.every(field => field.classList.contains('col-md-4')), 'Los tres campos deben compartir la fila en desktop');
     assert(actionRow.classList.contains('justify-content-end'), 'La fila de acciones debe alinearse a la derecha');
     assert(actionRow.querySelector('#cancelBtn') !== null, 'La fila de acciones debe incluir Cancelar');
-    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones debe incluir Guardar');
+    assert(actionRow.querySelector('button[type="submit"]') !== null, 'La fila de acciones debe incluir Listo');
 
     document.body.removeChild(montoForm);
     await cleanup();
@@ -351,12 +351,11 @@ async function testMontoFormInlineLayoutSeparatesValidationAndActions() {
     assert(generalError.classList.contains('w-100'), 'El mensaje general debe ocupar todo el ancho');
     assert(actionRow.classList.contains('justify-content-end'), 'Las acciones inline deben alinearse a la derecha');
     assert(actionRow.classList.contains('mt-3'), 'Las acciones inline deben separarse de los campos con margen superior');
-    assert(cancelBtn !== null, 'La fila de acciones inline debe incluir Cancelar');
-    assert(saveBtn !== null, 'La fila de acciones inline debe incluir Guardar');
+    assert(cancelBtn !== null && saveBtn !== null, 'La fila de acciones inline debe incluir Cancelar y Listo');
     assert(cancelBtn.classList.contains('btn-outline-secondary'), 'Cancelar inline debe verse como acción secundaria liviana');
     assert(cancelBtn.classList.contains('btn-sm'), 'Cancelar inline debe usar tamaño chico');
-    assert(saveBtn.classList.contains('btn-success'), 'Guardar inline debe mantenerse como acción primaria verde');
-    assert(saveBtn.classList.contains('btn-sm'), 'Guardar inline debe usar tamaño chico');
+    assert(saveBtn.classList.contains('btn-success'), 'Listo inline debe mantenerse como acción primaria verde');
+    assert(saveBtn.classList.contains('btn-sm'), 'Listo inline debe usar tamaño chico');
 
     document.body.removeChild(montoForm);
     await cleanup();

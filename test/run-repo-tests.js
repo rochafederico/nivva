@@ -26,6 +26,7 @@ import { tests as montoRowTests } from './monto-row.test.js';
 import { tests as montosListTests } from './montos-list.test.js';
 import { tests as montosListAccionesTests } from './montos-list-acciones.test.js';
 import { tests as debtFormMontosTests } from './debt-form-montos.test.js';
+import { tests as montoAbiertoErroresTests } from './monto-abierto-errores.test.js';
 
 async function run() {
     try {
@@ -85,6 +86,7 @@ async function run() {
         for (const test of montosListTests) { await test(); }
         for (const test of montosListAccionesTests) { await test(); }
         for (const test of debtFormMontosTests) { await test(); }
+        for (const test of montoAbiertoErroresTests) { await test(); }
 
         printResults();
         process.exit(0);
