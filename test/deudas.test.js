@@ -634,54 +634,6 @@ async function testCancelarEdicionInline() {
 }
 
 // ===================================================================
-// UC12: Regla "solo 1 inline" — confirm(true) descarta el actual y abre nuevo
-// ===================================================================
-async function testSoloUnInlineAbierto() {
-    console.log('  UC12: Regla solo 1 inline — confirm descarta y abre nuevo');
-    await cleanup();
-
-    const form = document.createElement('debt-form');
-    document.body.appendChild(form);
-
-    form.montos = [
-        { monto: 100, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false },
-        { monto: 200, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
-    ];
-    form.renderMontosList();
-
-    // Abrir inline en el primer monto
-    form.openInlineEdit(form.montos[0], 0);
-    assert(form._inlineEditIdx === 0, 'Primer inline abierto en idx 0');
-
-    // Simular confirm = true (usuario acepta descartar cambios)
-    const origConfirm = global.confirm;
-    global.confirm = () => true;
-    try {
-        // Intentar abrir inline en el segundo monto
-        form.openInlineEdit(form.montos[1], 1);
-        assert(form._inlineEditIdx === 1, 'Con confirm=true, nuevo inline abierto en idx 1');
-    } finally {
-        global.confirm = origConfirm;
-    }
-
-    // Simular confirm = false (usuario rechaza descartar cambios)
-    form._cancelInline(); // cerrar el inline actual primero
-    form.openInlineEdit(form.montos[0], 0);
-    assert(form._inlineEditIdx === 0, 'Inline abierto en idx 0');
-
-    global.confirm = () => false;
-    try {
-        form.openInlineEdit(form.montos[1], 1);
-        assert(form._inlineEditIdx === 0, 'Con confirm=false, inline original sigue en idx 0');
-    } finally {
-        global.confirm = origConfirm;
-    }
-
-    document.body.removeChild(form);
-    await cleanup();
-}
-
-// ===================================================================
 // UC13: Duplicar monto inline — copia datos, pagado=false, sin modal
 // ===================================================================
 async function testDuplicarMontoInline() {
@@ -1350,7 +1302,6 @@ export const tests = [
     testCancelarAltaInline,
     testEdicionInlineGuardar,
     testCancelarEdicionInline,
-    testSoloUnInlineAbierto,
     testDuplicarMontoInline,
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,

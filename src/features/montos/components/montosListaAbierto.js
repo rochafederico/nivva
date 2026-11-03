@@ -64,6 +64,20 @@ function confirmarExistente(lista, datos) {
     anunciar(lista, 'Monto actualizado.');
 }
 
+// Antes de abrir otro monto (criterio 12): uno nuevo vacío se descarta; si no, se intenta "Listo".
+// Devuelve si se pudo cerrar; si no, la fila queda abierta mostrando sus errores.
+export function cerrarAbiertoParaAbrirOtro(lista) {
+    if (!lista.abierto) return true;
+    const form = lista.abierto.fila.querySelector('app-form');
+    const vacio = ['monto', 'moneda', 'vencimiento'].every((nombre) => !form.querySelector(`[name="${nombre}"]`).value);
+    if (!lista.abierto.monto && vacio) {
+        lista.cerrarMonto();
+        return true;
+    }
+    form.triggerSubmit();
+    return !lista.abierto;
+}
+
 // Confirmar y descartar la fila abierta.
 export function conectarAbierto(lista) {
     lista.lista.addEventListener('monto:save', (e) => {
