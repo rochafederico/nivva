@@ -1,6 +1,6 @@
 ---
 id: 002-agregar-editar-monto-en-lista
-estado: borrador   # borrador | aprobada | implementada | baseline
+estado: aprobada   # borrador | aprobada | implementada | baseline
 issue: "#249"
 ---
 
