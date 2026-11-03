@@ -90,9 +90,10 @@ hablada son como en la spec 001.
 
 8. **Dado** un monto abierto con algún campo vacío o inválido, **cuando**
    se toca "Listo" o se presiona `Enter`, **entonces** la fila sigue
-   abierta, cada campo con problema muestra su mensaje debajo (los mismos
-   de hoy), aparece `Completá monto, moneda y vencimiento para agregar el
-   monto.` y el foco pasa al primer campo con problema. El lector anuncia
+   abierta, cada campo con problema muestra su mensaje debajo
+   (`Ingresá un monto válido.`, `Seleccioná una moneda.` o `Ingresá una
+   fecha válida.`), aparece `Completá monto, moneda y vencimiento para
+   agregar el monto.` y el foco pasa al primer campo con problema. El lector anuncia
    el mensaje de cada campo al llegar a él.
 
 ### Guardar el egreso con un monto abierto
@@ -136,8 +137,10 @@ hablada son como en la spec 001.
 15. **Dado** un egreso sin montos y sin ningún monto abierto, **cuando**
     se toca "Guardar" en el pie, **entonces** no se guarda, debajo de la
     lista se lee `Agregá al menos un monto para guardar el egreso.`, el
-    lector lo anuncia y el foco pasa a "Agregar monto". El mensaje se va
-    en cuanto se agrega un monto.
+    lector lo anuncia y el foco pasa a "Agregar monto". Si además falta
+    Acreedor o Tipo de deuda, también se marcan, y el foco va al primer
+    campo con problema en el orden de la ventana. El mensaje se va en
+    cuanto se agrega un monto.
 
 ## Escenarios
 
@@ -178,7 +181,8 @@ Ver `docs/sdd/accesibilidad.md`.
 | Descartar el monto abierto | `Cancelar` |
 | Nombres que anuncia el lector (monto nuevo) | `Listo, monto nuevo` · `Cancelar monto nuevo` |
 | Nombres que anuncia el lector (monto 3) | `Listo, monto 3` · `Cancelar cambios del monto 3` |
-| Campos y errores del monto | Sin cambios respecto de hoy |
+| Campos del monto | Sin cambios respecto de hoy |
+| Errores de los campos del monto | `Ingresá un monto válido.` · `Seleccioná una moneda.` · `Ingresá una fecha válida.` |
 | Anuncio al agregar | `Monto agregado. Vence el 10 de noviembre de 2026.` |
 | Anuncio al editar | `Monto actualizado.` |
 | Egreso sin montos al guardar | `Agregá al menos un monto para guardar el egreso.` (reemplaza `Debe agregar al menos un monto antes de guardar.`) |
