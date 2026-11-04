@@ -30,10 +30,10 @@ export class GastoForm extends HTMLElement {
         this.preparar();
     }
 
-    /** Deja el formulario listo para agregar un gasto nuevo. */
-    preparar() {
-        this.form.submitText = 'Agregar gasto';
-        this.form.initialValues = { moneda: 'ARS', fecha: hoy() };
+    /** Deja el formulario listo para agregar un gasto o, si se pasa, para editarlo. */
+    preparar(gasto = null) {
+        this.form.submitText = gasto ? 'Guardar cambios' : 'Agregar gasto';
+        this.form.initialValues = gasto || { moneda: 'ARS', fecha: hoy() };
         this._ordenar();
     }
 
