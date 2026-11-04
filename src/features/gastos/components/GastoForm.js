@@ -53,7 +53,7 @@ export class GastoForm extends HTMLElement {
         monto.className = 'mb-0 col-8 align-self-start';
         moneda.className = 'mb-0 col-4 align-self-start';
         fila.append(monto, moneda);
-        formEl.prepend(descripcion, fila, fecha);
+        formEl.replaceChildren(descripcion, fila, fecha, formEl.lastElementChild);
     }
 }
 
