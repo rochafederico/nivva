@@ -58,6 +58,8 @@ Exportar datos        ← verbo + objeto
 | **Saltar** | Omitir paso del tour | `Saltar` |
 | **Siguiente** | Avanzar al siguiente paso | `Siguiente` |
 | **Anterior** | Volver al paso previo | `Anterior` |
+| **Refinanciar** | Reemplazar los montos sin pagar de un egreso por un plan nuevo | `Refinanciar` |
+| **Adelantar** | Registrar un adelanto de capital junto con una refinanciación | `Adelantar capital (opcional)` |
 
 **Excepción:** `Listo` confirma una fila abierta dentro de un formulario que después se guarda con `Guardar`. No es infinitivo, pero no sugiere que ya quedó guardado. No se usa en otros casos.
 

@@ -23,6 +23,9 @@
 | **Ajustes** | Configuración, settings, opciones | Menú con acciones administrativas (exportar, importar, eliminar datos) | "Desde Ajustes podés exportar tus datos." |
 | **Balance** | Saldo, diferencia, resultado | Diferencia entre ingresos y egresos del mes | "Balance: +$5.000 ARS" |
 | **Pendientes** | Por pagar, a cobrar, impagos | Montos no marcados como pagados en el período | "Pendientes: $30.000 ARS" |
+| **Refinanciación** | Renegociación, reestructuración, plan de pagos | Plan nuevo que registra la persona y reemplaza los montos sin pagar de un egreso en una moneda | "Refinanciación guardada." |
+| **Refinanciado** | Reemplazado, anulado, cancelado | Monto sin pagar que una refinanciación reemplazó; queda como historial y no cuenta en los totales | "Refinanciado el 03/11/2026" |
+| **Adelanto** | Anticipo, pago a cuenta, amortización | Monto ya pagado que se registra junto con una refinanciación | "Adelanto: $ 20.000,00." |
 
 ---
 
@@ -70,6 +73,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ### Monto vs. Cuota
 - **"Monto"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
 - **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de monto en todos los contextos.
+- En una refinanciación se dice **"cuotas"** al escribir el plan; cada una queda guardada como un monto.
 
 ### Plata / Dinero
 
@@ -90,7 +94,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 
 - [x] Cada término tiene: término aprobado, sinónimos prohibidos, definición, ejemplo de uso
 - [x] Cubre: Egreso, Gasto, Gasto con vencimiento, Monto, Acreedor, Tipo de deuda, Ingreso, Moneda, Vencimiento, Período
-- [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes
+- [x] Cubre: Copia de seguridad, Ajustes, Balance, Pendientes, Refinanciación, Refinanciado, Adelanto
 - [x] Sección de términos técnicos internos que no deben exponerse al usuario
 - [x] Regla de anglicismos con decisión por término
 - [x] Links cruzados con 04-Voz y tono y 06-CTAs
