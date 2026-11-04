@@ -56,3 +56,20 @@ export function listRefinanciados(deudaId) {
 export function deleteAllRefinanciados() {
     return pedir('readwrite', (s) => s.clear(), 'Error al borrar los refinanciados');
 }
+
+const mismoRefinanciado = (a, b) => Number(a.monto) === Number(b.monto) && a.moneda === b.moneda
+    && a.vencimiento === b.vencimiento && a.refinanciadoEl === b.refinanciadoEl;
+
+/** Suma los de una copia de seguridad, sin repetir los que el egreso ya tiene. */
+export async function agregarRefinanciados(deudaId, items = []) {
+    if (!items.length) return;
+    const actuales = await listRefinanciados(deudaId);
+    await new Promise((resolve, reject) => {
+        const tx = getDB().transaction(REFINANCIADOS_STORE, 'readwrite');
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(new Error('Error al importar los refinanciados'));
+        items.filter((r) => !actuales.some((a) => mismoRefinanciado(a, r))).forEach((r) => {
+            tx.objectStore(REFINANCIADOS_STORE).add(new RefinanciadoEntity({ ...r, deudaId }));
+        });
+    });
+}
