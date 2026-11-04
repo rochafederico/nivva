@@ -36,6 +36,10 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
      tareas lo refactorizan: extraen la parte que se va a cambiar a
      archivos nuevos de 100 líneas o menos, sin cambiar comportamiento.
      Cada tarea que toque ese archivo lo deja con menos líneas que antes.
+   - Contá `tareas.md` entre los archivos: cada tarea lo marca `en PR`.
+   - Si la spec cambia lo que ve la persona, ordená por valor visible, no por
+     capas: cada tarea deja algo que se prueba en la app, y lo dice en "Cómo se
+     prueba en la app". Se admite una sola tarea base sin UI, y va primera.
    - Cada criterio de aceptación queda cubierto por al menos una tarea,
      citado con el número que tiene en la spec mergeada.
    - Para cada criterio de accesibilidad, elegí la técnica del W3C (ver
