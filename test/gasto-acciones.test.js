@@ -9,6 +9,8 @@ import { getSelectedMonth } from '../src/shared/MonthFilter.js';
 const avisos = [];
 window.addEventListener('app:notify', (e) => avisos.push(e.detail.message));
 const fecha = () => `${getSelectedMonth()}-15`;
+// UiModal da el foco al primer campo 100 ms después de abrir.
+const trasAbrir = () => new Promise((r) => setTimeout(r, 120));
 const boton = (lista, id) => lista.querySelector(`[data-gasto-id="${id}"] menu-button button`);
 const elegir = (lista, id, value) => lista.querySelector(`[data-gasto-id="${id}"] menu-button`)
     .dispatchEvent(new CustomEvent('menu:select', { detail: { value } }));
@@ -35,6 +37,7 @@ async function criterio9() {
     assert(modal.ui._modalEl.querySelector('button[type="submit"]').textContent === 'Guardar cambios', 'botón Guardar cambios');
     assert(modal.ui._modalEl.querySelector('[name="descripcion"]').value === 'Súper', 'trae sus datos');
     assert(!modal.ui._modalEl.querySelector('[name="tipo"]'), 'no se puede cambiar el tipo');
+    await trasAbrir();
     const enviar = (detail) => modal.form.form.dispatchEvent(new CustomEvent('form:submit', { detail }));
     enviar({ descripcion: 'Verdulería', monto: '10', moneda: 'ARS', fecha: fecha() });
     await waitFor(() => document.activeElement === boton(lista, id) && lista.textContent.includes('Verdulería'));
@@ -43,6 +46,7 @@ async function criterio9() {
     assert(avisos.at(-1) === 'Gasto actualizado.', 'anuncio');
 
     elegir(lista, id, 'edit');
+    await trasAbrir();
     enviar({ descripcion: 'Verdulería', monto: '10', moneda: 'ARS', fecha: '2020-10-05' });
     await waitFor(() => document.activeElement === fab);
     assert(document.activeElement === fab, 'si cambia de mes, el foco va al botón +');
