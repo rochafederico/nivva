@@ -165,15 +165,12 @@ Ver `docs/sdd/accesibilidad.md`.
 
 Deben quedar vacías antes de aprobar.
 
-- Aprobar en el glosario "Refinanciación", "Refinanciado" y "Adelanto", y en los CTAs
-  los verbos `Refinanciar` y `Adelantar`. Esos cambios van en otro PR, porque este solo puede tocar la spec.
-
 ## Definition of Ready
 
 - [x] Los criterios se pueden testear sin interpretar
 - [x] El alcance entra en una iteración (8 tareas o menos)
-- [ ] No hay preguntas abiertas
-- [ ] Textos revisados contra voz y tono y glosario
+- [x] No hay preguntas abiertas
+- [x] Textos revisados contra voz y tono y glosario
 - [x] Criterios de accesibilidad identificados
 - [x] Sin referencias a código, componentes, HTML, ARIA, funciones ni datos internos
 - [x] Se leyó `docs/sdd/learnings.md`
