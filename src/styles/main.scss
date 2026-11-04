@@ -151,3 +151,11 @@ $info:      #0dcaf0;
         border-radius: .25rem;
     }
 }
+
+// Descripción larga de un gasto: dos líneas a la vista, completa para el lector.
+.gasto-descripcion {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

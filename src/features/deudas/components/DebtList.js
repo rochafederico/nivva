@@ -1,7 +1,12 @@
 import './DebtDetailModal.js';
 import { DebtRowItem } from './DebtRowItem.js';
 import { createIngresoRow } from '../../ingresos/components/IngresoList.js';
+import { createGastoRow } from '../../gastos/components/GastoRow.js';
+import { listGastos } from '../../gastos/gastoRepository.js';
+import { filasDelMes } from './filasDelMes.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
+
+const EVENTOS_GASTO = ['gasto:saved', 'gasto:updated', 'gasto:deleted'];
 
 // Atributos opcionales (vista única del mes):
 //   include-ingresos  → mezcla los ingresos del mes con los montos (pestaña "Todo")
@@ -34,6 +39,7 @@ export class DebtList extends HTMLElement {
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
         window.removeEventListener('ingreso:added', this._onLoad);
+        EVENTOS_GASTO.forEach(tipo => window.removeEventListener(tipo, this._onLoad));
     }
 
     addEventListeners() {
@@ -54,6 +60,7 @@ export class DebtList extends HTMLElement {
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
         if (this._includeIngresos) window.addEventListener('ingreso:added', this._onLoad);
+        EVENTOS_GASTO.forEach(tipo => window.addEventListener(tipo, this._onLoad));
     }
 
     async loadDebts() {
@@ -67,7 +74,10 @@ export class DebtList extends HTMLElement {
             if (requestId !== this._requestId) return;
             this.ingresos = ingresos;
         }
+        // Un gasto ya está pagado: no entra en la lista de pendientes.
+        const gastos = this._estado === 'pendiente' ? [] : await listGastos({ mes: this.mes });
         if (requestId !== this._requestId) return;
+        this.gastos = gastos;
         this.debts = debts;
         this.renderTable();
     }
@@ -136,12 +146,7 @@ export class DebtList extends HTMLElement {
         if (this._estado === 'pendiente') {
             rows = rows.filter(row => !row.pagado);
         }
-        if (this._includeIngresos) {
-            // Ingresos y montos en orden cronológico; a igual fecha, primero los ingresos.
-            const ingresoRows = (this.ingresos || []).map(ingreso => ({ _kind: 'ingreso', ingreso }));
-            const dateOf = row => String(row._kind === 'ingreso' ? row.ingreso.fecha : row.vencimiento);
-            rows = [...ingresoRows, ...rows].sort((a, b) => dateOf(a).localeCompare(dateOf(b)));
-        }
+        rows = filasDelMes({ montos: rows, ingresos: this._includeIngresos ? this.ingresos : [], gastos: this.gastos });
 
         this._renderRowTable(container, rows, {
             showDetailAction: this._showDetailAction,
@@ -152,13 +157,13 @@ export class DebtList extends HTMLElement {
     // Renderiza una tabla Bootstrap con filas <tr> construidas por DebtRowItem.
     // Usa un layout unificado con 2 columnas (info + acciones) en todos los breakpoints.
     _renderRowTable(container, tableData, options = {}) {
-        let tableWrapper = container.querySelector('.table-responsive');
+        let tableWrapper = container.querySelector('.debt-list-tabla');
         let tbody;
 
         if (!tableWrapper) {
             container.innerHTML = '';
             tableWrapper = document.createElement('div');
-            tableWrapper.className = 'table-responsive';
+            tableWrapper.className = 'debt-list-tabla'; // sin table-responsive: recorta el menú ⋮
 
             const table = document.createElement('table');
             table.className = 'table table-hover table-striped mb-0';
@@ -190,29 +195,16 @@ export class DebtList extends HTMLElement {
                 tbody.appendChild(createIngresoRow(row.ingreso));
                 return;
             }
+            if (row._kind === 'gasto') {
+                tbody.appendChild(createGastoRow(row.gasto));
+                return;
+            }
             const rowItem = new DebtRowItem(row, {
                 excludeColumns: this._excludeColumns || [],
                 showDetailAction: options.showDetailAction ?? this._showDetailAction,
                 showPaymentAction: options.showPaymentAction ?? true,
             });
             tbody.appendChild(rowItem.element);
-        });
-    }
-
-    toggleEstado(id) {
-        const debt = this.debts.find(d => d.id === id);
-        debt.estadoPagada = !debt.estadoPagada;
-        window.db.updateDeuda(debt);
-        this.renderTable();
-    }
-
-    deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
-        const montoFmt = this.fmtMoneda(moneda, monto);
-        if (!confirm(`¿Seguro que quieres borrar los ${montoFmt} que le debes a "${acreedor}"?\nVencimiento: ${vencimiento} | Periodo: ${periodo}`)) return;
-        import('../../montos/montoRepository.js').then(({ deleteMonto }) => {
-            deleteMonto(id).then(() => {
-                this.loadDebts(); // Actualiza la tabla tras borrar
-            });
         });
     }
 
