@@ -1,6 +1,7 @@
 // Spec 003, criterios 2 y 5: campos, valores iniciales y errores por campo.
 import { assert } from './setup.js';
 import '../src/features/gastos/components/GastoForm.js';
+import { gastoFormErrores } from '../src/features/gastos/components/gastoFormErrores.js';
 
 function armar() {
     const form = document.createElement('gasto-form');
@@ -37,6 +38,7 @@ async function criterio5() {
     assert(aviso(form, 'monto').textContent === 'Ingresá un monto mayor a 0.', 'error de monto');
     assert(aviso(form, 'moneda').textContent === 'Seleccioná una moneda.', 'error de moneda');
     assert(aviso(form, 'fecha').textContent === 'Ingresá una fecha válida.', 'error de fecha');
+    assert(gastoFormErrores({ fecha: '2026-02-30' }).fecha && !gastoFormErrores({ fecha: '2026-02-28' }).fecha, 'valida el día del calendario');
     const descripcion = campo(form, 'descripcion');
     assert(document.activeElement === descripcion, 'el foco va al primero con error');
     assert(descripcion.getAttribute('aria-invalid') === 'true', 'marca el campo');
