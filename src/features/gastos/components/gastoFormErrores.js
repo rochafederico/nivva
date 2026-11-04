@@ -1,7 +1,7 @@
 // Validación del formulario de gasto: qué le falta a cada campo y cómo mostrarlo.
 import monedas from '../../../shared/config/monedas.js';
 
-function fechaValida(fecha) {
+export function fechaValida(fecha) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return false;
     const d = new Date(`${fecha}T12:00:00Z`);
     return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === fecha;
