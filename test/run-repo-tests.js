@@ -31,6 +31,7 @@ import { tests as montosListUnAbiertoTests } from './montos-list-un-abierto.test
 import { tests as debtFormCancelarTests } from './debt-form-cancelar.test.js';
 import { tests as debtFormGuardarTests } from './debt-form-guardar.test.js';
 import { tests as debtFormSinMontosTests } from './debt-form-sin-montos.test.js';
+import { tests as gastosRepositorioTests } from './gastos-repositorio.test.js';
 
 async function run() {
     try {
@@ -86,6 +87,7 @@ async function run() {
             ...montosListAbiertoTests, ...debtFormAgregarTests, ...debtFormEditarTests,
             ...montosListUnAbiertoTests, ...debtFormCancelarTests, ...debtFormGuardarTests,
             ...debtFormSinMontosTests]) { await test(); }
+        console.log('\n--- Spec 003: gastos ---'); for (const test of gastosRepositorioTests) { await test(); }
 
         printResults();
         process.exit(0);

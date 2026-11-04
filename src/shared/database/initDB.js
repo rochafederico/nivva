@@ -1,5 +1,5 @@
 // src/database/initDB.js
-import { DEUDAS_STORE, MONTOS_STORE, INGRESOS_STORE, DB_NAME, VERSION } from './schema.js';
+import { DEUDAS_STORE, MONTOS_STORE, INGRESOS_STORE, GASTOS_STORE, DB_NAME, VERSION } from './schema.js';
 import { FakeIDB } from './localStorageFallback.js';
 
 let db;
@@ -44,9 +44,15 @@ export function initDB() {
             if (!ingresosStore.indexNames.contains('by_fecha')) {
                 ingresosStore.createIndex('by_fecha', 'fecha');
             }
+            if (!db.objectStoreNames.contains(GASTOS_STORE)) {
+                const gastosStore = db.createObjectStore(GASTOS_STORE, { keyPath: 'id', autoIncrement: true });
+                gastosStore.createIndex('by_periodo', 'periodo');
+            }
         };
         request.onsuccess = (event) => {
             db = event.target.result;
+            // Otra pestaña con una versión nueva no tiene que quedar trabada por esta.
+            db.onversionchange = () => db.close();
             resolve(db);
         };
         request.onerror = () => {

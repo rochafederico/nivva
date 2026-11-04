@@ -2,22 +2,12 @@
 // Fallback de persistencia cuando IndexedDB no está disponible.
 // Jerarquía: localStorage → memoria de sesión (si LS también falla, ej. Safari privado).
 
+import { localStorageDisponible } from './localStorageDisponible.js';
+
 const LS_PREFIX = 'nivva_';
 const _mem = {}; // in-memory backing de último recurso
 
-function _ls() {
-    try {
-        const ls = globalThis.localStorage;
-        if (!ls) return null;
-        ls.setItem('__nivva_chk', '1');
-        ls.removeItem('__nivva_chk');
-        return ls;
-    } catch {
-        return null;
-    }
-}
-
-const LS = _ls(); // null si localStorage no está disponible
+const LS = localStorageDisponible(); // null si localStorage no está disponible
 
 function _load(name) {
     if (LS) {
@@ -229,7 +219,7 @@ class FakeTransaction {
 export class FakeIDB {
     constructor() {
         this._stores = {};
-        ['deudas', 'montos', 'ingresos'].forEach(n => {
+        ['deudas', 'montos', 'ingresos', 'gastos'].forEach(n => {
             this._stores[n] = new FakeObjectStore(n);
         });
     }
