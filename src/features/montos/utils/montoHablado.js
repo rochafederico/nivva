@@ -44,3 +44,9 @@ export function fechaHablada(isoDate) {
     if (!anio || !mes || !dia) return String(isoDate || '');
     return `${dia} de ${MESES[mes - 1]} de ${anio}`;
 }
+
+// Mes YYYY-MM en la forma hablada: "octubre de 2026".
+export function mesHablado(periodo) {
+    const [anio, mes] = String(periodo || '').split('-').map(Number);
+    return `${MESES[mes - 1]} de ${anio}`;
+}

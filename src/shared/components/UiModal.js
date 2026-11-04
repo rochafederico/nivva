@@ -1,6 +1,7 @@
 // src/components/UiModal.js
 // Web Component <ui-modal> - Modal usando Bootstrap 5 Modal JS (sin Shadow DOM)
 import { createModal } from '../ui/bootstrap/index.js';
+import { uiModalPlantilla } from './uiModalPlantilla.js';
 
 export class UiModal extends HTMLElement {
     constructor() {
@@ -102,6 +103,7 @@ export class UiModal extends HTMLElement {
         if (this.opener && typeof this.opener.focus === 'function') {
             this.opener.focus();
         }
+        this.dispatchEvent(new CustomEvent('ui-modal:cerrado'));
     }
 
     _focusFirst() {
@@ -115,19 +117,7 @@ export class UiModal extends HTMLElement {
         this._rendered = true;
         // Preserve existing children to place in modal body
         const existingChildren = Array.from(this.childNodes).map(n => n.cloneNode(true));
-        this.innerHTML = `
-        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-modal="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modal-title"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body"></div>
-                </div>
-            </div>
-        </div>
-        `;
+        this.innerHTML = uiModalPlantilla();
         const body = this.querySelector('.modal-body');
         existingChildren.forEach(child => body.appendChild(child));
     }
