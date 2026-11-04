@@ -7,14 +7,14 @@ Máximo 8 tareas; si hacen falta más, la spec se parte.
 
 | ID | Tarea | Criterios que cubre | Archivos | Líneas estimadas | Estado |
 |---|---|---|---|---|---|
-| T01 | Almacén y repositorio de gastos, versión 6, lo cargado antes se conserva | 20 | `schema.js`, `initDB.js`, `GastoEntity.js`, `GastoModel.js`, `gastoRepository.js`, `localStorageFallback.js`, `localStorageDisponible.js`, `test/gastos-repositorio.test.js`, `test/run-repo-tests.js` | 190 | en PR |
-| T02 | Resumen: Egresos y Balance suman gastos por moneda; el resto de la app no los ve | 12, 13, 14 | `statsService.js`, `StatsIndicators.js`, `kpiCell.js`, `test/gastos-resumen.test.js`, `test/gastos.suite.js`, `test/run-repo-tests.js` | 170 | en PR |
-| T03 | Copia de seguridad, importación y borrado de todos los datos | 15, 16, 20 | `ExportDataModal.js`, `exportarDeudas.js`, `ImportDataModal.js`, `importarMovimientos.js`, `dataActions.js`, `test/gastos-copia.test.js`, `test/gastos.suite.js` | 170 | en PR |
-| T04 | Formulario de gasto: campos, valores iniciales y errores por campo | 2, 5 | `GastoForm.js`, `gastoFormErrores.js`, `test/gasto-form.test.js`, `test/gastos.suite.js` | 180 | en PR |
-| T05 | Ventana del gasto: guardar, mensajes, cancelar, error al guardar, foco y título anunciado | 3, 4, 6 | `GastoModal.js`, `UiModal.js`, `uiModalPlantilla.js`, `AppToast.js`, `montoHablado.js`, `test/gasto-modal.test.js`, `test/gastos.suite.js` | 150 | en PR |
-| T06 | Segundo paso del botón + y títulos de gasto con vencimiento | 1, 18, 19, 20 | `RegistroSheet.js`, `ResumenMes.js`, `DebtModal.js`, `test/resumen.test.js`, `test/registro-sheet.test.js`, `test/debt-form-montos.test.js`, `test/gastos.suite.js` | 190 | en PR |
-| T07 | Fila del gasto en "Todo" y "Egresos": orden, lector, menú y 320 px | 7, 8, 13, 17 | `DebtList.js`, `filasDelMes.js`, `GastoRow.js`, `main.scss`, `test/gasto-row.test.js`, `test/gastos.suite.js` | 190 | en PR |
-| T08 | Editar y eliminar con su foco y anuncios; revisión a mano del PR | 8, 9, 10, 11, 21 | `gastoAcciones.js`, `GastoRow.js`, `GastoForm.js`, `GastoModal.js`, `DebtList.js`, `test/gasto-acciones.test.js`, `test/gastos.suite.js` | 190 | en PR |
+| T01 | Almacén y repositorio de gastos, versión 6, lo cargado antes se conserva | 20 | `schema.js`, `initDB.js`, `GastoEntity.js`, `GastoModel.js`, `gastoRepository.js`, `localStorageFallback.js`, `localStorageDisponible.js`, `test/gastos-repositorio.test.js`, `test/run-repo-tests.js` | 190 | mergeada |
+| T02 | Resumen: Egresos y Balance suman gastos por moneda; el resto de la app no los ve | 12, 13, 14 | `statsService.js`, `StatsIndicators.js`, `kpiCell.js`, `test/gastos-resumen.test.js`, `test/gastos.suite.js`, `test/run-repo-tests.js` | 170 | mergeada |
+| T03 | Copia de seguridad, importación y borrado de todos los datos | 15, 16, 20 | `ExportDataModal.js`, `exportarDeudas.js`, `ImportDataModal.js`, `importarMovimientos.js`, `dataActions.js`, `test/gastos-copia.test.js`, `test/gastos.suite.js` | 170 | mergeada |
+| T04 | Formulario de gasto: campos, valores iniciales y errores por campo | 2, 5 | `GastoForm.js`, `gastoFormErrores.js`, `test/gasto-form.test.js`, `test/gastos.suite.js` | 180 | mergeada |
+| T05 | Ventana del gasto: guardar, mensajes, cancelar, error al guardar, foco y título anunciado | 3, 4, 6 | `GastoModal.js`, `UiModal.js`, `uiModalPlantilla.js`, `AppToast.js`, `montoHablado.js`, `test/gasto-modal.test.js`, `test/gastos.suite.js` | 150 | mergeada |
+| T06 | Segundo paso del botón + y títulos de gasto con vencimiento | 1, 18, 19, 20 | `RegistroSheet.js`, `ResumenMes.js`, `DebtModal.js`, `test/resumen.test.js`, `test/registro-sheet.test.js`, `test/debt-form-montos.test.js`, `test/gastos.suite.js` | 190 | mergeada |
+| T07 | Fila del gasto en "Todo" y "Egresos": orden, lector, menú y 320 px | 7, 8, 13, 17 | `DebtList.js`, `filasDelMes.js`, `GastoRow.js`, `main.scss`, `test/gasto-row.test.js`, `test/gastos.suite.js` | 190 | mergeada |
+| T08 | Editar y eliminar con su foco y anuncios; revisión a mano del PR | 8, 9, 10, 11, 21 | `gastoAcciones.js`, `GastoRow.js`, `GastoForm.js`, `GastoModal.js`, `DebtList.js`, `test/gasto-acciones.test.js`, `test/gastos.suite.js` | 190 | mergeada |
 
 Estados: pendiente · en curso · en PR · mergeada.
 Solo una tarea puede estar **en curso**.
