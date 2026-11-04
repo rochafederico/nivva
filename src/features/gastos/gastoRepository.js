@@ -43,3 +43,10 @@ export function getAll() {
 export function deleteAllGastos() {
     return pedir('readwrite', (s) => s.clear(), 'Error clearing gastos');
 }
+
+export function sumGastosByMonth({ mes } = {}) {
+    return listGastos({ mes }).then((filas) => filas.reduce((totales, { moneda, monto }) => {
+        totales[moneda] = (totales[moneda] || 0) + (Number(monto) || 0);
+        return totales;
+    }, {}));
+}
