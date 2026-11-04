@@ -7,5 +7,6 @@ import { tests as refinanciarForm } from './refinanciar-form.test.js';
 import { tests as refinanciarModal } from './refinanciar-modal.test.js';
 import { tests as refinanciarDetalle } from './refinanciar-detalle.test.js';
 import { tests as refinanciarCopia } from './refinanciar-copia.test.js';
+import { tests as refinanciarResto } from './refinanciar-resto.test.js';
 
-export const tests = [...gastos, ...refinanciarRepositorio, ...refinanciarMenu, ...refinanciarCampos, ...planCuotas, ...refinanciarForm, ...refinanciarModal, ...refinanciarDetalle, ...refinanciarCopia];
+export const tests = [...gastos, ...refinanciarRepositorio, ...refinanciarMenu, ...refinanciarCampos, ...planCuotas, ...refinanciarForm, ...refinanciarModal, ...refinanciarDetalle, ...refinanciarCopia, ...refinanciarResto];
