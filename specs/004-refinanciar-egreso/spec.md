@@ -1,6 +1,6 @@
 ---
 id: 004-refinanciar-egreso
-estado: borrador   # borrador | aprobada | implementada | baseline
+estado: aprobada   # borrador | aprobada | implementada | baseline
 issue: "#284"
 ---
 
