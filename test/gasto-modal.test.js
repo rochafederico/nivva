@@ -68,6 +68,21 @@ async function errorAlGuardar() {
     fin();
 }
 
+async function dobleEnter() {
+    console.log('  Criterio 3: un segundo Enter mientras se cierra no guarda otra vez');
+    const { modal, fin } = await armar();
+    const cerrar = modal.ui.close;
+    modal.ui.close = () => {}; // la ventana sigue en su transición de cierre
+    llenar(modal);
+    await new Promise((r) => setTimeout(r, 30));
+    llenar(modal);
+    await new Promise((r) => setTimeout(r, 30));
+    assert((await getAll()).length === 1, 'se guarda una sola vez');
+    modal.ui.close = cerrar;
+    modal.ui.close();
+    fin();
+}
+
 async function tituloAnunciado() {
     console.log('  El diálogo apunta a su propio título');
     const { modal, fin } = await armar();
@@ -77,4 +92,4 @@ async function tituloAnunciado() {
     fin();
 }
 
-export const tests = [criterio3, criterio4, criterio6, errorAlGuardar, tituloAnunciado];
+export const tests = [criterio3, criterio4, criterio6, errorAlGuardar, dobleEnter, tituloAnunciado];
