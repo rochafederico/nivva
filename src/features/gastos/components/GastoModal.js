@@ -48,7 +48,6 @@ export class GastoModal extends HTMLElement {
         } catch (err) {
             console.error('Error al guardar el gasto', err);
             this.error.classList.remove('d-none');
-        } finally {
             this._guardando = false;
         }
     }
@@ -69,6 +68,7 @@ export class GastoModal extends HTMLElement {
     }
 
     _alCerrarse() {
+        this._guardando = false; // hasta acá: un Enter durante el cierre no guarda otra vez
         if (!this._alCerrar) return;
         const { evento, mensaje, detail } = this._alCerrar;
         this._alCerrar = null;
