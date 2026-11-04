@@ -16,12 +16,12 @@ flowchart TD
   MO --> V
   V -->|escribe cuotas · 5| T[Total anunciado]
   T -->|escribe adelanto · 6| AD[Fecha del adelanto y total con adelanto]
-  V & T & AD -->|Cancelar o Escape · 19| O[Donde se abrió]
+  V & T & AD -->|Cancelar o Escape · 19| O[Vuelve a la pantalla anterior, sin cambios]
   V & T & AD -->|vacío o inválido · 20| X[Errores por campo]
   X -->|corrige| V
   T & AD -->|Refinanciar o Enter · 7| C[Confirmación del navegador]
   C -->|cancela · 7| V
-  C -->|acepta · 8, 9, 10| O2[Donde se abrió, con mensaje]
+  C -->|acepta · 8, 9, 10| O2[Vuelve a la pantalla anterior, con mensaje y totales nuevos]
   C -->|no se pudo guardar| ES[Ventana abierta con error]
   O2 -->|abre el detalle · 13| R[Montos y Refinanciados]
 ```
