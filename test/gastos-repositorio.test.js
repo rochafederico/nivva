@@ -57,7 +57,7 @@ async function subirVersionConservaLoCargado() {
     vieja.close();
 
     await initDB();
-    assert(getDB().version === VERSION && VERSION === 6, 'la base queda en la versión 6');
+    assert(getDB().version === VERSION && VERSION >= 6, 'la base queda en la última versión');
     const deudas = await espera(getDB().transaction(DEUDAS_STORE).objectStore(DEUDAS_STORE).getAll());
     assert(deudas.length === 1 && deudas[0].acreedor === 'Banco', 'el egreso viejo sigue con sus datos');
     assert((await listGastos()).length === 0, 'el almacén de gastos arranca vacío');
