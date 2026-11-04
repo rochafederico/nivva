@@ -21,14 +21,14 @@ export class DebtModal extends HTMLElement {
     }
 
     openCreate() {
-        this.ui.setTitle('Agregar egreso');
+        this.ui.setTitle('Agregar gasto con vencimiento');
         this.form.reset({ trackAbandonment: false });
         this.form.startAnalyticsFlow('create_debt', { step: 'modal_open' });
         this.ui.open();
     }
 
     openEdit(deuda) {
-        this.ui.setTitle('Editar egreso');
+        this.ui.setTitle('Editar gasto con vencimiento');
         this.form.load(deuda);
         this.form.startAnalyticsFlow('edit_debt', { step: 'modal_open', deudaId: deuda?.id });
         this.ui.open();

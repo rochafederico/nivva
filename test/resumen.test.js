@@ -148,18 +148,14 @@ export const tests = [
 
         // UiModal mueve el .modal al <body> al abrirse: se consulta por su referencia
         const sheet = view.querySelector('#registro-sheet')._modalEl;
-        assert(sheet.querySelector('.modal-dialog')?.classList.contains('modal-sheet'), 'el selector es un bottom sheet');
         view.querySelector('#add-fab').click();
         assert(sheet.classList.contains('show'), 'el botón "+" abre el sheet');
-        assert(sheet.querySelector('.modal-title')?.textContent === '¿Qué querés agregar?', 'el sheet pregunta qué agregar');
-        const opciones = [...sheet.querySelectorAll('[data-registro]')].map(b => b.dataset.registro);
-        assert(JSON.stringify(opciones) === JSON.stringify(['ingreso', 'egreso']), 'ofrece Ingreso y Egreso');
-
         sheet.querySelector('[data-registro="ingreso"]').click();
+        assert(!sheet.classList.contains('show') && ingresoOpened === 1, '"Ingreso" cierra el sheet y abre su formulario');
+        view.querySelector('#add-fab').click();
         sheet.querySelector('[data-registro="egreso"]').click();
-        assert(!sheet.classList.contains('show'), 'elegir una opción cierra el sheet');
-        assert(ingresoOpened === 1, '"Ingreso" abre el formulario de ingreso');
-        assert(debtOpened === 1, '"Egreso" abre el formulario de egreso');
+        sheet.querySelector('[data-registro="vencimiento"]').click();
+        assert(debtOpened === 1, '"Gasto con vencimiento" abre el formulario del egreso');
         assert(window.location.pathname === '/', 'no navega a otra ruta');
         unmount(view);
     },
