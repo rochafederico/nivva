@@ -1,6 +1,6 @@
 ---
 id: 003-gastos-diarios
-estado: borrador   # borrador | aprobada | implementada | baseline
+estado: aprobada   # borrador | aprobada | implementada | baseline
 issue: "#272"
 ---
 
