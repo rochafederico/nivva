@@ -2,6 +2,7 @@
 // Resumen del mes en un banner compacto (una sola tarjeta, ~120px):
 // Ingresos, Egresos, Balance y "Por pagar este mes". Cada dato lleva a la lista que lo detalla.
 import { getMonthlySummary } from '../statsService.js';
+import { kpiCell } from './kpiCell.js';
 import { formatMoneda, KPI_CURRENCY } from '../../../shared/config/monedas.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
@@ -10,7 +11,7 @@ import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 // that render into the current (newly created) container node.
 let _monthHandler = null;
 let _dataChangedHandler = null;
-const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted', 'monto:updated'];
+const DATA_CHANGE_EVENTS = ['data-imported', 'ingreso:added', 'deuda:saved', 'deuda:updated', 'deuda:deleted', 'monto:updated', 'gasto:saved', 'gasto:updated', 'gasto:deleted'];
 
 // Destino de cada dato al tocarlo: el filtro de Inicio que lo detalla (Balance no tiene listado propio).
 export const DEFAULT_KPI_LINKS = {
@@ -28,11 +29,6 @@ export const KPI_ITEMS = [
   { key: 'pendientes', label: 'Por pagar este mes', icon: 'bi-hourglass-split', color: 'warning', source: 'pendientes' },
 ];
 
-// El amarillo de Bootstrap no alcanza contraste AA sobre blanco: se usa su variante "emphasis".
-function textClass(color) {
-  return color === 'warning' ? 'text-warning-emphasis' : `text-${color}`;
-}
-
 const plural = (n, singular, pluralForm) => `${n} ${n === 1 ? singular : pluralForm}`;
 
 function navigate(href) {
@@ -41,51 +37,6 @@ function navigate(href) {
     window.history.pushState({}, '', href);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
-}
-
-/** Un dato del banner: etiqueta (link si hay destino) y monto en la moneda principal. */
-function kpiCell({ label, icon, color }, amount, href, alert) {
-  const col = document.createElement('div');
-  col.className = 'col';
-
-  const cell = document.createElement('div');
-  cell.className = 'kpi-cell position-relative h-100';
-
-  const labelEl = document.createElement('div');
-  labelEl.className = `kpi-label small fw-semibold text-truncate ${textClass(color)}`;
-  const iconEl = document.createElement('i');
-  iconEl.className = `bi ${icon} me-1`;
-  iconEl.setAttribute('aria-hidden', 'true');
-  labelEl.appendChild(iconEl);
-  if (href) {
-    const link = document.createElement('a');
-    link.href = href;
-    link.className = 'stretched-link text-reset text-decoration-none';
-    link.textContent = label;
-    labelEl.appendChild(link);
-  } else {
-    labelEl.appendChild(document.createTextNode(label));
-  }
-  cell.appendChild(labelEl);
-
-  const valueRow = document.createElement('div');
-  valueRow.className = 'd-flex flex-wrap align-items-center column-gap-1';
-  const amountEl = document.createElement('span');
-  amountEl.className = `kpi-amount fw-bold text-nowrap ${textClass(color)}`;
-  amountEl.textContent = amount;
-  valueRow.appendChild(amountEl);
-  if (alert) {
-    // En mobile solo el ícono (no agranda el banner); desde md, el texto completo
-    const alertEl = document.createElement('span');
-    alertEl.className = 'kpi-alert badge text-bg-danger';
-    alertEl.title = alert;
-    alertEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span class="d-none d-md-inline ms-1">${alert}</span><span class="visually-hidden d-md-none">${alert}</span>`;
-    valueRow.appendChild(alertEl);
-  }
-  cell.appendChild(valueRow);
-
-  col.appendChild(cell);
-  return col;
 }
 
 export default function StatsIndicators({ mes, links = DEFAULT_KPI_LINKS } = {}) {
