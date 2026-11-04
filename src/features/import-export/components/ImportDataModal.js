@@ -4,6 +4,8 @@ import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppSpinner.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { MontoModel } from '../../montos/MontoModel.js';
+import { GastoModel } from '../../gastos/GastoModel.js';
+import { importarLista, leerLista } from './importarMovimientos.js';
 import {
     trackEvent,
     trackFlowStart,
@@ -108,12 +110,7 @@ export class ImportDataModal extends HTMLElement {
             }
         }
 
-        const ingresos = data.ingresos || (data.data && data.data.ingresos);
-        if (ingresos && !Array.isArray(ingresos)) {
-            return false;
-        }
-
-        return true;
+        return Array.isArray(leerLista(data, 'ingresos')) && Array.isArray(leerLista(data, 'gastos'));
     }
 
     #escapeHtml(str) {
@@ -127,7 +124,8 @@ export class ImportDataModal extends HTMLElement {
 
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
-        const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
+        const ingresos = leerLista(data, 'ingresos');
+        const gastos = leerLista(data, 'gastos');
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
         const renderCompactList = (items, renderItem) => {
@@ -146,12 +144,12 @@ export class ImportDataModal extends HTMLElement {
             <div class="border rounded p-3">
                 <h3 class="h6 text-primary mb-2">📋 Vista previa</h3>
                 <div class="d-flex flex-wrap gap-3 bg-body-tertiary rounded p-2 mb-3">
-                    <span class="small"><strong>${deudas.length}</strong> egresos · <strong>${totalMontos}</strong> montos</span>
+                    <span class="small"><strong>${deudas.length + gastos.length}</strong> egresos · <strong>${totalMontos}</strong> montos</span>
                     ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
                     ${exportDateStr}
                 </div>
                 <div class="d-grid gap-1">
-                    <div><span class="fw-semibold small">Egresos: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
+                    <div><span class="fw-semibold small">Egresos: </span>${renderCompactList([...deudas, ...gastos], e => this.#escapeHtml(e.acreedor || e.descripcion))}</div>
                     ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => this.#escapeHtml(i.descripcion || 'Ingreso'))}</div>` : ''}
                 </div>
             </div>
@@ -181,7 +179,7 @@ export class ImportDataModal extends HTMLElement {
             const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
             const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
-            const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
+            const { addGasto } = await import('../../gastos/gastoRepository.js');
             let importedCount = 0;
             let errorCount = 0;
 
@@ -212,26 +210,17 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
-            let ingresosImported = 0;
-            let ingresosErrors = 0;
-            if (ingresos && ingresos.length > 0) {
-                this.#showLoading('Importando ingresos...');
-                for (const ingreso of ingresos) {
-                    try {
-                        await addIngreso(ingreso);
-                        ingresosImported++;
-                    } catch (error) {
-                        console.error('Error al importar ingreso:', ingreso, error);
-                        ingresosErrors++;
-                    }
-                }
-            }
+            this.#showLoading('Importando ingresos...');
+            const { importados: ingresosImported, errores: ingresosErrors } = await importarLista(leerLista(this.importData, 'ingresos'), addIngreso);
+            const gastos = await importarLista(leerLista(this.importData, 'gastos'), (g) => addGasto(new GastoModel(g)));
+            const egresos = importedCount + gastos.importados;
+            const egresosErrors = errorCount + gastos.errores;
 
-            const totalErrors = errorCount + ingresosErrors;
+            const totalErrors = egresosErrors + ingresosErrors;
             const notifyType = totalErrors === 0 ? 'success' : 'warning';
             const notifyMsg = totalErrors === 0
-                ? `✅ Importación exitosa: ${importedCount} egresos, ${ingresosImported} ingresos.`
-                : `⚠️ Importación parcial: ${importedCount} egresos importados (${errorCount} con error), ${ingresosImported} ingresos (${ingresosErrors} con error).`;
+                ? `✅ Importación exitosa: ${egresos} egresos, ${ingresosImported} ingresos.`
+                : `⚠️ Importación parcial: ${egresos} egresos importados (${egresosErrors} con error), ${ingresosImported} ingresos (${ingresosErrors} con error).`;
 
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: notifyMsg, type: notifyType } }));
             window.dispatchEvent(new CustomEvent('data-imported', {
