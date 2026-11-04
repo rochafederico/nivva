@@ -1,6 +1,6 @@
 ---
 id: 002-agregar-editar-monto-en-lista
-estado: aprobada   # borrador | aprobada | implementada | baseline
+estado: implementada   # borrador | aprobada | implementada | baseline
 issue: "#249"
 ---
 
@@ -198,7 +198,7 @@ Deben quedar vacías antes de aprobar.
 ## Definition of Ready
 
 - [x] Los criterios se pueden testear sin interpretar
-- [ ] El alcance entra en una iteración (8 tareas o menos)
+- [x] El alcance entra en una iteración (8 tareas o menos)
 - [x] No hay preguntas abiertas
 - [x] Textos revisados contra voz y tono y glosario
 - [x] Criterios de accesibilidad identificados
