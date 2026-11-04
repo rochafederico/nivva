@@ -35,7 +35,7 @@ dice a quién darle el foco, y la lista se lo da al terminar de dibujarse (crite
 | `test/resumen.test.js` | Cambia (T06), sin asserts repetidos | Pasos nuevos | 259 → ~250 |
 | `src/features/deudas/components/DebtList.js` | Cambia (T07, T08), borra código muerto y extrae `filasDelMes.js` | Filas, orden y foco | 279 → ~255 |
 | `src/features/gastos/components/GastoRow.js`, `gastoAcciones.js` | Nuevo (T07, T08) | Fila; editar y eliminar | — |
-| `test/gastos.suite.js` | Nuevo (T01) | Reúne los tests de la 003: `run-repo-tests.js` tiene 98 líneas y solo se toca una vez | — |
+| `test/gastos.suite.js` | Nuevo (T02) | Reúne los tests de la 003: `run-repo-tests.js` tiene 98 líneas; T01 lo registra y T02 lo pasa a la suite | — |
 
 ## Datos
 
