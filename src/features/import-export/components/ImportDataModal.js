@@ -2,9 +2,8 @@
 import '../../../shared/components/UiModal.js';
 import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppSpinner.js';
-import { DeudaModel } from '../../deudas/DeudaModel.js';
-import { MontoModel } from '../../montos/MontoModel.js';
 import { GastoModel } from '../../gastos/GastoModel.js';
+import { importarDeuda } from './importarDeuda.js';
 import { importarLista, leerLista } from './importarMovimientos.js';
 import {
     trackEvent,
@@ -176,7 +175,6 @@ export class ImportDataModal extends HTMLElement {
                 updateFlowStep('import_data', 'import');
             }
 
-            const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
             const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const { addGasto } = await import('../../gastos/gastoRepository.js');
@@ -185,23 +183,7 @@ export class ImportDataModal extends HTMLElement {
 
             for (const deudaData of deudas) {
                 try {
-                    // Crear instancia de DeudaModel sin ID para que se genere uno nuevo
-                    const montos = (deudaData.montos || []).map(m => new MontoModel({
-                        monto: m.monto,
-                        moneda: m.moneda || 'ARS',
-                        vencimiento: m.vencimiento,
-                        periodo: m.periodo,
-                        pagado: m.pagado || false
-                    }));
-
-                    const deuda = new DeudaModel({
-                        acreedor: deudaData.acreedor,
-                        tipoDeuda: deudaData.tipoDeuda,
-                        notas: deudaData.notas || '',
-                        montos: montos
-                    });
-
-                    await addOrMergeDeuda(deuda);
+                    await importarDeuda(deudaData);
                     importedCount++;
 
                 } catch (error) {

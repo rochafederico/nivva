@@ -68,3 +68,31 @@ export function listRefinanciaciones(deudaId) {
 export function deleteAllRefinanciaciones() {
     return pedir('readwrite', (s) => s.clear(), 'Error al borrar las refinanciaciones', REFINANCIACIONES_STORE);
 }
+
+const mismoRefinanciado = (a, b) => Number(a.monto) === Number(b.monto) && a.moneda === b.moneda
+    && a.vencimiento === b.vencimiento && a.refinanciadoEl === b.refinanciadoEl;
+
+const mismaRefinanciacion = (a, b) => a.fecha === b.fecha && a.moneda === b.moneda && a.cuotas.join() === b.cuotas.join();
+
+/** Suma lo de una copia de seguridad, sin repetir lo que el egreso ya tiene. */
+function agregarSinRepetir(almacen, items, actuales, igual, crear) {
+    const nuevos = items.filter((r) => !actuales.some((a) => igual(a, r)));
+    return new Promise((resolve, reject) => {
+        const tx = getDB().transaction(almacen, 'readwrite');
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(new Error(`Error al importar ${almacen}`));
+        nuevos.forEach((r) => tx.objectStore(almacen).add(crear(r)));
+    });
+}
+
+export async function agregarRefinanciados(deudaId, items = []) {
+    if (!items.length) return;
+    const crear = (r) => new RefinanciadoEntity({ ...r, deudaId });
+    await agregarSinRepetir(REFINANCIADOS_STORE, items, await listRefinanciados(deudaId), mismoRefinanciado, crear);
+}
+
+export async function agregarRefinanciaciones(deudaId, items = []) {
+    if (!items.length) return;
+    const crear = ({ fecha, moneda, cuotas }) => ({ deudaId, fecha, moneda, cuotas: cuotas.map(Number) });
+    await agregarSinRepetir(REFINANCIACIONES_STORE, items, await listRefinanciaciones(deudaId), mismaRefinanciacion, crear);
+}
