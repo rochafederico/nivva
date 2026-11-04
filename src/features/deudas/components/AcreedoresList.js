@@ -4,6 +4,8 @@
 // El avance se muestra como barra de progreso "x de y cuotas".
 // Usa los modales #debtModal y #debtDetailModal del documento.
 import { createDropdown, destroyDropdown } from '../../../shared/ui/bootstrap/index.js';
+import { abrirRefinanciar } from '../../refinanciar/components/abrirRefinanciar.js';
+import { computePendiente, progresoCuotas } from './acreedorCalculos.js';
 
 const RELOAD_EVENTS = ['deuda:saved', 'deuda:updated', 'deuda:deleted', 'data-imported', 'monto:updated'];
 
@@ -20,24 +22,7 @@ function fmtMoneda(moneda, n) {
     return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n);
 }
 
-/** Pendiente (impago) por moneda de una lista de montos. */
-export function computePendiente(montos) {
-    const totals = {};
-    (montos || []).forEach(m => {
-        if (!m.pagado) {
-            totals[m.moneda] = (totals[m.moneda] || 0) + Number(m.monto);
-        }
-    });
-    return totals;
-}
-
-/** Avance de pagos de un egreso: { pagadas, total, porcentaje, texto: "1 de 2 cuotas" }. */
-export function progresoCuotas(montos = []) {
-    const total = montos.length;
-    const pagadas = montos.filter(m => m.pagado).length;
-    const porcentaje = total ? Math.round((pagadas / total) * 100) : 0;
-    return { pagadas, total, porcentaje, texto: `${pagadas} de ${total} ${total === 1 ? 'cuota' : 'cuotas'}` };
-}
+export { computePendiente, progresoCuotas };
 
 export class AcreedoresList extends HTMLElement {
     constructor() {
@@ -115,6 +100,11 @@ export class AcreedoresList extends HTMLElement {
                                         <i class="bi bi-pencil me-2" aria-hidden="true"></i>Editar
                                     </button>
                                 </li>
+                                ${progreso.pagadas < progreso.total ? `<li>
+                                    <button type="button" class="dropdown-item" data-refinanciar-id="${deuda.id}" aria-label="Refinanciar ${acreedor}">
+                                        <i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i>Refinanciar
+                                    </button>
+                                </li>` : ''}
                                 <li>
                                     <button type="button" class="dropdown-item text-danger" data-delete-id="${deuda.id}" data-acreedor="${acreedor}">
                                         <i class="bi bi-trash me-2" aria-hidden="true"></i>Eliminar
@@ -176,6 +166,10 @@ export class AcreedoresList extends HTMLElement {
                 modal.attachOpener?.(btn.closest('.dropdown')?.querySelector('.acreedor-menu-btn') || btn);
             });
         });
+
+        container.querySelectorAll('[data-refinanciar-id]').forEach(btn => btn.addEventListener('click', () => {
+            abrirRefinanciar(findDeuda(btn.dataset.refinanciarId), btn.closest('.dropdown')?.querySelector('.acreedor-menu-btn') || btn);
+        }));
 
         container.querySelectorAll('[data-delete-id]').forEach(btn => {
             btn.addEventListener('click', () => {
