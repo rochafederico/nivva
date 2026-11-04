@@ -3,5 +3,6 @@ import { tests as resumen } from './gastos-resumen.test.js';
 import { tests as copia } from './gastos-copia.test.js';
 import { tests as form } from './gasto-form.test.js';
 import { tests as modal } from './gasto-modal.test.js';
+import { tests as registroSheet } from './registro-sheet.test.js';
 
-export const tests = [...repositorio, ...resumen, ...copia, ...form, ...modal];
+export const tests = [...repositorio, ...resumen, ...copia, ...form, ...modal, ...registroSheet];

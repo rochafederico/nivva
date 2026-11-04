@@ -6,10 +6,11 @@
 // - Un único botón flotante (+) abre un bottom sheet para elegir qué registrar.
 // La pestaña activa vive en la URL (?vista=…&estado=pendiente), así funcionan Atrás/Adelante y los links.
 
-import '../shared/components/UiModal.js';
 import '../features/ingresos/components/IngresoModal.js';
 import '../features/ingresos/components/IngresoList.js';
 import '../features/deudas/components/DebtModal.js';
+import { crearRegistroSheet } from '../features/deudas/components/RegistroSheet.js';
+import '../features/gastos/components/GastoModal.js';
 import '../features/deudas/components/DebtDetailModal.js';
 import '../features/deudas/components/DebtList.js';
 import '../features/deudas/components/AcreedoresList.js';
@@ -110,8 +111,10 @@ export class ResumenMes extends HTMLElement {
         debtModal.id = 'debtModal';
         const detailModal = document.createElement('debt-detail-modal');
         detailModal.id = 'debtDetailModal';
-        this.append(ingresoModal, debtModal, detailModal);
-        this._sheet = this._renderSheet();
+        const gastoModal = document.createElement('gasto-modal');
+        gastoModal.id = 'gastoModal';
+        this.append(ingresoModal, debtModal, detailModal, gastoModal);
+        this._sheet = crearRegistroSheet(this, (tipo) => this._abrirRegistro(tipo));
 
         const root = document.createElement('div');
         root.className = 'd-flex flex-column gap-3';
@@ -181,45 +184,16 @@ export class ResumenMes extends HTMLElement {
         this._fab = fab;
     }
 
-    /** Bottom sheet "¿Qué querés agregar?" con las dos opciones de alta. */
-    _renderSheet() {
-        const sheet = document.createElement('ui-modal');
-        sheet.id = 'registro-sheet';
-        this.appendChild(sheet);
-        sheet.querySelector('.modal-dialog')?.classList.add('modal-sheet');
-        sheet.setTitle('¿Qué querés agregar?');
-
-        const options = document.createElement('div');
-        options.className = 'list-group list-group-flush registro-opciones';
-        options.innerHTML = `
-            <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3" data-registro="ingreso">
-                <i class="bi bi-arrow-down-circle fs-3 text-success" aria-hidden="true"></i>
-                <span><span class="d-block fw-semibold">Ingreso</span><small class="text-body-secondary">Sueldo, cobros, reintegros</small></span>
-            </button>
-            <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3" data-registro="egreso">
-                <i class="bi bi-arrow-up-circle fs-3 text-danger" aria-hidden="true"></i>
-                <span><span class="d-block fw-semibold">Egreso</span><small class="text-body-secondary">Tarjeta, préstamo, alquiler, servicio</small></span>
-            </button>
-        `;
-        options.addEventListener('click', (e) => {
-            const option = e.target.closest('[data-registro]');
-            if (option) this._abrirRegistro(option.dataset.registro);
-        });
-        sheet.appendChild(options);
-        return sheet;
-    }
-
     openRegistroSheet() {
-        this._sheet.returnFocusTo(this._fab);
-        this._sheet.open();
+        this._sheet.abrir(this._fab);
     }
 
     /** Cierra el sheet y, cuando terminó de cerrarse, abre el formulario elegido. */
     _abrirRegistro(tipo) {
         const abrir = () => {
-            const modal = this.querySelector(tipo === 'ingreso' ? '#ingresoModal' : '#debtModal');
-            modal.openCreate();
-            modal.attachOpener(this._fab);
+            const modal = this.querySelector({ ingreso: '#ingresoModal', gasto: '#gastoModal', vencimiento: '#debtModal' }[tipo]);
+            modal.openCreate(this._fab);
+            modal.attachOpener?.(this._fab);
         };
         const sheetEl = this._sheet._modalEl;
         if (this._sheet._bsModal && sheetEl) {
