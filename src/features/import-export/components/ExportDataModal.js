@@ -1,6 +1,7 @@
 // src/components/ExportDataModal.js
 import '../../../shared/components/AppForm.js';
 import '../../../shared/components/UiModal.js';
+import { mapDeudasParaExportar } from './exportarDeudas.js';
 import {
     trackEvent,
     trackFlowStart,
@@ -13,23 +14,8 @@ export class ExportDataModal extends HTMLElement {
         super();
     }
 
-    #mapDeudasForExport(deudas) {
-        return deudas.map(d => ({
-            acreedor: d.acreedor,
-            tipoDeuda: d.tipoDeuda,
-            notas: d.notas,
-            montos: (d.montos || []).map(m => ({
-                monto: m.monto,
-                moneda: m.moneda,
-                vencimiento: m.vencimiento,
-                periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : ''),
-                pagado: m.pagado,
-            }))
-        }));
-    }
-
-    #createAndDownloadJsonFile(deudas, ingresos) {
-        const json = JSON.stringify({ deudas, ingresos }, null, 2);
+    #createAndDownloadJsonFile(deudas, ingresos, gastos) {
+        const json = JSON.stringify({ deudas, ingresos, gastos }, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -57,10 +43,11 @@ export class ExportDataModal extends HTMLElement {
         try {
             const { listDeudas } = await import('../../deudas/deudaRepository.js');
             const { getAll } = await import('../../ingresos/ingresoRepository.js');
+            const { getAll: getGastos } = await import('../../gastos/gastoRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
-            deudas = this.#mapDeudasForExport(deudas);
-            this.#createAndDownloadJsonFile(deudas, ingresos);
+            deudas = mapDeudasParaExportar(deudas);
+            this.#createAndDownloadJsonFile(deudas, ingresos, await getGastos());
             this.close();
             trackEvent('export_data_used', {
                 flow: 'export_data',

@@ -49,8 +49,9 @@ export async function deleteAllData() {
   try {
     const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
     const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
+    const { getAll: getGastos, deleteAllGastos } = await import('../features/gastos/gastoRepository.js');
     stores = [
-      { name: 'Egresos', list: listDeudas, del: deleteDeudas },
+      { name: 'Egresos', list: async () => [...await listDeudas(), ...await getGastos()], del: () => Promise.all([deleteDeudas(), deleteAllGastos()]) },
       { name: 'Ingresos', list: getAll, del: deleteAllIngresos },
     ];
   } catch (error) {
