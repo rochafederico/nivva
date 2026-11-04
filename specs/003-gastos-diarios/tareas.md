@@ -14,7 +14,7 @@ Máximo 8 tareas; si hacen falta más, la spec se parte.
 | T05 | Ventana del gasto: guardar, mensajes, cancelar, error al guardar, foco y título anunciado | 3, 4, 6 | `GastoModal.js`, `UiModal.js`, `uiModalPlantilla.js`, `AppToast.js`, `montoHablado.js`, `test/gasto-modal.test.js`, `test/gastos.suite.js` | 150 | en PR |
 | T06 | Segundo paso del botón + y títulos de gasto con vencimiento | 1, 18, 19, 20 | `RegistroSheet.js`, `ResumenMes.js`, `DebtModal.js`, `test/resumen.test.js`, `test/registro-sheet.test.js`, `test/debt-form-montos.test.js`, `test/gastos.suite.js` | 190 | en PR |
 | T07 | Fila del gasto en "Todo" y "Egresos": orden, lector, menú y 320 px | 7, 8, 13, 17 | `DebtList.js`, `filasDelMes.js`, `GastoRow.js`, `main.scss`, `test/gasto-row.test.js`, `test/gastos.suite.js` | 190 | en PR |
-| T08 | Editar y eliminar con su foco y anuncios; revisión a mano del PR | 8, 9, 10, 11, 21 | `gastoAcciones.js`, `GastoRow.js`, `GastoForm.js`, `GastoModal.js`, `DebtList.js`, `test/gasto-acciones.test.js`, `test/gastos.suite.js` | 190 | pendiente |
+| T08 | Editar y eliminar con su foco y anuncios; revisión a mano del PR | 8, 9, 10, 11, 21 | `gastoAcciones.js`, `GastoRow.js`, `GastoForm.js`, `GastoModal.js`, `DebtList.js`, `test/gasto-acciones.test.js`, `test/gastos.suite.js` | 190 | en PR |
 
 Estados: pendiente · en curso · en PR · mergeada.
 Solo una tarea puede estar **en curso**.

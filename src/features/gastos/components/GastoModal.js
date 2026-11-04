@@ -1,7 +1,7 @@
 import '../../../shared/components/UiModal.js';
 import './GastoForm.js';
 import { GastoModel } from '../GastoModel.js';
-import { addGasto } from '../gastoRepository.js';
+import { addGasto, updateGasto } from '../gastoRepository.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 import { mesHablado } from '../../montos/utils/montoHablado.js';
 
@@ -22,9 +22,18 @@ export class GastoModal extends HTMLElement {
     }
 
     openCreate(opener) {
-        this.ui.setTitle('Agregar gasto');
+        return this._abrir('Agregar gasto', opener, null);
+    }
+
+    openEdit(gasto, opener) {
+        return this._abrir('Editar gasto', opener, gasto);
+    }
+
+    _abrir(titulo, opener, gasto) {
+        this._editando = gasto;
+        this.ui.setTitle(titulo);
         this.ui.returnFocusTo(opener);
-        this.form.preparar();
+        this.form.preparar(gasto);
         this.error.classList.add('d-none');
         return this.ui.open();
     }
@@ -33,9 +42,8 @@ export class GastoModal extends HTMLElement {
         if (this._guardando) return;
         this._guardando = true;
         try {
-            const modelo = new GastoModel(gasto);
-            const id = await addGasto(modelo);
-            this._alCerrar = { evento: 'gasto:saved', mensaje: this._mensaje('agregado', modelo), detail: { id, gasto: modelo, foco: 'agregar' } };
+            const modelo = new GastoModel({ ...gasto, id: this._editando?.id });
+            this._alCerrar = this._editando ? await this._actualizar(modelo) : await this._agregar(modelo);
             this.ui.close();
         } catch (err) {
             console.error('Error al guardar el gasto', err);
@@ -43,6 +51,17 @@ export class GastoModal extends HTMLElement {
         } finally {
             this._guardando = false;
         }
+    }
+
+    async _agregar(gasto) {
+        const id = await addGasto(gasto);
+        return { evento: 'gasto:saved', mensaje: this._mensaje('agregado', gasto), detail: { id, gasto, foco: 'agregar' } };
+    }
+
+    async _actualizar(gasto) {
+        await updateGasto(gasto);
+        const foco = gasto.periodo === getSelectedMonth() ? gasto.id : 'agregar';
+        return { evento: 'gasto:updated', mensaje: this._mensaje('actualizado', gasto), detail: { id: gasto.id, gasto, foco } };
     }
 
     _mensaje(accion, { periodo }) {

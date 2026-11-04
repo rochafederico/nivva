@@ -3,10 +3,9 @@ import { DebtRowItem } from './DebtRowItem.js';
 import { createIngresoRow } from '../../ingresos/components/IngresoList.js';
 import { createGastoRow } from '../../gastos/components/GastoRow.js';
 import { listGastos } from '../../gastos/gastoRepository.js';
+import { conectarGastos } from '../../gastos/components/gastoAcciones.js';
 import { filasDelMes } from './filasDelMes.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
-
-const EVENTOS_GASTO = ['gasto:saved', 'gasto:updated', 'gasto:deleted'];
 
 // Atributos opcionales (vista única del mes):
 //   include-ingresos  → mezcla los ingresos del mes con los montos (pestaña "Todo")
@@ -39,7 +38,7 @@ export class DebtList extends HTMLElement {
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
         window.removeEventListener('ingreso:added', this._onLoad);
-        EVENTOS_GASTO.forEach(tipo => window.removeEventListener(tipo, this._onLoad));
+        this._desconectarGastos();
     }
 
     addEventListeners() {
@@ -60,7 +59,7 @@ export class DebtList extends HTMLElement {
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
         if (this._includeIngresos) window.addEventListener('ingreso:added', this._onLoad);
-        EVENTOS_GASTO.forEach(tipo => window.addEventListener(tipo, this._onLoad));
+        this._desconectarGastos = conectarGastos(this);
     }
 
     async loadDebts() {

@@ -5,5 +5,6 @@ import { tests as form } from './gasto-form.test.js';
 import { tests as modal } from './gasto-modal.test.js';
 import { tests as registroSheet } from './registro-sheet.test.js';
 import { tests as row } from './gasto-row.test.js';
+import { tests as acciones } from './gasto-acciones.test.js';
 
-export const tests = [...repositorio, ...resumen, ...copia, ...form, ...modal, ...registroSheet, ...row];
+export const tests = [...repositorio, ...resumen, ...copia, ...form, ...modal, ...registroSheet, ...row, ...acciones];
