@@ -4,4 +4,5 @@ export const DB_NAME = 'deudasapp';
 export const DEUDAS_STORE = 'deudas';
 export const MONTOS_STORE = 'montos';
 export const INGRESOS_STORE = 'ingresos';
-export const VERSION = 5;
+export const GASTOS_STORE = 'gastos';
+export const VERSION = 6;
