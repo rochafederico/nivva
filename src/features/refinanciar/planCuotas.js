@@ -1,5 +1,6 @@
 // El plan que escribe la persona: cuotas, fechas y textos. Nivva no calcula cuotas ni intereses.
 import { formatMoneda } from '../../shared/config/monedas.js';
+import { fechaHablada, montoHablado } from '../montos/utils/montoHablado.js';
 
 const CUOTA = /^\d+(\.\d{1,2})?$/;
 
@@ -38,4 +39,17 @@ export const textoCantidad = (n, singular, plural) => `${n} ${n === 1 ? singular
 export function textoTotal(cuotas, moneda, adelanto = null) {
     const total = `${textoCantidad(cuotas.length, 'cuota', 'cuotas')}. Total: ${formatMoneda(sumar(cuotas), moneda)}`;
     return adelanto ? `${total}. Adelanto: ${formatMoneda(adelanto, moneda)}.` : total;
+}
+
+export function textoConfirmacion({ acreedor, reemplazados, moneda, cuotas, adelanto }) {
+    const total = montoHablado(sumar(cuotas.map((c) => c.monto)), moneda);
+    const conAdelanto = adelanto ? `Adelanto: ${montoHablado(adelanto.monto, moneda)}. ` : '';
+    return `¿Refinanciar ${textoCantidad(reemplazados, 'monto', 'montos')} de ${acreedor} por ${textoCantidad(cuotas.length, 'cuota', 'cuotas')}, con un total de ${total}? ${conAdelanto}No se puede deshacer.`;
+}
+
+export function textoGuardado({ moneda, cuotas, adelanto }) {
+    const plan = `${textoCantidad(cuotas.length, 'cuota', 'cuotas')}, la primera vence el ${fechaHablada(cuotas[0].vencimiento)}.`;
+    return adelanto
+        ? `Refinanciación guardada. Adelanto de ${montoHablado(adelanto.monto, moneda)} y ${plan}`
+        : `Refinanciación guardada. ${plan}`;
 }
