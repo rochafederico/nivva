@@ -46,7 +46,8 @@ export class ExportDataModal extends HTMLElement {
             const { getAll: getGastos } = await import('../../gastos/gastoRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
-            deudas = mapDeudasParaExportar(deudas);
+            const { listRefinanciados } = await import('../../refinanciar/refinanciarRepository.js');
+            deudas = mapDeudasParaExportar(deudas, await listRefinanciados());
             this.#createAndDownloadJsonFile(deudas, ingresos, await getGastos());
             this.close();
             trackEvent('export_data_used', {
