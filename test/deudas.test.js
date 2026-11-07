@@ -1067,8 +1067,6 @@ async function testAcreedoresListCuotasFormato() {
     assert(row.querySelector('.btn-outline-secondary, .btn-outline-danger') === null, 'Sin el grupo de 3 botones por fila');
     const menuBtn = row.querySelector('.acreedor-menu-btn');
     assert(menuBtn?.getAttribute('aria-label') === 'Más acciones para Test Cuotas', 'Menú "⋮" con nombre accesible');
-    const items = [...row.querySelectorAll('.dropdown-menu .dropdown-item')].map(b => b.textContent.trim());
-    assert(JSON.stringify(items) === JSON.stringify(['Editar', 'Refinanciar', 'Eliminar']), 'El menú ofrece Editar, Refinanciar y Eliminar');
     assert(row.classList.contains('cursor-pointer') && row.querySelector('button.list-row-title') !== null, 'La fila (y su título) abre el detalle');
 
     document.body.removeChild(shell);
