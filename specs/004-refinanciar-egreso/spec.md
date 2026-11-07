@@ -89,8 +89,11 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
 ### Lo refinanciado
 
 13. **Dado** un egreso refinanciado, **cuando** se ve su detalle, **entonces** debajo
-    de "Montos" aparece "Refinanciados", con cada monto reemplazado, su vencimiento
-    y `Refinanciado el 03/11/2026`. Se distingue por el texto, no solo por el color.
+    de "Montos" aparece "Refinanciados", con un grupo por día de refinanciación, el
+    más reciente primero. Cada grupo se titula `Refinanciado el 03/11/2026` y muestra
+    los montos que reemplazó con su vencimiento, del más próximo al más lejano. Dos
+    refinanciaciones del mismo día quedan en un mismo grupo. Se distingue por el
+    texto, no solo por el color.
 14. **Dado** un monto refinanciado, **cuando** se revisa el resto de la app,
     **entonces** no aparece en los movimientos del mes, en "Editar egreso" ni en la
     lista de montos pendientes, y no cuenta en Egresos, Balance, Por pagar este mes,
@@ -132,7 +135,7 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y la lista de refinanciados como lista (criterios 3 y 13) | Recorrer con lector de pantalla |
+| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y cada grupo de refinanciados como lista, con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
 | 1.4.1 Uso del color | Reconocer un monto refinanciado sin ver colores (criterio 13) | Mirar el detalle en escala de grises |
 | 1.4.3 y 1.4.11 Contraste | Leer los textos y distinguir campos, botones y foco | Revisar el contraste a mano |
 | 1.4.10 Reflow | Refinanciar a 320 px sin scroll horizontal | Achicar la ventana a 320 px |

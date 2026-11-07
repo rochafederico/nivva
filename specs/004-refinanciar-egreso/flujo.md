@@ -75,9 +75,12 @@ Notación: [Botón]  [__] campo  [▾] desplegable  ⋮ menú  «texto» de la s
 │ «Detalle del egreso»          ✕  │  Modal
 │ «Total pendiente», datos         │  Sin cambios
 │ «Montos»                         │  Tabla, sin cambios
-│ «Refinanciados»                  │  Título de la lista
-│ $ 15.000,00 · 10/05/2026         │  List group
+│ «Refinanciados»                  │  Título de la sección
+│ «Refinanciado el 05/11/2026»     │  Título del grupo, el más reciente primero
+│ $ 5.000,00 · 10/12/2026          │  List group del grupo
 │ «Refinanciado el 03/11/2026»     │  Texto, no solo color
+│ $ 15.000,00 · 10/05/2026         │  Por vencimiento dentro del grupo
+│ $ 15.000,00 · 10/06/2026         │
 │ [«Editar»][«Refinanciar»][«Cerrar»]  Botones; pueden pasar de línea
 └──────────────────────────────────┘
 ```
