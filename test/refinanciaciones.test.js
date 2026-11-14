@@ -1,7 +1,8 @@
-// Spec 004, criterios 8 y 13 (ajuste #321): cada refinanciación se recuerda con su día, su moneda y sus cuotas.
+// Spec 004, criterios 8 y 13 (ajuste #321): cada refinanciación se recuerda y se resume en el detalle.
 import { assert } from './setup.js';
-import { addDeuda, deleteDeudas } from '../src/features/deudas/deudaRepository.js';
-import { listMontos } from '../src/features/montos/montoRepository.js';
+import '../src/features/deudas/components/DebtDetailModal.js';
+import { addDeuda, deleteDeudas, getDeuda } from '../src/features/deudas/deudaRepository.js';
+import { listMontos, setPagado } from '../src/features/montos/montoRepository.js';
 import { deleteAllRefinanciaciones, deleteAllRefinanciados, listRefinanciaciones, refinanciarEgreso } from '../src/features/refinanciar/refinanciarRepository.js';
 import { textoRefinanciacion } from '../src/features/refinanciar/planCuotas.js';
 
@@ -35,4 +36,20 @@ function criterio13Textos() {
     assert(r([50, 50], 'USD').includes('de US$ 50,00'), 'con la moneda del plan');
 }
 
-export const tests = [criterio8, criterio13Textos];
+async function criterio13Detalle() {
+    console.log('  Criterio 13: solo "Refinanciaciones" debajo de Montos; pagar una cuota no cambia la línea');
+    const id = await armar();
+    await plan(id, '2026-06-19', [100.12, 100.12]);
+    await plan(id, '2026-07-01', [45], 'USD');
+    const cuota = (await listMontos()).find((m) => m.deudaId === id && !m.pagado);
+    await setPagado(cuota.id, true);
+    const detalle = document.body.appendChild(document.createElement('debt-detail-modal'));
+    await detalle.openDetail(await getDeuda(id));
+    const textos = (selector) => [...detalle.ui._bodyEl.querySelectorAll(selector)].map((t) => t.textContent);
+    assert(textos('strong').join() === 'Montos,Refinanciaciones', 'debajo de Montos, sin los reemplazados');
+    const lineas = textos('ul[aria-label="Refinanciaciones"] li');
+    assert(lineas.join('|') === '01/07/2026 · 1 cuota de US$ 45,00|19/06/2026 · 2 cuotas de $ 100,12 · Total: $ 200,24', 'la más reciente primero, sin cambios');
+    detalle.remove();
+}
+
+export const tests = [criterio8, criterio13Textos, criterio13Detalle];

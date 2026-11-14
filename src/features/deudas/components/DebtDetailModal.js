@@ -5,8 +5,8 @@ import '../../../shared/components/UiModal.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
 import { abrirRefinanciar } from '../../refinanciar/components/abrirRefinanciar.js';
-import { listRefinanciados } from '../../refinanciar/refinanciarRepository.js';
-import { listaRefinanciados, seccionMontos } from './detalleMontos.js';
+import { historialRefinanciacion } from './historialRefinanciacion.js';
+import { seccionMontos } from './detalleMontos.js';
 
 export class DebtDetailModal extends HTMLElement {
     constructor() {
@@ -19,7 +19,6 @@ export class DebtDetailModal extends HTMLElement {
         this.render();
         this.ui = this.querySelector('ui-modal');
 
-        // Use larger dialog for detail view
         const dialog = this.ui && this.ui.querySelector('.modal-dialog');
         if (dialog) {
             dialog.classList.add('modal-lg', 'modal-dialog-scrollable');
@@ -36,10 +35,10 @@ export class DebtDetailModal extends HTMLElement {
 
     async _cargarRefinanciados(deuda) {
         try {
-            const refinanciados = await listRefinanciados(deuda.id);
-            if (this.deuda === deuda && refinanciados.length) this.lugarRefinanciados.replaceChildren(listaRefinanciados(refinanciados));
+            const secciones = await historialRefinanciacion(deuda.id);
+            if (this.deuda === deuda) this.lugarRefinanciados.replaceChildren(...secciones);
         } catch (err) {
-            console.error('No se pudieron leer los refinanciados', err);
+            console.error('No se pudieron leer las refinanciaciones', err);
         }
     }
 
@@ -84,7 +83,6 @@ export class DebtDetailModal extends HTMLElement {
         const totales = this._calcTotalesPendientes();
         const nextVenc = this._nextVencimiento();
 
-        // Total amount — visually prominent at top
         const totalesStr = Object.entries(totales)
             .map(([moneda, monto]) => formatMoneda(monto, moneda))
             .join(' / ') || '—';
@@ -102,7 +100,6 @@ export class DebtDetailModal extends HTMLElement {
             ]
         });
 
-        // Debt info rows
         const makeRow = (label, value) => el('div', {
             className: 'd-flex justify-content-between py-1 border-bottom',
             children: [
