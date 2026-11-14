@@ -27,6 +27,7 @@ Se eligieron cuatro que ya dicen ocuparse de este problema, cada uno desde un á
 - **Qué hace:** Gala es un asistente con IA que responde consultas por WhatsApp y en la app; ya atendió a más de 5 millones de personas. El banco busca pasar de explicar cómo hacer un trámite a hacerlo por el cliente. [iProUP](https://www.iproup.com/innovacion/57677-ia-en-banca-el-caso-galicia-y-como-mejora-experiencia-del-cliente-con-tecnologia-propia), [iProUP](https://www.iproup.com/innovacion/72029-galicia-redefine-su-atencion-con-ia-que-cambiara-en-las-sucursales.amp)
 - **Lo humano:** resuelve trámites rápido, pero no acompaña la angustia ni ayuda a priorizar. Los modelos predictivos se usan también para ofrecer crédito de forma más eficiente. [El Economista](https://eleconomista.com.ar/finanzas/la-inteligencia-artificial-revoluciona-banca-tratamiento-diferente-cada-cliente-apps-medida-n95218)
 - **Límite:** solo ve las deudas con Galicia.
+- **Testimonio (una persona, sin datos internos):** alguien que fue cliente y además trabajó en el equipo técnico de la conversación con el cliente observó lo mismo desde los dos lados: con temas de deuda, la gente intenta hablar con una persona. La burocracia del banco hace difícil concretar la ayuda. Al refinanciar, el interés mensual sigue siendo alto.
 
 ### 2. Naranja X (también de Grupo Galicia)
 - **Qué hace:** ofrece el curso gratis "Hablemos de Plata" ([Naranja X](https://www.naranjax.com/sustentabilidad/curso-de-educacion-financiera-gratis-sumate-a-la-plataforma-hablemos-de-plata)) y planes para refinanciar ([Naranja X](https://www.naranjax.com/blog/herramientas-de-naranja-x-para-refinanciar-deudas)). Además, midió el estrés financiero de sus usuarios ([Naranja X](https://www.naranjax.com/sustentabilidad/bienestar-y-finanzas-naranja-x-presenta-el-primer-estudio-que-aborda-las-causas-del-estres-financiero/)).
@@ -63,6 +64,8 @@ La Red de Desendeudamiento Comunitario (ReDes) reúne a profesionales voluntario
 
 Todos los competidores locales **educan y además prestan**. Ninguno ve el panorama completo de deudas de una persona, y ninguno la ayuda a decidir qué hacer primero cuando no alcanza. YNAB resuelve la culpa y el hábito, pero no habla nuestro idioma ni está pensado para un contexto de deuda para subsistir.
 
+La gente busca a una persona por lo que esa persona le da: que entienda su caso, que le diga cuál es el próximo paso y que no la juzgue. Nivva puede dar eso sin depender de nadie y sin trámites.
+
 **Posicionamiento posible para Nivva:** *"El lugar donde ponés todas tus deudas, sin juicio, y que está de tu lado, no del de quien te presta."*
 
 ## Propuestas para Nivva
@@ -81,7 +84,7 @@ Estas propuestas respetan las reglas de la app: no tiene servidor y no opina sob
 
 ### 3. Rehacer el plan, no fallar
 - **Problema:** pagar tarde o pagar menos hoy se ve como error, y eso empuja a abandonar.
-- **Qué cambia:** inspirado en la regla de YNAB, un pago no hecho se reprograma en un paso y se muestra con un mensaje sin juicio. Se apoya en el pago parcial y la refinanciación ya propuestos.
+- **Qué cambia:** inspirado en la regla de YNAB, un pago no hecho se reprograma en un paso y se muestra con un mensaje sin juicio. Se apoya en el pago parcial y la refinanciación ya propuestos. Al refinanciar, se muestran dos números lado a lado: lo que se debía y lo que se va a terminar pagando con el plan nuevo. Nivva no opina sobre si conviene.
 - **A quién sirve:** todas las personas. **Impacto:** alto. **Esfuerzo:** medio.
 
 ### 4. Deudas fuera del banco
@@ -107,5 +110,4 @@ Empezar por la **1** y la **4**: tienen bajo esfuerzo y atacan las barreras de e
 
 - No se probaron las apps de los competidores. El análisis se basa en notas de prensa y fuentes públicas.
 - La encuesta de Lomas de Zamora es preliminar y local (450 personas).
-- El usuario mencionó "Galiai". Las fuentes nombran "Gala" como asistente de Galicia; hay que confirmar si se trata de otra función.
 - Nuestras encuestas tienen una muestra chica (N=37 y N=15).
