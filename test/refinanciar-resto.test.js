@@ -57,12 +57,7 @@ async function criterio11() {
     assert(!(await getDeuda(id)).montos.some((m) => m.id === nuevo.id), 'se elimina');
 }
 
-async function criterio17() {
-    console.log('  Criterio 17: eliminar el egreso borra sus refinanciados y sus refinanciaciones');
-    const id = await armar();
-    await deleteDeudaWithTrackingUseCase(id);
-    assert((await listRefinanciados(id)).length === 0 && (await listRefinanciaciones(id)).length === 0, 'no quedan');
-    await armar();
+async function borrarTodo() {
     const confirmar = globalThis.confirm;
     const original = window.setTimeout;
     globalThis.confirm = () => true;
@@ -70,7 +65,20 @@ async function criterio17() {
     await deleteAllData();
     window.setTimeout = original;
     globalThis.confirm = confirmar;
+}
+
+async function criterio17() {
+    console.log('  Criterio 17: eliminar el egreso borra sus refinanciados y sus refinanciaciones');
+    const id = await armar();
+    await deleteDeudaWithTrackingUseCase(id);
+    assert((await listRefinanciados(id)).length === 0 && (await listRefinanciaciones(id)).length === 0, 'no quedan');
+    await armar();
+    await borrarTodo();
     assert((await listRefinanciados()).length + (await listRefinanciaciones()).length === 0, 'eliminar todos los datos también los borra');
+    await refinanciarEgreso({ deudaId: await armar(), moneda: 'ARS', cuotas: CUOTAS, fecha: `${MES}-04` });
+    await deleteDeudas(); // quedan huérfanos, como si hubiera fallado el segundo paso del borrado
+    await borrarTodo();
+    assert((await listRefinanciados()).length + (await listRefinanciaciones()).length === 0, 'también borra los huérfanos');
 }
 
 export const tests = [criterio14, criterio15, criterio16, criterio11, criterio17];
