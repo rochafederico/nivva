@@ -22,7 +22,8 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
 4. Rama `it/NNN-descripcion-plan` desde `origin/main`.
 5. Si la spec cambia lo que ve o hace la persona, primero completá
    `flujo.md` desde la plantilla: recorrido en Mermaid, componente de
-   Bootstrap para cada paso, wireframe a 320 px y heurísticas. El plan elige componentes a
+   Bootstrap para cada paso, wireframe a 320 px con datos reales (vacío,
+   uno, varios, el mismo día, valores distintos) y heurísticas. El plan elige componentes a
    partir de ese flujo. Si un paso pide algo que Bootstrap no hace, pará
    y preguntá si se ajusta la spec o se justifica un componente propio.
    Si el entorno tiene lienzos de diseño, armá uno con el recorrido y una
@@ -40,6 +41,8 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
    - Si la spec cambia lo que ve la persona, ordená por valor visible, no por
      capas: cada tarea deja algo que se prueba en la app, y lo dice en "Cómo se
      prueba en la app". Se admite una sola tarea base sin UI, y va primera.
+     La primera tarea visible de cada pantalla se prueba en el teléfono antes
+     de empezar la siguiente que toque esa pantalla.
    - Cada criterio de aceptación queda cubierto por al menos una tarea,
      citado con el número que tiene en la spec mergeada.
    - Para cada criterio de accesibilidad, elegí la técnica del W3C (ver
