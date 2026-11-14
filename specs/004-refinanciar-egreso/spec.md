@@ -97,12 +97,9 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
     centavos. Con una cuota, `19/06/2026 · 1 cuota de $ 600,72`. La línea muestra el
     plan como se registró: editar, pagar, eliminar o volver a refinanciar sus montos no
     la cambia. El adelanto no va en la línea: es un monto más (criterio 9). Una
-    refinanciación guardada antes de que existiera esta lista no aparece. Después
-    aparece "Refinanciados", con un grupo por día de refinanciación, el
-    más reciente primero. Cada grupo se titula `Refinanciado el 03/11/2026` y muestra
-    los montos que reemplazó con su vencimiento, del más próximo al más lejano. Dos
-    refinanciaciones del mismo día quedan en un mismo grupo. Se distingue por el
-    texto, no solo por el color.
+    refinanciación guardada antes de que existiera esta lista no aparece. Los montos
+    reemplazados no se muestran en el detalle: Nivva los guarda como historial
+    (criterios 17 y 18).
 14. **Dado** un monto refinanciado, **cuando** se revisa el resto de la app,
     **entonces** no aparece en los movimientos del mes, en "Editar egreso" ni en la
     lista de montos pendientes, y no cuenta en Egresos, Balance, Por pagar este mes,
@@ -111,9 +108,9 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
 15. **Dado** un egreso con 3 montos pagados, 2 refinanciados, un adelanto y 12 cuotas
     nuevas, **cuando** se ve en Acreedores, **entonces** el avance dice
     `4 de 16 cuotas`. Sin adelanto, dice `3 de 15 cuotas`.
-16. **Dado** un monto refinanciado, **cuando** se ve, **entonces** no se puede marcar
-    como pagado, editar, duplicar ni eliminar por separado. Al guardar cambios en
-    "Editar egreso", sigue como estaba.
+16. **Dado** un monto refinanciado, **cuando** se guardan cambios en "Editar egreso",
+    **entonces** sigue como estaba: no se puede marcar como pagado, editar, duplicar ni
+    eliminar por separado.
 17. **Dado** un egreso refinanciado, **cuando** se elimina, **entonces** también se
     borran sus montos refinanciados y sus refinanciaciones, con la misma confirmación de hoy.
 18. **Dado** una refinanciación, **cuando** se exporta una copia de seguridad y se
@@ -145,8 +142,7 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre, "Refinanciaciones" como lista y cada grupo de refinanciados como lista, con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
-| 1.4.1 Uso del color | Reconocer un monto refinanciado sin ver colores (criterio 13) | Mirar el detalle en escala de grises |
+| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y "Refinanciaciones" como lista (criterios 3 y 13) | Recorrer con lector de pantalla |
 | 1.4.3 y 1.4.11 Contraste | Leer los textos y distinguir campos, botones y foco | Revisar el contraste a mano |
 | 1.4.10 Reflow | Refinanciar a 320 px sin scroll horizontal | Achicar la ventana a 320 px |
 | 2.1.1 Teclado | Hacer todo el recorrido sin mouse (criterios 1, 7 y 19) | Refinanciar y cancelar con teclado |
@@ -172,7 +168,7 @@ Ver `docs/sdd/accesibilidad.md`.
 | Confirmación | `¿Refinanciar 3 montos de Banco Galicia por 3 cuotas, con un total de 14800,50 pesos? No se puede deshacer.` · Con adelanto: `… Adelanto: 20000 pesos. No se puede deshacer.` |
 | Mensaje al guardar | `Refinanciación guardada. 3 cuotas, la primera vence el 10 de diciembre de 2026.` · `Refinanciación guardada. Adelanto de 20000 pesos y 3 cuotas, la primera vence el 10 de diciembre de 2026.` |
 | Error al guardar | `No pudimos guardar la refinanciación. Intentá de nuevo.` |
-| Detalle | `Refinanciaciones` · `19/06/2026 · 6 cuotas de $ 100,12 · Total: $ 600,72` · `19/06/2026 · 6 cuotas, en promedio $ 100,12 · Total: $ 600,72` · `19/06/2026 · 1 cuota de $ 600,72` · `Refinanciados` · `Refinanciado el 03/11/2026` |
+| Detalle | `Refinanciaciones` · `19/06/2026 · 6 cuotas de $ 100,12 · Total: $ 600,72` · `19/06/2026 · 6 cuotas, en promedio $ 100,12 · Total: $ 600,72` · `19/06/2026 · 1 cuota de $ 600,72` |
 
 ## Preguntas abiertas
 

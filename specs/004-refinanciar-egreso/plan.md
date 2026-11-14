@@ -21,7 +21,7 @@ avisos, "Editar egreso", avance, lista del mes) deja de verlos sin tocar ese có
 | `src/features/refinanciar/components/RefinanciarForm.js`, `refinanciarErrores.js` | Nuevo (T02, T03) | Campos, total y errores | — |
 | `src/features/refinanciar/components/RefinanciarModal.js`, `abrirRefinanciar.js` | Nuevo (T02, T04) | Ventana, guardar, mensajes y foco | — |
 | `src/features/deudas/components/AcreedoresList.js` | Cambia (T02, T04), extrae `acreedorCalculos.js` | Opción del menú | 195 → <180 |
-| `src/features/deudas/components/DebtDetailModal.js` | Cambia (T05), extrae `detalleMontos.js` | Botón y lista de refinanciados | 193 → <170 |
+| `src/features/deudas/components/DebtDetailModal.js` | Cambia (T05), extrae `detalleMontos.js` | Botón `Refinanciar` | 193 → <170 |
 | `src/shared/database/schema.js`, `initDB.js`, `localStorageFallback.js` | Cambia (T05b) | Almacén `refinanciaciones`, versión 8 | 9, 68, 233 → <233 |
 | `src/features/refinanciar/refinanciarRepository.js`, `planCuotas.js` | Cambia (T05b) | Guarda la refinanciación en la misma transacción; texto de la línea | —, 55 |
 | `src/features/deudas/components/detalleMontos.js` | Cambia (T05b) | Sección "Refinanciaciones" | — |
@@ -34,6 +34,7 @@ avisos, "Editar egreso", avance, lista del mes) deja de verlos sin tocar ese có
 
 ## Datos
 
+Los montos reemplazados no se muestran (ajuste a la spec): se guardan para que no cuenten y viajan en la copia.
 Almacén `refinanciados`, `keyPath: id`, índice `by_deudaId`: `{ id, deudaId, monto, moneda, vencimiento, periodo, refinanciadoEl }`. `VERSION` pasa de 6 a 7. La subida solo agrega el almacén, sin migrar datos.
 
 Almacén `refinanciaciones` (ajuste, T05b), `keyPath: id`, índice `by_deudaId`: `{ id, deudaId, fecha, moneda, cuotas }`,
@@ -58,8 +59,7 @@ Borrado: primero el egreso y después sus refinanciados, sin tocar `deudaReposit
 
 | Criterio | Técnica | Test |
 |---|---|---|
-| 1.3.1 | [H44](https://www.w3.org/WAI/WCAG22/Techniques/html/H44) `label`; [H48](https://www.w3.org/WAI/WCAG22/Techniques/html/H48) `ul` para refinanciados | `refinanciar-form`, `refinanciar-detalle` |
-| 1.4.1 | [G14](https://www.w3.org/WAI/WCAG22/Techniques/general/G14) el texto `Refinanciado el` | `refinanciar-detalle` |
+| 1.3.1 | [H44](https://www.w3.org/WAI/WCAG22/Techniques/html/H44) `label`; [H48](https://www.w3.org/WAI/WCAG22/Techniques/html/H48) `ul` para refinanciaciones | `refinanciar-form`, `refinanciar-detalle` |
 | 1.4.3 y 1.4.11 | [G18](https://www.w3.org/WAI/WCAG22/Techniques/general/G18), [G207](https://www.w3.org/WAI/WCAG22/Techniques/general/G207) | A mano (T07) |
 | 1.4.10 | [C31](https://www.w3.org/WAI/WCAG22/Techniques/css/C31) campos apilados y list group | A mano, 320 px (T07) |
 | 2.1.1 | [H91](https://www.w3.org/WAI/WCAG22/Techniques/html/H91) controles nativos; `Escape` de Bootstrap | `refinanciar-modal` |
