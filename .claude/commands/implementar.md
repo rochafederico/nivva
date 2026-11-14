@@ -20,6 +20,9 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
    sobre un PR de ajuste a la spec sin mergear.
 3. Rama `it/NNN-descripcion` (o `it/NNN-descripcion-T0N` si apilás).
 4. Primero los tests de los criterios que cubre la tarea; después el código.
+   Para enviar un formulario con campos numéricos, el test emite `form:submit`
+   en su `app-form` con los valores: happy-dom marca `stepMismatch` y el
+   envío nativo no pasa (como `refinanciar-form` y `montos`).
 5. Si la tarea toca UI, seguí `flujo.md`: los componentes de Bootstrap
    que nombra y el recorrido. Si algo no coincide, pará y avisá.
    Si algo de la spec no cierra, pará y explicá qué falta. No lo resuelvas
