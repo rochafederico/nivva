@@ -38,10 +38,6 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   límites en #254. (001)
 - [1] `bootstrap.md` tiene que decir que `dropdown-menu-end` necesita
   `data-bs-popper` cuando no se usa el JavaScript de Bootstrap. (001)
-- [3] Los tests que cargan un campo numérico fallan en happy-dom por
-  `stepMismatch`: pasó en #268 y #277, y en la 004 el plan lo tuvo que
-  esquivar emitiendo `form:submit`. **Promover** a una regla en
-  `AGENTS.md` o a un helper de test. (002, 004)
 - [2] Defecto del flujo: una sesión sin dependencias no puede cumplir "tests
   en verde antes del PR" de `/implementar`. #268, #270, #274 y #276 a #280 se
   pushearon sin correrlos. El comando tiene que decir qué hacer. En la 003
@@ -73,3 +69,4 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
 |---|---|---|
 | Un PR apilado se mergea después de su base y de los ajustes a la spec (001, 003, 004) | `/implementar`, pasos 2 y 9 | sdd/21 |
 | Los comentarios de revisión automática se responden antes de pedir `validado` (003, 004) | `/implementar`, paso 10 | sdd/21 |
+| Tests de campos numéricos: `form:submit` en vez del envío nativo (002, 004) | `/implementar`, paso 4 | sdd/23 |
