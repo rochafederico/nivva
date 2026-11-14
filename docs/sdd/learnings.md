@@ -15,18 +15,21 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   "Cómo se cumple" en accesibilidad y nada lo prohibía. Ahora la spec es
   solo funcional y la técnica va al plan. En la retro de 001 alcanzó
   (#248 y #255 salieron sin técnica): no hace falta check. (001)
-- [3] La interacción se vio recién al usar la app en el teléfono y se
+- [4] La interacción se vio recién al usar la app en el teléfono y se
   cambió después de implementarla: #248 (interruptor y menú ⋮), #255
   (interruptor sin texto visible) y el menú desalineado en T08. Ahora el
   plan incluye `flujo.md`, pero la 001 no lo tuvo. **Promover** a un
   check: tarea de UI en `tareas.md` exige `flujo.md` con wireframe, y la
   primera tarea de UI se valida en el preview mobile antes de seguir. El
   lienzo recorrible de `/plan` adelanta la validación, pero no reemplaza
-  este check. (001, 003)
-- [2] Un PR apilado se mergea después de su base, nunca antes: T07 entró
+  este check. En la 004 el detalle cambió tres veces en la prueba de T05
+  (#320, #321, #325): el wireframe no tenía datos reales. (001, 003, 004)
+- [3] Un PR apilado se mergea después de su base, nunca antes: T07 entró
   dentro de T06 y #246 llegó a `main` con 360 líneas; #288 a #291 entraron en
-  una rama intermedia. **Promover** a `/implementar`: indicar cada base y el
-  orden de merge. (001, 003)
+  una rama intermedia; #316 entró antes del ajuste #325 que lo cambiaba, y
+  GitHub no deja cambiar la base de un PR que es parte de una pila. No se
+  apilan tareas sobre una tarea visible sin probar. **Promover** a
+  `/implementar`: indicar cada base y el orden de merge. (001, 003, 004)
 - [2] Defecto del flujo: 7 PRs de la 001 se mergearon sin `validado`, y
   #276 de la 002 con el check en rojo. **Promover:** el check tiene que ser
   obligatorio en la protección de `main`, que hoy no exige ninguno. (001, 002)
@@ -39,9 +42,10 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   límites en #254. (001)
 - [1] `bootstrap.md` tiene que decir que `dropdown-menu-end` necesita
   `data-bs-popper` cuando no se usa el JavaScript de Bootstrap. (001)
-- [2] Los tests que cargan un campo numérico fallan en happy-dom por
-  `stepMismatch`: pasó en #268 y #277. **Promover** a una regla en
-  `AGENTS.md` o a un helper de test. (002)
+- [3] Los tests que cargan un campo numérico fallan en happy-dom por
+  `stepMismatch`: pasó en #268 y #277, y en la 004 el plan lo tuvo que
+  esquivar emitiendo `form:submit`. **Promover** a una regla en
+  `AGENTS.md` o a un helper de test. (002, 004)
 - [2] Defecto del flujo: una sesión sin dependencias no puede cumplir "tests
   en verde antes del PR" de `/implementar`. #268, #270, #274 y #276 a #280 se
   pushearon sin correrlos. El comando tiene que decir qué hacer. En la 003
@@ -60,10 +64,16 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   probar nada en la app. Se corrige en `sdd/20`. (003)
 - [1] Defecto del flujo: el plan no contó `tareas.md` entre los archivos y T01
   no entraba. Se corrige en `sdd/20`. (003)
-- [1] Los comentarios de revisión automática se resuelven antes de mergear:
-  #286 y #293 dejaron dos bugs en `main`. (003)
+- [2] Los comentarios de revisión automática se resuelven antes de mergear:
+  #286 y #293 dejaron dos bugs en `main`, y #315 dejó el cierre con `Escape`
+  durante el guardado. **Promover** a `/implementar`: responder cada
+  comentario antes de pedir `validado`. (003, 004)
 - [1] Los tests en un navegador con Bootstrap simulado no reemplazan a la CI:
   no vieron dos fallas de happy-dom en T04 y T08. (003)
+- [1] `tareas.md` no se actualiza al mergear: T01 a T07 de la 004 quedaron
+  en "en PR". Candidato a un check que compare `tareas.md` con los PRs. (004)
+- [1] Un check de `pull_request_target` (`validado`) no se vuelve a correr:
+  repite el evento viejo, sin la etiqueta. Se saca y se pone la etiqueta. (004)
 
 ## Promovidos
 
