@@ -43,6 +43,7 @@ botón `+`. Desde el menú ⋮, vuelve al ⋮ de ese egreso, también después d
 | Confirmar | `confirm()` del navegador | Sí |
 | Error al guardar | [Alert](https://getbootstrap.com/docs/5.3/components/alerts/) | Sí, con `role="alert"` |
 | Mensaje al guardar | [Toast](https://getbootstrap.com/docs/5.3/components/toasts/) y su región de anuncios, ya en uso | Sí |
+| Grupos de "Montos" | Tabla de hoy | Sí. El título del grupo es una fila de encabezado que se lee con cada monto |
 | Refinanciados | [List group](https://getbootstrap.com/docs/5.3/components/list-group/) | Sí. Cada fila se entiende sola, sin scroll horizontal |
 
 ## Wireframe
@@ -74,7 +75,11 @@ Notación: [Botón]  [__] campo  [▾] desplegable  ⋮ menú  «texto» de la s
 ├──────────────────────────────────┤
 │ «Detalle del egreso»          ✕  │  Modal
 │ «Total pendiente», datos         │  Sin cambios
-│ «Montos»                         │  Tabla, sin cambios
+│ «Montos»                         │  Tabla
+│ $ 15.000,00 · 10/02/2026 · pagado│  Montos sin refinanciación primero
+│ «Refinanciación del 03/11/2026»  │  Título del grupo, el más reciente primero
+│ $ 20.000,00 · 03/11/2026 · pagado│  Adelanto, por vencimiento con las cuotas
+│ $ 5.000,00 · 10/12/2026          │  Cuotas del plan
 │ «Refinanciados»                  │  Título de la sección
 │ «Refinanciado el 05/11/2026»     │  Título del grupo, el más reciente primero
 │ $ 5.000,00 · 10/12/2026          │  List group del grupo

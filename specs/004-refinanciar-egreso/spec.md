@@ -82,18 +82,23 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
     `Refinanciación guardada. Adelanto de 20000 pesos y 3 cuotas, la primera vence el
     10 de diciembre de 2026.`
 11. **Dado** un plan nuevo, **cuando** se usan sus montos, **entonces** se editan, se
-    marcan como pagados y se eliminan como cualquier otro monto.
+    marcan como pagados y se eliminan como cualquier otro monto, y siguen en el grupo
+    de su refinanciación (criterio 13) aunque cambie su vencimiento.
 12. **Dado** un plan refinanciado, **cuando** se refinancia otra vez, **entonces**
     solo se reemplazan sus montos sin pagar. Los anteriores no cambian.
 
 ### Lo refinanciado
 
-13. **Dado** un egreso refinanciado, **cuando** se ve su detalle, **entonces** debajo
-    de "Montos" aparece "Refinanciados", con un grupo por día de refinanciación, el
+13. **Dado** un egreso refinanciado, **cuando** se ve su detalle, **entonces** "Montos"
+    muestra primero los montos que no vienen de una refinanciación y después un grupo
+    por día de refinanciación, el más reciente primero, titulado
+    `Refinanciación del 03/11/2026`, con sus cuotas y su adelanto del vencimiento más
+    próximo al más lejano. Las cuotas guardadas antes de que existieran estos grupos
+    quedan entre los montos sin grupo. Debajo de "Montos" aparece "Refinanciados", con un grupo por día de refinanciación, el
     más reciente primero. Cada grupo se titula `Refinanciado el 03/11/2026` y muestra
-    los montos que reemplazó con su vencimiento, del más próximo al más lejano. Dos
-    refinanciaciones del mismo día quedan en un mismo grupo. Se distingue por el
-    texto, no solo por el color.
+    los montos que reemplazó con su vencimiento, del más próximo al más lejano. En las
+    dos listas, dos refinanciaciones del mismo día quedan en un mismo grupo y se
+    distinguen por el texto, no solo por el color.
 14. **Dado** un monto refinanciado, **cuando** se revisa el resto de la app,
     **entonces** no aparece en los movimientos del mes, en "Editar egreso" ni en la
     lista de montos pendientes, y no cuenta en Egresos, Balance, Por pagar este mes,
@@ -108,7 +113,7 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
 17. **Dado** un egreso refinanciado, **cuando** se elimina, **entonces** también se
     borran sus montos refinanciados, con la misma confirmación de hoy.
 18. **Dado** una refinanciación, **cuando** se exporta una copia de seguridad y se
-    importa, **entonces** vuelve con los montos refinanciados, sus fechas y el plan.
+    importa, **entonces** vuelve con los montos refinanciados, sus fechas y el plan en su grupo.
     Una copia anterior a esta iteración se importa sin error y sin refinanciados.
 
 ### Cancelar y errores
@@ -135,7 +140,7 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y cada grupo de refinanciados como lista, con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
+| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y cada grupo de "Montos" y de "Refinanciados" con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
 | 1.4.1 Uso del color | Reconocer un monto refinanciado sin ver colores (criterio 13) | Mirar el detalle en escala de grises |
 | 1.4.3 y 1.4.11 Contraste | Leer los textos y distinguir campos, botones y foco | Revisar el contraste a mano |
 | 1.4.10 Reflow | Refinanciar a 320 px sin scroll horizontal | Achicar la ventana a 320 px |
@@ -162,7 +167,7 @@ Ver `docs/sdd/accesibilidad.md`.
 | Confirmación | `¿Refinanciar 3 montos de Banco Galicia por 3 cuotas, con un total de 14800,50 pesos? No se puede deshacer.` · Con adelanto: `… Adelanto: 20000 pesos. No se puede deshacer.` |
 | Mensaje al guardar | `Refinanciación guardada. 3 cuotas, la primera vence el 10 de diciembre de 2026.` · `Refinanciación guardada. Adelanto de 20000 pesos y 3 cuotas, la primera vence el 10 de diciembre de 2026.` |
 | Error al guardar | `No pudimos guardar la refinanciación. Intentá de nuevo.` |
-| Detalle | `Refinanciados` · `Refinanciado el 03/11/2026` |
+| Detalle | `Refinanciación del 03/11/2026` · `Refinanciados` · `Refinanciado el 03/11/2026` |
 
 ## Preguntas abiertas
 
