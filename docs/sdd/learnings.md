@@ -24,12 +24,6 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   lienzo recorrible de `/plan` adelanta la validación, pero no reemplaza
   este check. En la 004 el detalle cambió tres veces en la prueba de T05
   (#320, #321, #325): el wireframe no tenía datos reales. (001, 003, 004)
-- [3] Un PR apilado se mergea después de su base, nunca antes: T07 entró
-  dentro de T06 y #246 llegó a `main` con 360 líneas; #288 a #291 entraron en
-  una rama intermedia; #316 entró antes del ajuste #325 que lo cambiaba, y
-  GitHub no deja cambiar la base de un PR que es parte de una pila. No se
-  apilan tareas sobre una tarea visible sin probar. **Promover** a
-  `/implementar`: indicar cada base y el orden de merge. (001, 003, 004)
 - [2] Defecto del flujo: 7 PRs de la 001 se mergearon sin `validado`, y
   #276 de la 002 con el check en rojo. **Promover:** el check tiene que ser
   obligatorio en la protección de `main`, que hoy no exige ninguno. (001, 002)
@@ -64,10 +58,6 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   probar nada en la app. Se corrige en `sdd/20`. (003)
 - [1] Defecto del flujo: el plan no contó `tareas.md` entre los archivos y T01
   no entraba. Se corrige en `sdd/20`. (003)
-- [2] Los comentarios de revisión automática se resuelven antes de mergear:
-  #286 y #293 dejaron dos bugs en `main`, y #315 dejó el cierre con `Escape`
-  durante el guardado. **Promover** a `/implementar`: responder cada
-  comentario antes de pedir `validado`. (003, 004)
 - [1] Los tests en un navegador con Bootstrap simulado no reemplazan a la CI:
   no vieron dos fallas de happy-dom en T04 y T08. (003)
 - [1] `tareas.md` no se actualiza al mergear: T01 a T07 de la 004 quedaron
@@ -79,3 +69,5 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
 
 | Aprendizaje | Promovido a | PR |
 |---|---|---|
+| Un PR apilado se mergea después de su base y de los ajustes a la spec (001, 003, 004) | `/implementar`, pasos 2 y 9 | sdd/21 |
+| Los comentarios de revisión automática se responden antes de pedir `validado` (003, 004) | `/implementar`, paso 10 | sdd/21 |

@@ -14,7 +14,10 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
 2. Tomá la tarea indicada o la primera `pendiente` cuyas dependencias estén
    `mergeada`. Si la anterior está `en PR` sin mergear, apilá la rama
    encima y guardá la base con
-   `git config branch.<rama>.sddBase <rama-anterior>`.
+   `git config branch.<rama>.sddBase <rama-anterior>`. No apiles sobre una
+   tarea que cambia lo que ve la persona hasta que el humano la pruebe: un
+   ajuste a la spec obliga a rehacer todas las de arriba. Tampoco apiles
+   sobre un PR de ajuste a la spec sin mergear.
 3. Rama `it/NNN-descripcion` (o `it/NNN-descripcion-T0N` si apilás).
 4. Primero los tests de los criterios que cubre la tarea; después el código.
 5. Si la tarea toca UI, seguí `flujo.md`: los componentes de Bootstrap
@@ -27,3 +30,9 @@ abrir el PR o crear issues o comentarios, mostrá el resumen y esperá el OK.
 7. Marcá la tarea `en PR` en `tareas.md`.
 8. `npm run lint`, `npm test` y `node scripts/check-pr-size.mjs` en verde.
 9. Abrí el PR con la plantilla, con pasos concretos para validar. No mergees.
+   Si está apilado, la descripción dice su base y el orden de merge: primero
+   la base, después este. Al mergear la base se borra su rama, para que este
+   PR pase a apuntar a `main` antes de mergearlo.
+10. Antes de pedir `validado`, respondé cada comentario de la revisión
+    automática: corregido (con el commit) o por qué no aplica. Lo que no se
+    corrige en la tarea va a un issue.
