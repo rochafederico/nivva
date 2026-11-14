@@ -73,7 +73,7 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 ### Monto vs. Cuota
 - **"Monto"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
 - **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de monto en todos los contextos.
-- En una refinanciación se dice **"cuotas"** al escribir el plan; cada una queda guardada como un monto.
+- En una refinanciación se dice **"cuotas"** al escribir el plan y al resumirlo en "Refinanciaciones"; cada una queda guardada como un monto.
 
 ### Plata / Dinero
 
