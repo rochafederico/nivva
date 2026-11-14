@@ -82,7 +82,7 @@ async function versionConservaLoCargado() {
     await espera(vieja.transaction(MONTOS_STORE, 'readwrite').objectStore(MONTOS_STORE).add({ deudaId: 1, monto: 10, periodo: '2026-11' }));
     vieja.close();
     await initDB();
-    assert(getDB().version === VERSION && VERSION === 7, 'la base queda en la versión 7');
+    assert(getDB().version === VERSION && VERSION === 8, 'la base queda en la versión 8');
     assert((await espera(getDB().transaction(MONTOS_STORE).objectStore(MONTOS_STORE).getAll())).length === 1, 'los montos siguen');
     assert((await listRefinanciados()).length === 0, 'el almacén arranca vacío');
     await espera(getDB().transaction(MONTOS_STORE, 'readwrite').objectStore(MONTOS_STORE).clear());

@@ -6,4 +6,5 @@ export const MONTOS_STORE = 'montos';
 export const INGRESOS_STORE = 'ingresos';
 export const GASTOS_STORE = 'gastos';
 export const REFINANCIADOS_STORE = 'refinanciados';
-export const VERSION = 7;
+export const REFINANCIACIONES_STORE = 'refinanciaciones';
+export const VERSION = 8;

@@ -1,4 +1,3 @@
-// src/shared/database/localStorageFallback.js
 // Fallback de persistencia sin IndexedDB. Jerarquía: localStorage → memoria de sesión (si LS también falla, ej. Safari privado).
 
 import { localStorageDisponible } from './localStorageDisponible.js';
@@ -218,7 +217,7 @@ class FakeTransaction {
 export class FakeIDB {
     constructor() {
         this._stores = {};
-        ['deudas', 'montos', 'ingresos', 'gastos', 'refinanciados'].forEach(n => {
+        ['deudas', 'montos', 'ingresos', 'gastos', 'refinanciados', 'refinanciaciones'].forEach(n => {
             this._stores[n] = new FakeObjectStore(n);
         });
     }
