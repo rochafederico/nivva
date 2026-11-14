@@ -4,6 +4,9 @@
 import '../../../shared/components/UiModal.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
+import { abrirRefinanciar } from '../../refinanciar/components/abrirRefinanciar.js';
+import { listRefinanciados } from '../../refinanciar/refinanciarRepository.js';
+import { listaRefinanciados, seccionMontos } from './detalleMontos.js';
 
 export class DebtDetailModal extends HTMLElement {
     constructor() {
@@ -28,6 +31,23 @@ export class DebtDetailModal extends HTMLElement {
         this.ui.setTitle('Detalle del egreso');
         this._renderContent();
         this.ui.open();
+        await this._cargarRefinanciados(deuda);
+    }
+
+    async _cargarRefinanciados(deuda) {
+        try {
+            const refinanciados = await listRefinanciados(deuda.id);
+            if (this.deuda === deuda && refinanciados.length) this.lugarRefinanciados.replaceChildren(listaRefinanciados(refinanciados));
+        } catch (err) {
+            console.error('No se pudieron leer los refinanciados', err);
+        }
+    }
+
+    _refinanciar() {
+        const { opener } = this.ui;
+        this.ui.returnFocusTo(null);
+        this.ui.addEventListener('ui-modal:cerrado', () => abrirRefinanciar(this.deuda, opener), { once: true });
+        this.close();
     }
 
     close() {
@@ -105,7 +125,8 @@ export class DebtDetailModal extends HTMLElement {
         });
 
         // Montos section — priority visual section
-        const montosSection = this._renderMontosSection(montos);
+        const montosSection = seccionMontos(montos);
+        this.lugarRefinanciados = el('div');
 
         const closeButton = el('button', {
             className: 'btn btn-secondary',
@@ -124,6 +145,15 @@ export class DebtDetailModal extends HTMLElement {
             this.close();
             window.dispatchEvent(new CustomEvent('deuda:edit', { detail: this.deuda }));
         });
+        if (montos.some(m => !m.pagado)) {
+            const refinanciar = el('button', {
+                className: 'btn btn-primary',
+                text: 'Refinanciar',
+                attrs: { type: 'button', 'aria-label': `Refinanciar ${this.deuda.acreedor}` }
+            });
+            refinanciar.addEventListener('click', () => this._refinanciar());
+            actions.unshift(refinanciar);
+        }
         actions.unshift(editButton);
 
         const content = el('div', {
@@ -131,6 +161,7 @@ export class DebtDetailModal extends HTMLElement {
                 headerSection,
                 infoSection,
                 montosSection,
+                this.lugarRefinanciados,
                 el('div', {
                     className: 'd-flex justify-content-end gap-2 mt-3',
                     children: actions
@@ -138,50 +169,6 @@ export class DebtDetailModal extends HTMLElement {
             ]
         });
         this.ui.appendChild(content);
-    }
-
-    _renderMontosSection(montos) {
-        const thead = el('thead', {
-            children: [el('tr', {
-                children: [
-                    el('th', { text: 'Monto' }),
-                    el('th', { text: 'Moneda' }),
-                    el('th', { text: 'Vencimiento' })
-                ]
-            })]
-        });
-
-        const tbody = el('tbody', { attrs: { id: 'detail-montos-tbody' } });
-        montos
-            .slice()
-            .sort((a, b) => (a.vencimiento || '').localeCompare(b.vencimiento || ''))
-            .forEach(monto => tbody.appendChild(this._renderMontoRow(monto)));
-
-        const table = el('table', {
-            className: 'table table-sm w-100',
-            children: [thead, tbody]
-        });
-
-        return el('div', {
-            children: [
-                el('strong', { className: 'mb-2 d-block', text: 'Montos' }),
-                el('div', {
-                    className: 'overflow-auto',
-                    style: 'max-height: 260px;',
-                    children: [table]
-                })
-            ]
-        });
-    }
-
-    _renderMontoRow(monto) {
-        return el('tr', {
-            children: [
-                el('td', { text: formatMoneda(monto.monto, monto.moneda) }),
-                el('td', { text: monto.moneda }),
-                el('td', { text: monto.vencimiento || '—' })
-            ]
-        });
     }
 
     render() {

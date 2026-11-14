@@ -5,5 +5,6 @@ import { tests as refinanciarCampos } from './refinanciar-campos.test.js';
 import { tests as planCuotas } from './plan-cuotas.test.js';
 import { tests as refinanciarForm } from './refinanciar-form.test.js';
 import { tests as refinanciarModal } from './refinanciar-modal.test.js';
+import { tests as refinanciarDetalle } from './refinanciar-detalle.test.js';
 
-export const tests = [...gastos, ...refinanciarRepositorio, ...refinanciarMenu, ...refinanciarCampos, ...planCuotas, ...refinanciarForm, ...refinanciarModal];
+export const tests = [...gastos, ...refinanciarRepositorio, ...refinanciarMenu, ...refinanciarCampos, ...planCuotas, ...refinanciarForm, ...refinanciarModal, ...refinanciarDetalle];
