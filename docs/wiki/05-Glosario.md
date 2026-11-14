@@ -24,7 +24,7 @@
 | **Balance** | Saldo, diferencia, resultado | Diferencia entre ingresos y egresos del mes | "Balance: +$5.000 ARS" |
 | **Pendientes** | Por pagar, a cobrar, impagos | Montos no marcados como pagados en el período | "Pendientes: $30.000 ARS" |
 | **Refinanciación** | Renegociación, reestructuración, plan de pagos | Plan nuevo que registra la persona y reemplaza los montos sin pagar de un egreso en una moneda | "Refinanciación guardada." |
-| **Refinanciado** | Reemplazado, anulado, cancelado | Monto sin pagar que una refinanciación reemplazó; queda como historial y no cuenta en los totales | "Refinanciado el 03/11/2026" |
+| **Refinanciado** | Reemplazado, anulado, cancelado | Monto sin pagar que una refinanciación reemplazó; queda como historial y no cuenta en los totales | — (no se muestra) |
 | **Adelanto** | Anticipo, pago a cuenta, amortización | Monto ya pagado que se registra junto con una refinanciación | "Adelanto: $ 20.000,00." |
 
 ---

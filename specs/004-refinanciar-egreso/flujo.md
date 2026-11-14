@@ -23,7 +23,7 @@ flowchart TD
   C -->|cancela · 7| V
   C -->|acepta · 8, 9, 10| O2[Vuelve a la pantalla anterior, con mensaje y totales nuevos]
   C -->|no se pudo guardar| ES[Ventana abierta con error]
-  O2 -->|abre el detalle · 13| R[Montos y Refinanciados]
+  O2 -->|abre el detalle · 13| R[Montos y Refinanciaciones]
 ```
 
 Decisión de foco (criterios 10 y 19): el detalle se cierra al abrir la ventana, igual que con `Editar`. Si se abrió
@@ -44,7 +44,6 @@ botón `+`. Desde el menú ⋮, vuelve al ⋮ de ese egreso, también después d
 | Error al guardar | [Alert](https://getbootstrap.com/docs/5.3/components/alerts/) | Sí, con `role="alert"` |
 | Mensaje al guardar | [Toast](https://getbootstrap.com/docs/5.3/components/toasts/) y su región de anuncios, ya en uso | Sí |
 | Refinanciaciones | [List group](https://getbootstrap.com/docs/5.3/components/list-group/) | Sí. Cada línea se entiende sola |
-| Refinanciados | [List group](https://getbootstrap.com/docs/5.3/components/list-group/) | Sí. Cada fila se entiende sola, sin scroll horizontal |
 
 ## Wireframe
 
@@ -82,12 +81,6 @@ Notación: [Botón]  [__] campo  [▾] desplegable  ⋮ menú  «texto» de la s
 │ «03/11/2026 · 3 cuotas, en       │  Cuotas distintas: promedio
 │   promedio $ 4.933,50 · Total:   │
 │   $ 14.800,50»                   │
-│ «Refinanciados»                  │  Título de la sección
-│ «Refinanciado el 05/11/2026»     │  Título del grupo, el más reciente primero
-│ $ 5.000,00 · 10/12/2026          │  List group del grupo
-│ «Refinanciado el 03/11/2026»     │  Texto, no solo color
-│ $ 15.000,00 · 10/05/2026         │  Por vencimiento dentro del grupo
-│ $ 15.000,00 · 10/06/2026         │
 │ [«Editar»][«Refinanciar»][«Cerrar»]  Botones; pueden pasar de línea
 └──────────────────────────────────┘
 ```
