@@ -1,5 +1,6 @@
 // El plan que escribe la persona: cuotas, fechas y textos. Nivva no calcula cuotas ni intereses.
 import { formatMoneda } from '../../shared/config/monedas.js';
+import { formatFecha } from '../../shared/utils/fechas.js';
 import { fechaHablada, montoHablado } from '../montos/utils/montoHablado.js';
 
 const CUOTA = /^\d+(\.\d{1,2})?$/;
@@ -52,4 +53,14 @@ export function textoGuardado({ moneda, cuotas, adelanto }) {
     return adelanto
         ? `Refinanciación guardada. Adelanto de ${montoHablado(adelanto.monto, moneda)} y ${plan}`
         : `Refinanciación guardada. ${plan}`;
+}
+
+/** Línea de "Refinanciaciones" (criterio 13): "de" solo si todas las cuotas son iguales; si no, el promedio. */
+export function textoRefinanciacion({ fecha, moneda, cuotas }) {
+    const total = sumar(cuotas);
+    const inicio = `${formatFecha(fecha)} · ${textoCantidad(cuotas.length, 'cuota', 'cuotas')}`;
+    if (cuotas.length === 1) return `${inicio} de ${formatMoneda(total, moneda)}`;
+    const iguales = cuotas.every((c) => c === cuotas[0]);
+    const cuota = formatMoneda(iguales ? cuotas[0] : Math.round((total * 100) / cuotas.length) / 100, moneda);
+    return `${inicio}${iguales ? ' de' : ', en promedio'} ${cuota} · Total: ${formatMoneda(total, moneda)}`;
 }
