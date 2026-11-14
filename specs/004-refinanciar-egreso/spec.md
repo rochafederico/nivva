@@ -73,6 +73,8 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
 8. **Dado** que se aceptó, **cuando** se guarda, **entonces** el egreso suma un monto
    sin pagar por cuota, uno por mes y el mismo día del primer vencimiento. Si ese
    mes no tiene ese día, vence el último día del mes. Se acepta una fecha pasada.
+   Además, Nivva recuerda la refinanciación: el día en que se guardó, su moneda y el
+   valor de cada cuota, en orden (criterio 13).
 9. **Dado** un adelanto, **cuando** se guarda, **entonces** es un monto más del
    egreso, ya pagado y con la fecha del adelanto como vencimiento: cuenta en Egresos
    y Balance del mes de esa fecha, y se edita y elimina como cualquier otro monto.
@@ -88,8 +90,15 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
 
 ### Lo refinanciado
 
-13. **Dado** un egreso refinanciado, **cuando** se ve su detalle, **entonces** debajo
-    de "Montos" aparece "Refinanciados", con un grupo por día de refinanciación, el
+13. **Dado** un egreso refinanciado, **cuando** se ve su detalle, **entonces** "Montos"
+    no cambia y debajo aparece "Refinanciaciones", una línea por refinanciación, la más
+    reciente primero: `19/06/2026 · 6 cuotas de $ 100,12 · Total: $ 600,72`. Si las
+    cuotas no son todas iguales, dice `6 cuotas, en promedio $ 100,12`, redondeado a
+    centavos. Con una cuota, `19/06/2026 · 1 cuota de $ 600,72`. La línea muestra el
+    plan como se registró: editar, pagar, eliminar o volver a refinanciar sus montos no
+    la cambia. El adelanto no va en la línea: es un monto más (criterio 9). Una
+    refinanciación guardada antes de que existiera esta lista no aparece. Después
+    aparece "Refinanciados", con un grupo por día de refinanciación, el
     más reciente primero. Cada grupo se titula `Refinanciado el 03/11/2026` y muestra
     los montos que reemplazó con su vencimiento, del más próximo al más lejano. Dos
     refinanciaciones del mismo día quedan en un mismo grupo. Se distingue por el
@@ -106,9 +115,10 @@ no, que no estaban refinanciados. Monto y fecha hablados son como en la spec 001
     como pagado, editar, duplicar ni eliminar por separado. Al guardar cambios en
     "Editar egreso", sigue como estaba.
 17. **Dado** un egreso refinanciado, **cuando** se elimina, **entonces** también se
-    borran sus montos refinanciados, con la misma confirmación de hoy.
+    borran sus montos refinanciados y sus refinanciaciones, con la misma confirmación de hoy.
 18. **Dado** una refinanciación, **cuando** se exporta una copia de seguridad y se
-    importa, **entonces** vuelve con los montos refinanciados, sus fechas y el plan.
+    importa, **entonces** vuelve con los montos refinanciados, sus fechas, el plan y cada
+    refinanciación de "Refinanciaciones", sin duplicarla si ya estaba.
     Una copia anterior a esta iteración se importa sin error y sin refinanciados.
 
 ### Cancelar y errores
@@ -135,7 +145,7 @@ Ver `docs/sdd/accesibilidad.md`.
 
 | Criterio | Qué tiene que poder hacer la persona | Cómo se comprueba usando la app |
 |---|---|---|
-| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre y cada grupo de refinanciados como lista, con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
+| 1.3.1 Info y relaciones | Escuchar cada campo con su nombre, "Refinanciaciones" como lista y cada grupo de refinanciados como lista, con su fecha como título (criterios 3 y 13) | Recorrer con lector de pantalla |
 | 1.4.1 Uso del color | Reconocer un monto refinanciado sin ver colores (criterio 13) | Mirar el detalle en escala de grises |
 | 1.4.3 y 1.4.11 Contraste | Leer los textos y distinguir campos, botones y foco | Revisar el contraste a mano |
 | 1.4.10 Reflow | Refinanciar a 320 px sin scroll horizontal | Achicar la ventana a 320 px |
@@ -162,7 +172,7 @@ Ver `docs/sdd/accesibilidad.md`.
 | Confirmación | `¿Refinanciar 3 montos de Banco Galicia por 3 cuotas, con un total de 14800,50 pesos? No se puede deshacer.` · Con adelanto: `… Adelanto: 20000 pesos. No se puede deshacer.` |
 | Mensaje al guardar | `Refinanciación guardada. 3 cuotas, la primera vence el 10 de diciembre de 2026.` · `Refinanciación guardada. Adelanto de 20000 pesos y 3 cuotas, la primera vence el 10 de diciembre de 2026.` |
 | Error al guardar | `No pudimos guardar la refinanciación. Intentá de nuevo.` |
-| Detalle | `Refinanciados` · `Refinanciado el 03/11/2026` |
+| Detalle | `Refinanciaciones` · `19/06/2026 · 6 cuotas de $ 100,12 · Total: $ 600,72` · `19/06/2026 · 6 cuotas, en promedio $ 100,12 · Total: $ 600,72` · `19/06/2026 · 1 cuota de $ 600,72` · `Refinanciados` · `Refinanciado el 03/11/2026` |
 
 ## Preguntas abiertas
 

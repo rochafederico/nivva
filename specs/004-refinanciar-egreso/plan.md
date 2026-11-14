@@ -22,6 +22,9 @@ avisos, "Editar egreso", avance, lista del mes) deja de verlos sin tocar ese có
 | `src/features/refinanciar/components/RefinanciarModal.js`, `abrirRefinanciar.js` | Nuevo (T02, T04) | Ventana, guardar, mensajes y foco | — |
 | `src/features/deudas/components/AcreedoresList.js` | Cambia (T02, T04), extrae `acreedorCalculos.js` | Opción del menú | 195 → <180 |
 | `src/features/deudas/components/DebtDetailModal.js` | Cambia (T05), extrae `detalleMontos.js` | Botón y lista de refinanciados | 193 → <170 |
+| `src/shared/database/schema.js`, `initDB.js`, `localStorageFallback.js` | Cambia (T05b) | Almacén `refinanciaciones`, versión 8 | 9, 68, 233 → <233 |
+| `src/features/refinanciar/refinanciarRepository.js`, `planCuotas.js` | Cambia (T05b) | Guarda la refinanciación en la misma transacción; texto de la línea | —, 55 |
+| `src/features/deudas/components/detalleMontos.js` | Cambia (T05b) | Sección "Refinanciaciones" | — |
 | `src/features/deudas/use-cases/deleteDeudaWithTrackingUseCase.js` | Cambia (T07) | Borra los refinanciados del egreso | 12 |
 | `src/layout/dataActions.js` | Cambia (T07) | Borra todo, con los refinanciados | 98 → 99 |
 | `src/features/import-export/components/exportarDeudas.js` | Cambia (T06) | Exporta refinanciados | 15 |
@@ -32,6 +35,13 @@ avisos, "Editar egreso", avance, lista del mes) deja de verlos sin tocar ese có
 ## Datos
 
 Almacén `refinanciados`, `keyPath: id`, índice `by_deudaId`: `{ id, deudaId, monto, moneda, vencimiento, periodo, refinanciadoEl }`. `VERSION` pasa de 6 a 7. La subida solo agrega el almacén, sin migrar datos.
+
+Almacén `refinanciaciones` (ajuste, T05b), `keyPath: id`, índice `by_deudaId`: `{ id, deudaId, fecha, moneda, cuotas }`,
+con `cuotas` como lista de números en el orden escrito. `fecha` es el día en que se guardó, igual a `refinanciadoEl`.
+La moneda hace falta para mostrar `$` o `US$`. `VERSION` pasa de 7 a 8 y solo agrega el almacén. Las cuotas y el
+adelanto se siguen guardando como montos (criterios 8 y 9); el registro no se toca después, por eso la línea no cambia
+al editar o pagar. Total y promedio en centavos enteros, como `planCuotas`; el promedio se redondea a centavos y la
+línea dice "de" solo si todas las cuotas son iguales.
 
 Copia de seguridad: cada egreso suma `refinanciados`, opcional al importar (criterio 18). Al importar sobre un egreso que ya existe, un refinanciado igual en monto, moneda, vencimiento y fecha no se duplica.
 
@@ -66,6 +76,8 @@ Borrado: primero el egreso y después sus refinanciados, sin tocar `deudaReposit
 - Importar una copia anterior a la refinanciación sobre el mismo egreso trae de vuelta los montos reemplazados y el total cuenta doble. La spec no lo cubre: queda en un issue aparte.
 - La lista se dibuja de nuevo al guardar y el botón que abrió la ventana desaparece: `abrirRefinanciar` busca
   un control con el mismo nombre accesible después de dibujar y, si no está, va a `add-fab`. Lo cubre `refinanciar-modal`.
+- La versión 8 vuelve a cerrar la base en otras pestañas abiertas (#306), como la 7.
+- La copia (T06) y el borrado (T07) suman el almacén nuevo; una copia sin `refinanciaciones` se importa igual.
 - Las cuotas se suman en centavos enteros, para que el total no muestre errores de redondeo: lo cubre `plan-cuotas`.
 - `stepMismatch` de happy-dom en el campo de adelanto: los tests emiten `form:submit`, como `gasto-form`.
 - Los dos pasos de `Enter` pueden guardar dos veces: el guardado queda bloqueado hasta cerrar, como en #305.
