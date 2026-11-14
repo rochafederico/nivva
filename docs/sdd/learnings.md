@@ -23,7 +23,9 @@ Este archivo se mantiene corto: si pasa de 30 entradas, toca limpieza.
   primera tarea de UI se valida en el preview mobile antes de seguir. El
   lienzo recorrible de `/plan` adelanta la validación, pero no reemplaza
   este check. En la 004 el detalle cambió tres veces en la prueba de T05
-  (#320, #321, #325): el wireframe no tenía datos reales. (001, 003, 004)
+  (#320, #321, #325): el wireframe no tenía datos reales. Promovido en
+  parte en sdd/22 (wireframe con datos reales y primera tarea visible
+  probada antes de seguir); falta el check automático. (001, 003, 004)
 - [2] Defecto del flujo: 7 PRs de la 001 se mergearon sin `validado`, y
   #276 de la 002 con el check en rojo. **Promover:** el check tiene que ser
   obligatorio en la protección de `main`, que hoy no exige ninguno. (001, 002)

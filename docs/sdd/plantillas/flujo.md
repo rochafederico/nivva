@@ -38,6 +38,10 @@ Cada pantalla o estado que cambia, en texto a 320 px de ancho. Solo
 elementos, orden y textos de la spec, con el componente de Bootstrap a la
 derecha. Sin colores ni medidas: alcanza con ver qué entra y qué se ve.
 
+Con datos reales, no con un solo ejemplo: vacío, uno, varios, dos del mismo
+día, valores distintos y textos largos. Cada pantalla que muestra lo que se
+guardó se dibuja después de guardar dos veces.
+
 ```
 Notación: [Botón]  (◯─) interruptor  [__] campo  [▾] desplegable
           ⋮ menú  ── separador  «texto» texto exacto de la spec
