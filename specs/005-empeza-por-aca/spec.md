@@ -1,6 +1,6 @@
 ---
 id: 005-empeza-por-aca
-estado: borrador   # borrador | aprobada | implementada | baseline
+estado: aprobada   # borrador | aprobada | implementada | baseline
 issue: "#326"
 ---
 
